@@ -1,3 +1,4 @@
+using LimousineBooking.Application.Availability;
 using LimousineBooking.Application.Common;
 using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
@@ -19,10 +20,12 @@ namespace LimousineBooking.Api.Controllers.Admin;
 public class DriversController : ControllerBase
 {
     private readonly IDriverService _driverService;
+    private readonly IDriverAvailabilityService _availabilityService;
 
-    public DriversController(IDriverService driverService)
+    public DriversController(IDriverService driverService, IDriverAvailabilityService availabilityService)
     {
         _driverService = driverService;
+        _availabilityService = availabilityService;
     }
 
     /// <summary>List/search drivers with optional filtering, sorting, and pagination.</summary>
@@ -87,6 +90,20 @@ public class DriversController : ControllerBase
     {
         var result = await _driverService.ResetPasswordAsync(id, request, cancellationToken);
         return result.Succeeded ? Ok(result.Driver) : MapError(result);
+    }
+
+    /// <summary>
+    /// Read-only view of a driver's availability schedule (current status +
+    /// scheduled periods). Administrators cannot modify the schedule in this
+    /// step — only the driver can, via /api/driver/availability.
+    /// </summary>
+    /// <response code="404">No driver exists with the given id.</response>
+    [HttpGet("{driverId:guid}/availability")]
+    public async Task<ActionResult<DriverScheduleResponse>> GetAvailability(
+        Guid driverId, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken cancellationToken)
+    {
+        var schedule = await _availabilityService.GetScheduleAsync(driverId, from, to, cancellationToken);
+        return schedule is null ? NotFound(new { message = "Driver not found." }) : Ok(schedule);
     }
 
     private ActionResult MapError(DriverOperationResult result) => result.Error switch

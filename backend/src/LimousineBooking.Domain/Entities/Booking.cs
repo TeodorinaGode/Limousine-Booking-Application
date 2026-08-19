@@ -1,5 +1,6 @@
 using LimousineBooking.Domain.Common;
 using LimousineBooking.Domain.Enums;
+using BookingAssignmentType = LimousineBooking.Domain.Enums.AssignmentType;
 
 namespace LimousineBooking.Domain.Entities;
 
@@ -26,6 +27,21 @@ public class Booking : AuditableEntity
     public string Currency { get; private set; } = string.Empty;
 
     public BookingStatus Status { get; private set; } = BookingStatus.Pending;
+
+    /// <summary>
+    /// True when automatic assignment could not find an eligible driver+vehicle and
+    /// an administrator must assign one manually. Deliberately separate from
+    /// <see cref="Status"/> — a booking can be Pending with this false (brand new,
+    /// assignment not attempted/finished yet) or Pending with this true (assignment
+    /// was attempted and failed).
+    /// </summary>
+    public bool RequiresManualAssignment { get; private set; }
+
+    /// <summary>Internal, admin-facing explanation of why automatic assignment failed. Never shown to the customer.</summary>
+    public string? ManualAssignmentReason { get; private set; }
+
+    /// <summary>Null until a driver/vehicle is assigned; then records whether it happened automatically or via admin action.</summary>
+    public AssignmentType? AssignmentType { get; private set; }
 
     public Route? Route { get; private set; }
     public Driver? Driver { get; private set; }
@@ -60,8 +76,12 @@ public class Booking : AuditableEntity
             throw new ArgumentException("Customer last name is required.", nameof(customerLastName));
         if (string.IsNullOrWhiteSpace(customerEmail))
             throw new ArgumentException("Customer email is required.", nameof(customerEmail));
+        if (!EmailFormat.IsValid(customerEmail))
+            throw new ArgumentException("Customer email format is invalid.", nameof(customerEmail));
         if (string.IsNullOrWhiteSpace(customerPhone))
             throw new ArgumentException("Customer phone is required.", nameof(customerPhone));
+        if (!PhoneFormat.IsValid(customerPhone))
+            throw new ArgumentException("Customer phone format is invalid.", nameof(customerPhone));
         if (routeId == Guid.Empty)
             throw new ArgumentException("RouteId is required.", nameof(routeId));
         if (string.IsNullOrWhiteSpace(pickupAddress))
@@ -106,4 +126,38 @@ public class Booking : AuditableEntity
     }
 
     public void ChangeStatus(BookingStatus newStatus) => Status = newStatus;
+
+    /// <summary>
+    /// Called by AutomaticAssignmentService when an eligible driver+vehicle pair is
+    /// found. Moves the booking straight to Confirmed — there is no intermediate
+    /// "assigned but not yet confirmed" state for automatic assignment in v1.
+    /// </summary>
+    public void ConfirmAutomaticAssignment(Guid driverId, Guid vehicleId)
+    {
+        if (driverId == Guid.Empty)
+            throw new ArgumentException("DriverId is required.", nameof(driverId));
+        if (vehicleId == Guid.Empty)
+            throw new ArgumentException("VehicleId is required.", nameof(vehicleId));
+
+        DriverId = driverId;
+        VehicleId = vehicleId;
+        AssignmentType = BookingAssignmentType.Automatic;
+        RequiresManualAssignment = false;
+        ManualAssignmentReason = null;
+        Status = BookingStatus.Confirmed;
+    }
+
+    /// <summary>
+    /// Called when automatic assignment cannot find an eligible driver+vehicle.
+    /// The booking stays Pending with no driver/vehicle — RequiresManualAssignment
+    /// is a separate flag precisely so an administrator can find these later.
+    /// </summary>
+    public void MarkRequiresManualAssignment(string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new ArgumentException("A reason is required.", nameof(reason));
+
+        RequiresManualAssignment = true;
+        ManualAssignmentReason = reason;
+    }
 }

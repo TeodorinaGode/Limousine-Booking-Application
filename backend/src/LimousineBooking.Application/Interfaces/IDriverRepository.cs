@@ -14,6 +14,16 @@ public interface IDriverRepository
     Task<(IReadOnlyList<Driver> Items, int TotalCount)> SearchAsync(DriverSearchQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Drivers who pass every automatic-assignment eligibility check that can be
+    /// expressed as a database filter: active, linked User active, currently
+    /// available, has an active current vehicle with at least
+    /// <paramref name="minPassengerCapacity"/> seats. Includes User and
+    /// CurrentVehicle. Scheduled-availability and booking-conflict checks happen
+    /// afterward — those need per-candidate queries this filter can't express.
+    /// </summary>
+    Task<IReadOnlyList<Driver>> GetAssignmentCandidatesAsync(int minPassengerCapacity, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// True if this vehicle is currently assigned as another driver's CurrentVehicle,
     /// excluding <paramref name="excludeDriverId"/> if given. Enforces "one vehicle,
     /// zero or one current driver."

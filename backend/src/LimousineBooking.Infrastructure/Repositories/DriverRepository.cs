@@ -76,6 +76,19 @@ public class DriverRepository : IDriverRepository
         return (items, totalCount);
     }
 
+    public async Task<IReadOnlyList<Driver>> GetAssignmentCandidatesAsync(int minPassengerCapacity, CancellationToken cancellationToken = default) =>
+        await _dbContext.Drivers
+            .Include(d => d.User)
+            .Include(d => d.CurrentVehicle)
+            .Where(d =>
+                d.IsActive &&
+                d.User!.IsActive &&
+                d.IsAvailable &&
+                d.CurrentVehicleId != null &&
+                d.CurrentVehicle!.IsActive &&
+                d.CurrentVehicle.PassengerCapacity >= minPassengerCapacity)
+            .ToListAsync(cancellationToken);
+
     public async Task<bool> IsVehicleAssignedToAnotherDriverAsync(Guid vehicleId, Guid? excludeDriverId, CancellationToken cancellationToken = default)
     {
         var query = _dbContext.Drivers.Where(d => d.CurrentVehicleId == vehicleId);

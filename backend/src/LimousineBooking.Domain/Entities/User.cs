@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using LimousineBooking.Domain.Common;
 using LimousineBooking.Domain.Enums;
 
@@ -6,8 +5,6 @@ namespace LimousineBooking.Domain.Entities;
 
 public class User : AuditableEntity
 {
-    private static readonly Regex EmailPattern = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
-
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
@@ -64,7 +61,7 @@ public class User : AuditableEntity
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email is required.", nameof(email));
-        if (!EmailPattern.IsMatch(email))
+        if (!EmailFormat.IsValid(email))
             throw new ArgumentException("Email format is invalid.", nameof(email));
         if (string.IsNullOrWhiteSpace(firstName))
             throw new ArgumentException("First name is required.", nameof(firstName));

@@ -67,6 +67,17 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .HasConversion<string>()
             .HasMaxLength(30);
 
+        builder.Property(b => b.RequiresManualAssignment)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(b => b.ManualAssignmentReason)
+            .HasMaxLength(500);
+
+        builder.Property(b => b.AssignmentType)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
         builder.Property(b => b.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
@@ -81,8 +92,20 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasIndex(b => b.RouteId);
         builder.HasIndex(b => b.CreatedAt);
 
-        // Supports looking up a driver's schedule for a given day.
+        // Supports looking up a driver's schedule for a given day, and the
+        // automatic-assignment conflict scan (candidate driver IDs + travel date).
         builder.HasIndex(b => new { b.DriverId, b.TravelDate });
+
+        // Same purpose as the DriverId+TravelDate index above, but for the
+        // explicit vehicle-conflict check the assignment service also runs
+        // (section 14 — a vehicle could in principle be reassigned to a
+        // different driver between bookings, so the driver-scoped index alone
+        // isn't sufficient to answer "is this vehicle already booked then?").
+        builder.HasIndex(b => new { b.VehicleId, b.TravelDate });
+
+        // Lets the future admin UI query "which bookings need manual assignment"
+        // without scanning every Pending booking.
+        builder.HasIndex(b => b.RequiresManualAssignment);
 
         builder.HasOne(b => b.Route)
             .WithMany(r => r.Bookings)

@@ -20,4 +20,7 @@ public class CurrentUserService : ICurrentUserService
     public string? Email => User?.FindFirst("email")?.Value;
 
     public string? Role => User?.FindFirst("role")?.Value;
+
+    public Guid? DriverId =>
+        Guid.TryParse(User?.FindFirst("driverId")?.Value, out var id) ? id : null;
 }

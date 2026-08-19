@@ -9,6 +9,9 @@ public interface IRouteRepository
 
     Task<(IReadOnlyList<Route> Items, int TotalCount)> SearchAsync(RouteSearchQuery query, CancellationToken cancellationToken = default);
 
+    /// <summary>All active routes, for the public routes listing. No pagination — this is a small, public reference list.</summary>
+    Task<IReadOnlyList<Route>> GetActiveAsync(CancellationToken cancellationToken = default);
+
     /// <summary>
     /// True if an *active* route already exists for this departure/destination pair
     /// (trimmed, case-insensitive), excluding <paramref name="excludeRouteId"/> if given.

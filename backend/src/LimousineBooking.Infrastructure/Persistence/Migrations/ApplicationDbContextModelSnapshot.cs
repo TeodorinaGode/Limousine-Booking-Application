@@ -28,6 +28,10 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AssignmentType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("BookingReference")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -64,6 +68,10 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("DriverId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ManualAssignmentReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -82,6 +90,11 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
+
+                    b.Property<bool>("RequiresManualAssignment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<Guid>("RouteId")
                         .HasColumnType("uuid");
@@ -109,15 +122,17 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("DriverId");
 
+                    b.HasIndex("RequiresManualAssignment");
+
                     b.HasIndex("RouteId");
 
                     b.HasIndex("Status");
 
                     b.HasIndex("TravelDate");
 
-                    b.HasIndex("VehicleId");
-
                     b.HasIndex("DriverId", "TravelDate");
+
+                    b.HasIndex("VehicleId", "TravelDate");
 
                     b.ToTable("Bookings", null, t =>
                         {

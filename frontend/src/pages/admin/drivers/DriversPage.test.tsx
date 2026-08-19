@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DriversPage from "./DriversPage";
 import * as driverService from "../../../services/driverService";
@@ -56,6 +57,14 @@ function pagedResult<T>(items: T[]): PagedResult<T> {
   return { items, page: 1, pageSize: 20, totalCount: items.length, totalPages: 1 };
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <DriversPage />
+    </MemoryRouter>
+  );
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
@@ -75,7 +84,7 @@ describe("DriversPage", () => {
       pagedResult([makeDriver(), makeDriver({ id: "2", firstName: "Mark", lastName: "Brown", email: "mark@example.com" })])
     );
 
-    render(<DriversPage />);
+    renderPage();
 
     expect(await screen.findByText("John Smith")).toBeInTheDocument();
     expect(screen.getByText("Mark Brown")).toBeInTheDocument();
@@ -84,7 +93,7 @@ describe("DriversPage", () => {
   it("shows an error message when loading fails", async () => {
     mockedDriverService.getDrivers.mockRejectedValue(new Error("Network error"));
 
-    render(<DriversPage />);
+    renderPage();
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Network error");
   });
@@ -93,7 +102,7 @@ describe("DriversPage", () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([makeDriver()]));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.type(screen.getByLabelText("Search drivers"), "John");
@@ -113,7 +122,7 @@ describe("DriversPage", () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([makeDriver()]));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.selectOptions(screen.getByLabelText("Status:"), "active");
@@ -130,7 +139,7 @@ describe("DriversPage", () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([makeDriver()]));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.selectOptions(screen.getByLabelText("Availability:"), "available");
@@ -147,7 +156,7 @@ describe("DriversPage", () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([makeDriver()]));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.selectOptions(screen.getByLabelText("Vehicle:"), "unassigned");
@@ -164,7 +173,7 @@ describe("DriversPage", () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([]));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("No drivers found.");
 
     await user.click(screen.getByRole("button", { name: "Add Driver" }));
@@ -181,7 +190,7 @@ describe("DriversPage", () => {
     mockedDriverService.createDriver.mockResolvedValue(makeDriver());
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("No drivers found.");
 
     await user.click(screen.getByRole("button", { name: "Add Driver" }));
@@ -207,7 +216,7 @@ describe("DriversPage", () => {
     mockedDriverService.createDriver.mockRejectedValue(new Error("A user with this email already exists."));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("No drivers found.");
 
     await user.click(screen.getByRole("button", { name: "Add Driver" }));
@@ -226,7 +235,7 @@ describe("DriversPage", () => {
     mockedDriverService.createDriver.mockRejectedValue(new Error("This vehicle is already assigned to another driver."));
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("No drivers found.");
 
     await user.click(screen.getByRole("button", { name: "Add Driver" }));
@@ -246,7 +255,7 @@ describe("DriversPage", () => {
     mockedDriverService.updateDriver.mockResolvedValue({ ...driver, lastName: "Doe" });
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -271,7 +280,7 @@ describe("DriversPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
@@ -287,7 +296,7 @@ describe("DriversPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
@@ -303,7 +312,7 @@ describe("DriversPage", () => {
     mockedDriverService.resetDriverPassword.mockResolvedValue(driver);
     const user = userEvent.setup();
 
-    render(<DriversPage />);
+    renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Reset Password" }));

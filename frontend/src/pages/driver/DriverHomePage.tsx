@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 function DriverHomePage() {
@@ -18,6 +18,9 @@ function DriverHomePage() {
           Logged in as {user.firstName} {user.lastName} ({user.email})
         </p>
       )}
+      <nav>
+        <Link to="/driver/availability">My Availability</Link>
+      </nav>
       <button type="button" onClick={handleLogout}>
         Logout
       </button>

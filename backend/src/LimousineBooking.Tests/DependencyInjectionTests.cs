@@ -12,8 +12,9 @@ public class DependencyInjectionTests
     public void AddApplication_RegistersWithoutThrowing()
     {
         var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder().Build();
 
-        var result = services.AddApplication();
+        var result = services.AddApplication(configuration);
 
         Assert.Same(services, result);
     }

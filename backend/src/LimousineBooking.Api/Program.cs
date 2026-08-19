@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using LimousineBooking.Api.Json;
 using LimousineBooking.Application;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Infrastructure;
@@ -14,9 +15,10 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new FlexibleTimeOnlyJsonConverter()));
 
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services

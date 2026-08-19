@@ -57,6 +57,12 @@ public class RouteRepository : IRouteRepository
         return (items, totalCount);
     }
 
+    public async Task<IReadOnlyList<DomainRoute>> GetActiveAsync(CancellationToken cancellationToken = default) =>
+        await _dbContext.Routes
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.DepartureLocation)
+            .ToListAsync(cancellationToken);
+
     public async Task<bool> HasActiveDuplicateAsync(string departureLocation, string destination, Guid? excludeRouteId, CancellationToken cancellationToken = default)
     {
         var normalizedDeparture = departureLocation.Trim();

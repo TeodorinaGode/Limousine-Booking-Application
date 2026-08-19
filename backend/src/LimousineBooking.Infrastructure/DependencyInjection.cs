@@ -1,6 +1,7 @@
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Entities;
 using LimousineBooking.Infrastructure.Authentication;
+using LimousineBooking.Infrastructure.Common;
 using LimousineBooking.Infrastructure.Persistence;
 using LimousineBooking.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -27,11 +28,15 @@ public static class DependencyInjection
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDriverRepository, DriverRepository>();
         services.AddScoped<IRouteRepository, RouteRepository>();
         services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IDriverAvailabilityRepository, DriverAvailabilityRepository>();
+        services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<ITransactionRunner, TransactionRunner>();
 
         // Further external service integrations (email, notifications, etc.)
         // will be registered here as they are introduced in subsequent steps.

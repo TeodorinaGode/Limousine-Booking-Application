@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import {
   activateDriver,
@@ -275,6 +276,7 @@ function DriversPage() {
                 <td>{driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}` : "Not assigned"}</td>
                 <td>{driver.isActive ? "Active" : "Inactive"}</td>
                 <td>
+                  <Link to={`/admin/drivers/${driver.id}`}>View Details</Link>{" "}
                   <button type="button" onClick={() => setModalState({ driver })}>
                     Edit
                   </button>{" "}

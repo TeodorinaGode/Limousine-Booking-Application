@@ -21,8 +21,7 @@ public class DriverAvailability : AuditableEntity
     {
         if (driverId == Guid.Empty)
             throw new ArgumentException("DriverId is required.", nameof(driverId));
-        if (endTime <= startTime)
-            throw new ArgumentException("End time must be after start time.", nameof(endTime));
+        Validate(startTime, endTime);
 
         DriverId = driverId;
         Date = date;
@@ -30,5 +29,25 @@ public class DriverAvailability : AuditableEntity
         EndTime = endTime;
         IsAvailable = isAvailable;
         Notes = notes;
+    }
+
+    public void Update(DateOnly date, TimeOnly startTime, TimeOnly endTime, bool isAvailable, string? notes)
+    {
+        Validate(startTime, endTime);
+
+        Date = date;
+        StartTime = startTime;
+        EndTime = endTime;
+        IsAvailable = isAvailable;
+        Notes = notes;
+    }
+
+    /// <summary>Half-open interval overlap: this period and another starting at <paramref name="otherStart"/> ending at <paramref name="otherEnd"/> overlap.</summary>
+    public bool Overlaps(TimeOnly otherStart, TimeOnly otherEnd) => StartTime < otherEnd && otherStart < EndTime;
+
+    private static void Validate(TimeOnly startTime, TimeOnly endTime)
+    {
+        if (endTime <= startTime)
+            throw new ArgumentException("End time must be after start time.", nameof(endTime));
     }
 }

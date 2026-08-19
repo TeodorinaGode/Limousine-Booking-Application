@@ -1,8 +1,12 @@
 using System.Text;
 using LimousineBooking.Application;
+using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Infrastructure;
 using LimousineBooking.Infrastructure.Authentication;
+using LimousineBooking.Infrastructure.Persistence;
+using LimousineBooking.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -14,12 +18,29 @@ builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
-
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer();
+
+// JwtBearerOptions is configured via a deferred callback (resolving
+// IOptions<JwtSettings> at the time options are actually built) rather than
+// closing over a value read from IConfiguration up front. This keeps the
+// token-validating side and the token-issuing side (JwtTokenService, which
+// also resolves IOptions<JwtSettings>) guaranteed to agree — including when
+// configuration is layered in after this point, as WebApplicationFactory
+// does in integration tests.
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtSettings>>((options, jwtSettingsOptions) =>
     {
+        var jwtSettings = jwtSettingsOptions.Value;
+
+        // Tokens are issued with short claim names ("sub", "email", "role", "name" —
+        // see JwtTokenService) rather than the long ClaimTypes.* URIs. Disabling the
+        // default inbound claim-type remapping keeps what's read consistent with what
+        // was written, and RoleClaimType must match "role" for [Authorize(Roles=...)]
+        // to recognize it.
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -29,7 +50,9 @@ builder.Services
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                string.IsNullOrEmpty(jwtSettings.Key) ? Guid.NewGuid().ToString() : jwtSettings.Key))
+                string.IsNullOrEmpty(jwtSettings.SecretKey) ? Guid.NewGuid().ToString() : jwtSettings.SecretKey)),
+            RoleClaimType = "role",
+            NameClaimType = "email"
         };
     });
 
@@ -81,6 +104,21 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    try
+    {
+        using var seedScope = app.Services.CreateScope();
+        var dbContext = seedScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var passwordService = seedScope.ServiceProvider.GetRequiredService<IPasswordService>();
+        await DevelopmentDataSeeder.SeedAsync(dbContext, passwordService);
+    }
+    catch (Exception ex)
+    {
+        // Dev-only convenience seeding must not prevent the API from starting
+        // when PostgreSQL isn't reachable yet (e.g. running the API without
+        // `docker compose up postgres` first).
+        app.Logger.LogWarning(ex, "Skipped development user seeding — database was not reachable.");
+    }
 }
 
 app.UseHttpsRedirection();

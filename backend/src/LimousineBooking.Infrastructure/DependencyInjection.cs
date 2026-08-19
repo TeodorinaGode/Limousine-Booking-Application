@@ -1,5 +1,9 @@
+using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Domain.Entities;
 using LimousineBooking.Infrastructure.Authentication;
 using LimousineBooking.Infrastructure.Persistence;
+using LimousineBooking.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +21,18 @@ public static class DependencyInjection
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
 
-        // Repository implementations and external service integrations
-        // (email, notifications, etc.) will be registered here as they
-        // are introduced in subsequent steps.
+        services.AddHttpContextAccessor();
+
+        services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IDriverRepository, DriverRepository>();
+
+        // Further external service integrations (email, notifications, etc.)
+        // will be registered here as they are introduced in subsequent steps.
 
         return services;
     }

@@ -147,6 +147,87 @@ public class BookingTests
     }
 
     [Fact]
+    public void ConfirmManualAssignment_SetsDriverVehicleStatusAndAssignmentType()
+    {
+        var booking = CreateValidBooking();
+        var driverId = Guid.NewGuid();
+        var vehicleId = Guid.NewGuid();
+
+        booking.ConfirmManualAssignment(driverId, vehicleId);
+
+        Assert.Equal(driverId, booking.DriverId);
+        Assert.Equal(vehicleId, booking.VehicleId);
+        Assert.Equal(BookingStatus.Confirmed, booking.Status);
+        Assert.Equal(AssignmentType.Manual, booking.AssignmentType);
+        Assert.False(booking.RequiresManualAssignment);
+    }
+
+    [Fact]
+    public void UnassignForRevalidation_ClearsAssignmentAndResetsStatusToPending()
+    {
+        var booking = CreateValidBooking();
+        booking.ConfirmAutomaticAssignment(Guid.NewGuid(), Guid.NewGuid());
+
+        booking.UnassignForRevalidation();
+
+        Assert.Null(booking.DriverId);
+        Assert.Null(booking.VehicleId);
+        Assert.Null(booking.AssignmentType);
+        Assert.False(booking.RequiresManualAssignment);
+        Assert.Equal(BookingStatus.Pending, booking.Status);
+    }
+
+    [Fact]
+    public void UpdateDetails_ReplacesEditableFieldsIncludingPrice()
+    {
+        var booking = CreateValidBooking(price: 180.00m);
+        var newRouteId = Guid.NewGuid();
+
+        booking.UpdateDetails(
+            newRouteId, new DateOnly(2026, 10, 1), new TimeOnly(9, 30), "Neue Adresse 5, Zurich", 3,
+            "Janet", "Doey", "janet.doey@example.com", "+41791234999", "Extra luggage", 250.00m, "EUR");
+
+        Assert.Equal(newRouteId, booking.RouteId);
+        Assert.Equal(new DateOnly(2026, 10, 1), booking.TravelDate);
+        Assert.Equal(new TimeOnly(9, 30), booking.PickupTime);
+        Assert.Equal("Neue Adresse 5, Zurich", booking.PickupAddress);
+        Assert.Equal(3, booking.PassengerCount);
+        Assert.Equal("Janet", booking.CustomerFirstName);
+        Assert.Equal(250.00m, booking.Price);
+        Assert.Equal("EUR", booking.Currency);
+    }
+
+    [Fact]
+    public void UpdateDetails_InvalidEmail_Throws()
+    {
+        var booking = CreateValidBooking();
+
+        Assert.Throws<ArgumentException>(() => booking.UpdateDetails(
+            Guid.NewGuid(), new DateOnly(2026, 10, 1), new TimeOnly(9, 30), "Address", 2,
+            "Jane", "Doe", "not-an-email", "+41791234567", null, 180.00m, "CHF"));
+    }
+
+    [Fact]
+    public void Cancel_SetsStatusAndReleasesDriverAndVehicle_ButKeepsPrice()
+    {
+        var booking = CreateValidBooking(price: 180.00m);
+        booking.ConfirmAutomaticAssignment(Guid.NewGuid(), Guid.NewGuid());
+        var adminUserId = Guid.NewGuid();
+        var cancelledAt = new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc);
+
+        booking.Cancel("Customer requested cancellation", adminUserId, cancelledAt);
+
+        Assert.Equal(BookingStatus.Cancelled, booking.Status);
+        Assert.Null(booking.DriverId);
+        Assert.Null(booking.VehicleId);
+        Assert.Null(booking.AssignmentType);
+        Assert.Equal(180.00m, booking.Price);
+        Assert.Equal("Customer requested cancellation", booking.CancellationReason);
+        Assert.Equal(adminUserId, booking.CancelledByUserId);
+        Assert.Equal(cancelledAt, booking.CancelledAt);
+    }
+
+    [Fact]
     public void Booking_RoutePriceChange_DoesNotAffectExistingBookingPrice()
     {
         var route = new Route("Basel", "Zurich", 60, 180.00m, "CHF");

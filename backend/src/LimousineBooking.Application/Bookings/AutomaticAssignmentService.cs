@@ -1,5 +1,6 @@
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Entities;
+using LimousineBooking.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,7 +21,9 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
     private readonly IBookingRepository _bookingRepository;
     private readonly IDriverRepository _driverRepository;
     private readonly IAvailabilityEvaluationService _availabilityEvaluationService;
+    private readonly IAssignmentHistoryRepository _assignmentHistoryRepository;
     private readonly ITransactionRunner _transactionRunner;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly BookingSettings _settings;
     private readonly ILogger<AutomaticAssignmentService> _logger;
 
@@ -28,14 +31,18 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
         IBookingRepository bookingRepository,
         IDriverRepository driverRepository,
         IAvailabilityEvaluationService availabilityEvaluationService,
+        IAssignmentHistoryRepository assignmentHistoryRepository,
         ITransactionRunner transactionRunner,
+        IDateTimeProvider dateTimeProvider,
         IOptions<BookingSettings> settings,
         ILogger<AutomaticAssignmentService> logger)
     {
         _bookingRepository = bookingRepository;
         _driverRepository = driverRepository;
         _availabilityEvaluationService = availabilityEvaluationService;
+        _assignmentHistoryRepository = assignmentHistoryRepository;
         _transactionRunner = transactionRunner;
+        _dateTimeProvider = dateTimeProvider;
         _settings = settings.Value;
         _logger = logger;
     }
@@ -45,7 +52,7 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
 
     private async Task<bool> AttemptAssignmentAsync(Guid bookingId, CancellationToken cancellationToken)
     {
-        var booking = await _bookingRepository.GetByIdWithRouteAsync(bookingId, cancellationToken);
+        var booking = await _bookingRepository.GetByIdWithDetailsAsync(bookingId, cancellationToken);
         if (booking?.Route is null)
         {
             _logger.LogWarning("Automatic assignment skipped — booking {BookingId} or its route could not be loaded.", bookingId);
@@ -99,6 +106,11 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
             .First();
 
         booking.ConfirmAutomaticAssignment(selected.Id, selected.CurrentVehicleId!.Value);
+
+        await _assignmentHistoryRepository.AddAsync(
+            new AssignmentHistory(booking.Id, selected.Id, selected.CurrentVehicleId!.Value, AssignmentType.Automatic, assignedByUserId: null, _dateTimeProvider.UtcNow),
+            cancellationToken);
+
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(

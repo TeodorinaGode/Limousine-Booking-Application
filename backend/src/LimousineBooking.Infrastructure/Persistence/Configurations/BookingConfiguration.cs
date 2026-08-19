@@ -78,6 +78,12 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        builder.Property(b => b.CancellationReason)
+            .HasMaxLength(500);
+
+        builder.Property(b => b.CancelledAt)
+            .HasColumnType("timestamptz");
+
         builder.Property(b => b.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
@@ -106,6 +112,9 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         // Lets the future admin UI query "which bookings need manual assignment"
         // without scanning every Pending booking.
         builder.HasIndex(b => b.RequiresManualAssignment);
+
+        // Supports the admin booking search's "customer email" filter/search field.
+        builder.HasIndex(b => b.CustomerEmail);
 
         builder.HasOne(b => b.Route)
             .WithMany(r => r.Bookings)

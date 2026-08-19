@@ -43,6 +43,10 @@ public class Booking : AuditableEntity
     /// <summary>Null until a driver/vehicle is assigned; then records whether it happened automatically or via admin action.</summary>
     public AssignmentType? AssignmentType { get; private set; }
 
+    public string? CancellationReason { get; private set; }
+    public DateTime? CancelledAt { get; private set; }
+    public Guid? CancelledByUserId { get; private set; }
+
     public Route? Route { get; private set; }
     public Driver? Driver { get; private set; }
     public Vehicle? Vehicle { get; private set; }
@@ -70,6 +74,72 @@ public class Booking : AuditableEntity
     {
         if (string.IsNullOrWhiteSpace(bookingReference))
             throw new ArgumentException("Booking reference is required.", nameof(bookingReference));
+
+        ValidateEditableFields(customerFirstName, customerLastName, customerEmail, customerPhone, routeId, pickupAddress, passengerCount, price, currency);
+
+        BookingReference = bookingReference;
+        CustomerFirstName = customerFirstName;
+        CustomerLastName = customerLastName;
+        CustomerEmail = customerEmail;
+        CustomerPhone = customerPhone;
+        RouteId = routeId;
+        TravelDate = travelDate;
+        PickupTime = pickupTime;
+        PickupAddress = pickupAddress;
+        PassengerCount = passengerCount;
+        Price = price;
+        Currency = currency;
+        Notes = notes;
+        Status = BookingStatus.Pending;
+    }
+
+    /// <summary>
+    /// Administrator edit of the fields a customer originally supplied, plus the
+    /// price/currency the caller has already decided on (see AdminBookingService —
+    /// unchanged unless the route itself changed, since price is a snapshot, not
+    /// something that silently drifts with the route's current price).
+    /// </summary>
+    public void UpdateDetails(
+        Guid routeId,
+        DateOnly travelDate,
+        TimeOnly pickupTime,
+        string pickupAddress,
+        int passengerCount,
+        string customerFirstName,
+        string customerLastName,
+        string customerEmail,
+        string customerPhone,
+        string? notes,
+        decimal price,
+        string currency)
+    {
+        ValidateEditableFields(customerFirstName, customerLastName, customerEmail, customerPhone, routeId, pickupAddress, passengerCount, price, currency);
+
+        RouteId = routeId;
+        TravelDate = travelDate;
+        PickupTime = pickupTime;
+        PickupAddress = pickupAddress;
+        PassengerCount = passengerCount;
+        CustomerFirstName = customerFirstName;
+        CustomerLastName = customerLastName;
+        CustomerEmail = customerEmail;
+        CustomerPhone = customerPhone;
+        Notes = notes;
+        Price = price;
+        Currency = currency;
+    }
+
+    private static void ValidateEditableFields(
+        string customerFirstName,
+        string customerLastName,
+        string customerEmail,
+        string customerPhone,
+        Guid routeId,
+        string pickupAddress,
+        int passengerCount,
+        decimal price,
+        string currency)
+    {
         if (string.IsNullOrWhiteSpace(customerFirstName))
             throw new ArgumentException("Customer first name is required.", nameof(customerFirstName));
         if (string.IsNullOrWhiteSpace(customerLastName))
@@ -92,21 +162,6 @@ public class Booking : AuditableEntity
             throw new ArgumentOutOfRangeException(nameof(price), "Price must not be negative.");
         if (string.IsNullOrWhiteSpace(currency))
             throw new ArgumentException("Currency is required.", nameof(currency));
-
-        BookingReference = bookingReference;
-        CustomerFirstName = customerFirstName;
-        CustomerLastName = customerLastName;
-        CustomerEmail = customerEmail;
-        CustomerPhone = customerPhone;
-        RouteId = routeId;
-        TravelDate = travelDate;
-        PickupTime = pickupTime;
-        PickupAddress = pickupAddress;
-        PassengerCount = passengerCount;
-        Price = price;
-        Currency = currency;
-        Notes = notes;
-        Status = BookingStatus.Pending;
     }
 
     public void AssignDriver(Guid driverId)
@@ -159,5 +214,59 @@ public class Booking : AuditableEntity
 
         RequiresManualAssignment = true;
         ManualAssignmentReason = reason;
+    }
+
+    /// <summary>Called by an administrator's explicit assignment/reassignment (Prompt 10) — the vehicle-compatibility and eligibility checks all happen before this is called.</summary>
+    public void ConfirmManualAssignment(Guid driverId, Guid vehicleId)
+    {
+        if (driverId == Guid.Empty)
+            throw new ArgumentException("DriverId is required.", nameof(driverId));
+        if (vehicleId == Guid.Empty)
+            throw new ArgumentException("VehicleId is required.", nameof(vehicleId));
+
+        DriverId = driverId;
+        VehicleId = vehicleId;
+        AssignmentType = BookingAssignmentType.Manual;
+        RequiresManualAssignment = false;
+        ManualAssignmentReason = null;
+        Status = BookingStatus.Confirmed;
+    }
+
+    /// <summary>
+    /// Resets a booking to its pre-assignment state so AutomaticAssignmentService can
+    /// re-run from a clean slate — used when an administrator edits a trip-affecting
+    /// field (route/date/time/passenger count) on an already-assigned booking. Status
+    /// must move back to Pending here (not left as Confirmed), otherwise a booking
+    /// with no driver could incorrectly still read as Confirmed if reassignment fails.
+    /// </summary>
+    public void UnassignForRevalidation()
+    {
+        DriverId = null;
+        VehicleId = null;
+        AssignmentType = null;
+        RequiresManualAssignment = false;
+        ManualAssignmentReason = null;
+        Status = BookingStatus.Pending;
+    }
+
+    /// <summary>
+    /// Cancelling releases the driver/vehicle (so they stop being considered in
+    /// conflict checks — GetConflictScanAsync already excludes Cancelled bookings)
+    /// but keeps every other field, including Price, intact for historical/reporting
+    /// purposes. A Cancelled or Completed booking cannot be cancelled again — enforced
+    /// by the caller (AdminBookingService), not here, so the failure can carry a
+    /// specific, user-facing reason rather than a generic ArgumentException.
+    /// </summary>
+    public void Cancel(string? reason, Guid? cancelledByUserId, DateTime cancelledAt)
+    {
+        Status = BookingStatus.Cancelled;
+        DriverId = null;
+        VehicleId = null;
+        AssignmentType = null;
+        RequiresManualAssignment = false;
+        ManualAssignmentReason = null;
+        CancellationReason = string.IsNullOrWhiteSpace(reason) ? null : reason;
+        CancelledByUserId = cancelledByUserId;
+        CancelledAt = cancelledAt;
     }
 }

@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IBookingReferenceGenerator, BookingReferenceGenerator>();
         services.AddScoped<IAutomaticAssignmentService, AutomaticAssignmentService>();
         services.AddScoped<IPublicBookingService, PublicBookingService>();
+        services.AddScoped<IAdminBookingService, AdminBookingService>();
 
         // Further use cases, validators, and mapping profiles will be
         // registered here as they are introduced in subsequent steps.

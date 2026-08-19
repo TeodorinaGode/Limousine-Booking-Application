@@ -10,6 +10,8 @@ import RoutesPage from "../pages/admin/routes/RoutesPage";
 import VehiclesPage from "../pages/admin/vehicles/VehiclesPage";
 import DriversPage from "../pages/admin/drivers/DriversPage";
 import DriverDetailsPage from "../pages/admin/drivers/DriverDetailsPage";
+import BookingsPage from "../pages/admin/bookings/BookingsPage";
+import BookingDetailPage from "../pages/admin/bookings/BookingDetailPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
@@ -72,6 +74,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
             <DriverDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/bookings"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <BookingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/bookings/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <BookingDetailPage />
           </ProtectedRoute>
         }
       />

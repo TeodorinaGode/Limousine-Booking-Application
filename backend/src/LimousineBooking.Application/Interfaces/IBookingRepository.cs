@@ -1,3 +1,4 @@
+using LimousineBooking.Application.Bookings;
 using LimousineBooking.Domain.Entities;
 
 namespace LimousineBooking.Application.Interfaces;
@@ -6,8 +7,16 @@ public interface IBookingRepository
 {
     Task<bool> ReferenceExistsAsync(string bookingReference, CancellationToken cancellationToken = default);
 
-    /// <summary>Includes Route — the assignment service needs EstimatedDurationMinutes to compute the trip's end time.</summary>
-    Task<Booking?> GetByIdWithRouteAsync(Guid id, CancellationToken cancellationToken = default);
+    /// <summary>Includes Route, Driver (+ Driver.User), and Vehicle — everything the assignment service and admin endpoints need without a second round trip.</summary>
+    Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchAsync(AdminBookingSearchQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>Counts for the admin dashboard — each a targeted COUNT query, never a full table load.</summary>
+    Task<AdminBookingCounts> GetDashboardCountsAsync(DateOnly today, CancellationToken cancellationToken = default);
+
+    /// <summary>The next <paramref name="count"/> upcoming Pending/Confirmed bookings (today or later), soonest first.</summary>
+    Task<IReadOnlyList<Booking>> GetUpcomingAsync(DateOnly fromDate, int count, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Non-cancelled bookings on <paramref name="date"/> whose DriverId or VehicleId

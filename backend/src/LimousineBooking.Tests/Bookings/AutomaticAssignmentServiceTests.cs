@@ -27,7 +27,9 @@ public class AutomaticAssignmentServiceTests
     private readonly Mock<IBookingRepository> _bookingRepository = new();
     private readonly Mock<IDriverRepository> _driverRepository = new();
     private readonly Mock<IAvailabilityEvaluationService> _availabilityEvaluationService = new();
+    private readonly Mock<IAssignmentHistoryRepository> _assignmentHistoryRepository = new();
     private readonly Mock<ITransactionRunner> _transactionRunner = new();
+    private readonly Mock<IDateTimeProvider> _dateTimeProvider = new();
 
     public AutomaticAssignmentServiceTests()
     {
@@ -38,13 +40,19 @@ public class AutomaticAssignmentServiceTests
             .Returns((Func<CancellationToken, Task<bool>> operation, CancellationToken ct) => operation(ct));
 
         _bookingRepository.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _assignmentHistoryRepository
+            .Setup(r => r.AddAsync(It.IsAny<LimousineBooking.Domain.Entities.AssignmentHistory>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _dateTimeProvider.Setup(d => d.UtcNow).Returns(new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc));
     }
 
     private AutomaticAssignmentService CreateService(BookingSettings? settings = null) => new(
         _bookingRepository.Object,
         _driverRepository.Object,
         _availabilityEvaluationService.Object,
+        _assignmentHistoryRepository.Object,
         _transactionRunner.Object,
+        _dateTimeProvider.Object,
         Options.Create(settings ?? new BookingSettings()),
         Mock.Of<ILogger<AutomaticAssignmentService>>());
 
@@ -94,7 +102,7 @@ public class AutomaticAssignmentServiceTests
         IReadOnlyList<DomainBooking>? conflictScan = null,
         IReadOnlyDictionary<Guid, int>? workload = null)
     {
-        _bookingRepository.Setup(r => r.GetByIdWithRouteAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+        _bookingRepository.Setup(r => r.GetByIdWithDetailsAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
         _driverRepository.Setup(r => r.GetAssignmentCandidatesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(candidates);
 
         var scheduled = (scheduledDrivers ?? candidates).Select(d => d.Id).ToHashSet();

@@ -120,6 +120,21 @@ if (app.Environment.IsDevelopment())
         app.Logger.LogWarning(ex, "Skipped development user seeding — database was not reachable.");
     }
 }
+else
+{
+    // Outside Development, ASP.NET Core has no automatic exception page —
+    // without this, unhandled exceptions still return 500 but with no body.
+    // This gives a consistent JSON error shape without leaking stack traces.
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new { message = "An unexpected error occurred." });
+        });
+    });
+}
 
 app.UseHttpsRedirection();
 

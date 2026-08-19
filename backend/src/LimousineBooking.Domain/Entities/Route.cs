@@ -23,16 +23,22 @@ public class Route : AuditableEntity
 
     public Route(string departureLocation, string destination, int estimatedDurationMinutes, decimal price, string currency)
     {
-        if (string.IsNullOrWhiteSpace(departureLocation))
-            throw new ArgumentException("Departure location is required.", nameof(departureLocation));
-        if (string.IsNullOrWhiteSpace(destination))
-            throw new ArgumentException("Destination is required.", nameof(destination));
-        if (estimatedDurationMinutes <= 0)
-            throw new ArgumentOutOfRangeException(nameof(estimatedDurationMinutes), "Estimated duration must be greater than zero.");
-        if (price < 0)
-            throw new ArgumentOutOfRangeException(nameof(price), "Price must not be negative.");
-        if (string.IsNullOrWhiteSpace(currency))
-            throw new ArgumentException("Currency is required.", nameof(currency));
+        Validate(departureLocation, destination, estimatedDurationMinutes, price, currency);
+
+        DepartureLocation = departureLocation;
+        Destination = destination;
+        EstimatedDurationMinutes = estimatedDurationMinutes;
+        Price = price;
+        Currency = currency;
+    }
+
+    /// <summary>
+    /// Replaces every editable field (used by administrator route management).
+    /// Does not touch <see cref="IsActive"/> — use <see cref="Activate"/>/<see cref="Deactivate"/>.
+    /// </summary>
+    public void Update(string departureLocation, string destination, int estimatedDurationMinutes, decimal price, string currency)
+    {
+        Validate(departureLocation, destination, estimatedDurationMinutes, price, currency);
 
         DepartureLocation = departureLocation;
         Destination = destination;
@@ -52,4 +58,18 @@ public class Route : AuditableEntity
     public void Deactivate() => IsActive = false;
 
     public void Activate() => IsActive = true;
+
+    private static void Validate(string departureLocation, string destination, int estimatedDurationMinutes, decimal price, string currency)
+    {
+        if (string.IsNullOrWhiteSpace(departureLocation))
+            throw new ArgumentException("Departure location is required.", nameof(departureLocation));
+        if (string.IsNullOrWhiteSpace(destination))
+            throw new ArgumentException("Destination is required.", nameof(destination));
+        if (estimatedDurationMinutes <= 0)
+            throw new ArgumentOutOfRangeException(nameof(estimatedDurationMinutes), "Estimated duration must be greater than zero.");
+        if (price < 0)
+            throw new ArgumentOutOfRangeException(nameof(price), "Price must not be negative.");
+        if (string.IsNullOrWhiteSpace(currency))
+            throw new ArgumentException("Currency is required.", nameof(currency));
+    }
 }

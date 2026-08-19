@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 function AdminHomePage() {
@@ -18,6 +18,9 @@ function AdminHomePage() {
           Logged in as {user.firstName} {user.lastName} ({user.email})
         </p>
       )}
+      <nav>
+        <Link to="/admin/routes">Manage Routes</Link>
+      </nav>
       <button type="button" onClick={handleLogout}>
         Logout
       </button>

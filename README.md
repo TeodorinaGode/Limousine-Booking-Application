@@ -105,7 +105,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/unauthorized`.
+Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/admin/routes` (Administrator-only route management), `/unauthorized`.
 
 ## API Endpoints
 
@@ -116,6 +116,12 @@ Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-
 | `GET /api/test/authenticated` | any authenticated user | Dev-only: verifies a token is accepted |
 | `GET /api/test/admin` | `Administrator` | Dev-only: verifies role-based authorization |
 | `GET /api/test/driver` | `Driver` | Dev-only: verifies role-based authorization |
+| `GET /api/admin/routes` | `Administrator` | List routes. Query: `search`, `isActive`, `sortBy` (`departure`\|`destination`\|`duration`\|`price`\|`status`\|`createdAt`), `sortDirection` (`asc`\|`desc`), `page`, `pageSize` (max 100) |
+| `GET /api/admin/routes/{id}` | `Administrator` | Get one route, or `404` |
+| `POST /api/admin/routes` | `Administrator` | Create a route (active by default). `409` on duplicate active departure+destination |
+| `PUT /api/admin/routes/{id}` | `Administrator` | Full update, including `isActive` |
+| `PUT /api/admin/routes/{id}/activate` | `Administrator` | Convenience toggle; also blocked by `409` if it would recreate a duplicate |
+| `PUT /api/admin/routes/{id}/deactivate` | `Administrator` | Convenience toggle. Never deletes the route |
 
 `TestController` exists purely to verify authentication/authorization end-to-end (including from Swagger); it isn't part of the product API surface and can be removed once real protected endpoints exist.
 
@@ -142,11 +148,19 @@ cd backend
 dotnet test
 ```
 
+```
+cd frontend
+npm run test
+```
+
+Frontend tests use Vitest + React Testing Library.
+
 ## Assumptions and Decisions
 
 - **Controllers over minimal APIs**: the Api project uses `--use-controllers` for a conventional, discoverable structure as the API surface grows.
 - **DbContext has no entities yet** *(Prompt 1 only — superseded)*: as of Prompt 2, `ApplicationDbContext` exposes the full domain model; see the entity list under **Database changes** in the Prompt 3 notes below.
-- **Frontend pinned to Vite 5 / React Router 7 / React 18** instead of the very latest majors: `npm create vite@latest` currently scaffolds Vite 8, which ships an experimental Rolldown-based bundler requiring native platform bindings that aren't available for this Node version (20.15) on Windows — `npm run build` failed outright. Vite 5.4 is stable and builds/runs cleanly here. React Router was still bumped to v7 (from the v6 the template would otherwise pull in) because v6 has two unpatched CVEs (open redirect, SSR deserialization); v7 does not have the Vite 8 problem.
+- **Frontend pinned to Vite 6 / React Router 7 / React 18** instead of the very latest majors: `npm create vite@latest` currently scaffolds Vite 8, which ships an experimental Rolldown-based bundler requiring native platform bindings that aren't available for this Node version (20.15) on Windows — `npm run build` failed outright. Started on Vite 5.4 (Prompt 1), then bumped to Vite 6.4 in Prompt 4 (alongside Vitest 3, needed for a testing setup) since Vite 6 patches known path-traversal/`fs.deny`-bypass advisories in the dev server that 5.x doesn't, while still working on this Node version — Vite 7+/8 require Node ≥20.19 and 8 has the broken bundler. React Router was still bumped to v7 (from the v6 the template would otherwise pull in) because v6 has two unpatched CVEs (open redirect, SSR deserialization); v7 does not have the Vite 8 problem.
+- **Frontend test tooling**: Vitest 3 + React Testing Library + jsdom, added in Prompt 4 since no test runner existed before. `npm audit` is clean (0 vulnerabilities) after the Vite 6 bump.
 - **Frontend dev container runs `vite --host` directly** rather than a multi-stage Nginx build, since this is a development Compose setup, not a production deployment config.
 - **No customer-facing auth artifacts were created** (no login/register endpoints, no customer JWT) — consistent with customers remaining unauthenticated guests.
 - **JWT config property names**: `Jwt:SecretKey` / `Jwt:AccessTokenExpirationMinutes` (not `Jwt:Key/ExpiryMinutes`), matching the Prompt 3 spec. Note the spec's illustrative env var casing (`JWT__SECRET_KEY`) would **not** actually bind to a `SecretKey` property under ASP.NET Core's config rules — the env var must be `Jwt__SecretKey` (double underscore as the section separator, then the exact — case-insensitive — property name with no extra underscores). `.env.example` files use the correct form.
@@ -156,9 +170,14 @@ dotnet test
 - **No refresh tokens / no logout endpoint**, per the spec: access-token-only, frontend just discards the token locally on logout.
 - **`TestController` (`/api/test/*`) is a temporary, clearly-marked dev/QA surface** for verifying the auth pipeline — not a real product endpoint. Fine to delete once real protected endpoints exist.
 - **Frontend route guards are UX-only**: `ProtectedRoute` redirects unauthenticated/wrong-role users client-side, but the backend's `[Authorize(Roles=...)]` is the actual security boundary, per the spec's explicit requirement.
+- **Duplicate-route uniqueness applies only to active routes** (trimmed, case-insensitive on departure+destination), not globally — a deactivated route can coexist with a new active route covering the same city pair, which is what lets a route's price/duration be revised without losing the old record's history.
+- **`Route.Update(...)` is a new domain method** (Prompt 4): Prompt 2's `Route` entity only exposed `UpdatePrice()` plus `Activate()`/`Deactivate()`; full-field admin editing needed a general update method. It reuses the same validation as the constructor (extracted into a shared private `Validate` helper) — no new columns, no migration.
+- **Both `PUT /{id}` and dedicated `/activate`, `/deactivate` endpoints exist**: the full `PUT` can flip `isActive` as part of an edit, while the dedicated endpoints let the frontend toggle status with one click without resending the whole form.
+- **Sorting is an explicit allow-list** (`departure`, `destination`, `duration`, `price`, `status`, `createdAt`) mapped to real columns in the repository — an unrecognized `sortBy` silently falls back to `departure` rather than erroring, since this is a list endpoint where leniency is friendlier than a 400.
+- **Global exception-handling middleware was added** (`Program.cs`, non-Development only) since none existed before this prompt and the spec requires unhandled errors to return a generic `500` without stack traces in production. In Development, ASP.NET Core's built-in developer exception page (auto-enabled) still shows full details.
+- **Deactivation confirmation uses the native `window.confirm()`** rather than a custom modal — satisfies "show a confirmation dialog" without extra UI code; success/error feedback uses a simple inline message with a 3s auto-dismiss rather than a toast library.
 
 ## Known Issues / Follow-ups
 
-- **Docker was not available in the environment this was built in** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles are written to spec but not verified end-to-end with an actual `docker compose up`. Likewise, no local PostgreSQL was available to run `dotnet ef database update` or exercise `/api/auth/login` against a real database — this was substituted with (a) inspecting the generated migration SQL and (b) mocked/`WebApplicationFactory`-based tests that don't require a live database. Please run a real login through Swagger once Postgres is available, to confirm end-to-end.
-- `npm audit` reports one moderate advisory in `esbuild` (bundled transitively via Vite 5) that only affects the local dev server accepting cross-origin requests — not exploitable in production builds. Resolving it requires the still-broken Vite 8, so it's left as-is for now.
-- Customer booking APIs, automatic driver assignment, notifications, and the admin/driver dashboards are all deliberately unimplemented — scoped for later steps.
+- **Docker was not available in the environment this was built in** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles are written to spec but not verified end-to-end with an actual `docker compose up`. Likewise, no local PostgreSQL was available to run `dotnet ef database update` or exercise `/api/auth/login` or the routes CRUD endpoints against a real database — this was substituted with (a) inspecting the generated migration SQL, (b) `dotnet ef migrations has-pending-model-changes` (confirms Prompt 4 needed no migration), and (c) mocked/`WebApplicationFactory`-based tests that don't require a live database. Please exercise `/admin/routes` end-to-end through the UI once Postgres is available.
+- Customer booking APIs, automatic driver assignment, notifications, and the admin/driver dashboards are all deliberately unimplemented — scoped for later steps. The future `GET /api/public/routes` endpoint mentioned in Prompt 4 was **not** added, per its own instruction not to implement it yet.

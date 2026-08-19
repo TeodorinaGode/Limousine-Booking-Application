@@ -20,6 +20,8 @@ function AdminHomePage() {
       )}
       <nav>
         <Link to="/admin/routes">Manage Routes</Link>
+        {" | "}
+        <Link to="/admin/vehicles">Manage Vehicles</Link>
       </nav>
       <button type="button" onClick={handleLogout}>
         Logout

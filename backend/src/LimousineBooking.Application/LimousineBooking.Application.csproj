@@ -12,6 +12,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Only Swagger-relevant DTOs (e.g. the Vehicle request models) have XML
+         doc comments so far; CS1591 would otherwise warn on every other public type. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
 </Project>

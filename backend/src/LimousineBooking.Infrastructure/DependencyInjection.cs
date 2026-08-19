@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDriverRepository, DriverRepository>();
         services.AddScoped<IRouteRepository, RouteRepository>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
 
         // Further external service integrations (email, notifications, etc.)
         // will be registered here as they are introduced in subsequent steps.

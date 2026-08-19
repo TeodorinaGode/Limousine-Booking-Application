@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using LimousineBooking.Application;
 using LimousineBooking.Application.Interfaces;
@@ -95,6 +96,16 @@ builder.Services.AddSwaggerGen(options =>
     {
         { jwtSecurityScheme, Array.Empty<string>() }
     });
+
+    // Request/response DTOs live in LimousineBooking.Application, not this
+    // assembly, so both projects' XML doc files are needed for Swagger to
+    // pick up property-level descriptions (validation rules, etc.).
+    foreach (var assemblyName in new[] { Assembly.GetExecutingAssembly().GetName().Name, "LimousineBooking.Application" })
+    {
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
+        if (File.Exists(xmlPath))
+            options.IncludeXmlComments(xmlPath);
+    }
 });
 
 var app = builder.Build();

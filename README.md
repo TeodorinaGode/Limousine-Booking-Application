@@ -105,7 +105,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/admin/routes` (Administrator-only route management), `/unauthorized`.
+Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/admin/routes` (Administrator-only route management), `/admin/vehicles` (Administrator-only vehicle management), `/unauthorized`.
 
 ## API Endpoints
 
@@ -122,6 +122,12 @@ Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-
 | `PUT /api/admin/routes/{id}` | `Administrator` | Full update, including `isActive` |
 | `PUT /api/admin/routes/{id}/activate` | `Administrator` | Convenience toggle; also blocked by `409` if it would recreate a duplicate |
 | `PUT /api/admin/routes/{id}/deactivate` | `Administrator` | Convenience toggle. Never deletes the route |
+| `GET /api/admin/vehicles` | `Administrator` | List vehicles. Query: `search`, `isActive`, `minCapacity`, `sortBy` (`registrationNumber`\|`make`\|`model`\|`passengerCapacity`\|`createdAt`), `sortDirection`, `page`, `pageSize` (max 100) |
+| `GET /api/admin/vehicles/{id}` | `Administrator` | Get one vehicle, or `404` |
+| `POST /api/admin/vehicles` | `Administrator` | Create a vehicle (active by default). `409` on duplicate registration number (global, not just active vehicles) |
+| `PUT /api/admin/vehicles/{id}` | `Administrator` | Full update, including `isActive` |
+| `PUT /api/admin/vehicles/{id}/activate` | `Administrator` | Convenience toggle |
+| `PUT /api/admin/vehicles/{id}/deactivate` | `Administrator` | Convenience toggle. Never deletes the vehicle |
 
 `TestController` exists purely to verify authentication/authorization end-to-end (including from Swagger); it isn't part of the product API surface and can be removed once real protected endpoints exist.
 
@@ -176,8 +182,11 @@ Frontend tests use Vitest + React Testing Library.
 - **Sorting is an explicit allow-list** (`departure`, `destination`, `duration`, `price`, `status`, `createdAt`) mapped to real columns in the repository — an unrecognized `sortBy` silently falls back to `departure` rather than erroring, since this is a list endpoint where leniency is friendlier than a 400.
 - **Global exception-handling middleware was added** (`Program.cs`, non-Development only) since none existed before this prompt and the spec requires unhandled errors to return a generic `500` without stack traces in production. In Development, ASP.NET Core's built-in developer exception page (auto-enabled) still shows full details.
 - **Deactivation confirmation uses the native `window.confirm()`** rather than a custom modal — satisfies "show a confirmation dialog" without extra UI code; success/error feedback uses a simple inline message with a 3s auto-dismiss rather than a toast library.
+- **Vehicle registration uniqueness is global** (active AND inactive vehicles), unlike Route's active-only duplicate rule — a deliberate difference: Prompt 2 already put an unconditional unique index on `Vehicle.RegistrationNumber`, and a real license plate identifies one physical vehicle permanently (unlike a route, which is just a reusable city pair). Registration numbers are also normalized (trimmed, internal whitespace collapsed, uppercased) *before storage*, not just for comparison — the DB's plain unique index is sufficient without needing `citext` or a functional index.
+- **Vehicle type stays free text with `<datalist>` suggestions** (Sedan/SUV/Van/Limousine/Minivan) rather than an enum, matching the spec's "keep it extensible" note and Prompt 2's original string-typed column.
+- **Swagger XML doc comments span two assemblies**: DTOs live in `LimousineBooking.Application`, not `LimousineBooking.Api`, so both projects now set `GenerateDocumentationFile`, and `Program.cs` calls `IncludeXmlComments` for both — Swashbuckle only picks up comments from assemblies you explicitly point it at, regardless of which project's types appear in a controller signature. (`CS1591` is suppressed in both projects since most existing public members still lack doc comments.)
 
 ## Known Issues / Follow-ups
 
-- **Docker was not available in the environment this was built in** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles are written to spec but not verified end-to-end with an actual `docker compose up`. Likewise, no local PostgreSQL was available to run `dotnet ef database update` or exercise `/api/auth/login` or the routes CRUD endpoints against a real database — this was substituted with (a) inspecting the generated migration SQL, (b) `dotnet ef migrations has-pending-model-changes` (confirms Prompt 4 needed no migration), and (c) mocked/`WebApplicationFactory`-based tests that don't require a live database. Please exercise `/admin/routes` end-to-end through the UI once Postgres is available.
+- **Docker was not available in the environment this was built in** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles are written to spec but not verified end-to-end with an actual `docker compose up`. Likewise, no local PostgreSQL was available to run `dotnet ef database update` or exercise the admin CRUD endpoints against a real database — this was substituted with (a) inspecting generated migration SQL where relevant, (b) `dotnet ef migrations has-pending-model-changes` (confirms Prompts 4 and 5 needed no migration), and (c) mocked/`WebApplicationFactory`-based tests that don't require a live database.
 - Customer booking APIs, automatic driver assignment, notifications, and the admin/driver dashboards are all deliberately unimplemented — scoped for later steps. The future `GET /api/public/routes` endpoint mentioned in Prompt 4 was **not** added, per its own instruction not to implement it yet.

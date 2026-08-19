@@ -20,16 +20,23 @@ public class Vehicle : AuditableEntity
 
     public Vehicle(string registrationNumber, string make, string model, string vehicleType, int passengerCapacity, string? notes = null)
     {
-        if (string.IsNullOrWhiteSpace(registrationNumber))
-            throw new ArgumentException("Registration number is required.", nameof(registrationNumber));
-        if (string.IsNullOrWhiteSpace(make))
-            throw new ArgumentException("Make is required.", nameof(make));
-        if (string.IsNullOrWhiteSpace(model))
-            throw new ArgumentException("Model is required.", nameof(model));
-        if (string.IsNullOrWhiteSpace(vehicleType))
-            throw new ArgumentException("Vehicle type is required.", nameof(vehicleType));
-        if (passengerCapacity <= 0)
-            throw new ArgumentOutOfRangeException(nameof(passengerCapacity), "Passenger capacity must be greater than zero.");
+        Validate(registrationNumber, make, model, vehicleType, passengerCapacity);
+
+        RegistrationNumber = registrationNumber;
+        Make = make;
+        Model = model;
+        VehicleType = vehicleType;
+        PassengerCapacity = passengerCapacity;
+        Notes = notes;
+    }
+
+    /// <summary>
+    /// Replaces every editable field except <see cref="IsActive"/> (used by
+    /// administrator vehicle management) — use <see cref="Activate"/>/<see cref="Deactivate"/>.
+    /// </summary>
+    public void Update(string registrationNumber, string make, string model, string vehicleType, int passengerCapacity, string? notes)
+    {
+        Validate(registrationNumber, make, model, vehicleType, passengerCapacity);
 
         RegistrationNumber = registrationNumber;
         Make = make;
@@ -42,4 +49,18 @@ public class Vehicle : AuditableEntity
     public void Deactivate() => IsActive = false;
 
     public void Activate() => IsActive = true;
+
+    private static void Validate(string registrationNumber, string make, string model, string vehicleType, int passengerCapacity)
+    {
+        if (string.IsNullOrWhiteSpace(registrationNumber))
+            throw new ArgumentException("Registration number is required.", nameof(registrationNumber));
+        if (string.IsNullOrWhiteSpace(make))
+            throw new ArgumentException("Make is required.", nameof(make));
+        if (string.IsNullOrWhiteSpace(model))
+            throw new ArgumentException("Model is required.", nameof(model));
+        if (string.IsNullOrWhiteSpace(vehicleType))
+            throw new ArgumentException("Vehicle type is required.", nameof(vehicleType));
+        if (passengerCapacity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(passengerCapacity), "Passenger capacity must be greater than zero.");
+    }
 }

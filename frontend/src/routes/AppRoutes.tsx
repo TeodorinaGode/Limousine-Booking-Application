@@ -6,6 +6,7 @@ import DriverHomePage from "../pages/driver/DriverHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import RoutesPage from "../pages/admin/routes/RoutesPage";
 import VehiclesPage from "../pages/admin/vehicles/VehiclesPage";
+import DriversPage from "../pages/admin/drivers/DriversPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
@@ -43,6 +44,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
             <VehiclesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/drivers"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <DriversPage />
           </ProtectedRoute>
         }
       />

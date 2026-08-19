@@ -1,4 +1,5 @@
 using LimousineBooking.Application.Authentication;
+using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Routes;
 using LimousineBooking.Application.Vehicles;
@@ -13,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, LoginHandler>();
         services.AddScoped<IRouteService, RouteService>();
         services.AddScoped<IVehicleService, VehicleService>();
+        services.AddScoped<IDriverService, DriverService>();
 
         // Further use cases, validators, and mapping profiles will be
         // registered here as they are introduced in subsequent steps.

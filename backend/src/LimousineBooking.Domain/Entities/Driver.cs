@@ -1,9 +1,14 @@
+using System.Text.RegularExpressions;
 using LimousineBooking.Domain.Common;
 
 namespace LimousineBooking.Domain.Entities;
 
 public class Driver : AuditableEntity
 {
+    // Deliberately loose: digits, spaces, +, -, parentheses, 7-25 chars.
+    // International numbers must work, not just Swiss ones.
+    private static readonly Regex PhonePattern = new(@"^[0-9+\-\s()]{7,25}$", RegexOptions.Compiled);
+
     public Guid UserId { get; private set; }
     public string Phone { get; private set; } = string.Empty;
     public Guid? CurrentVehicleId { get; private set; }
@@ -23,10 +28,15 @@ public class Driver : AuditableEntity
     {
         if (userId == Guid.Empty)
             throw new ArgumentException("UserId is required.", nameof(userId));
-        if (string.IsNullOrWhiteSpace(phone))
-            throw new ArgumentException("Phone is required.", nameof(phone));
+        ValidatePhone(phone);
 
         UserId = userId;
+        Phone = phone;
+    }
+
+    public void UpdatePhone(string phone)
+    {
+        ValidatePhone(phone);
         Phone = phone;
     }
 
@@ -47,4 +57,12 @@ public class Driver : AuditableEntity
     public void Deactivate() => IsActive = false;
 
     public void Activate() => IsActive = true;
+
+    private static void ValidatePhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            throw new ArgumentException("Phone is required.", nameof(phone));
+        if (!PhonePattern.IsMatch(phone))
+            throw new ArgumentException("Phone number format is invalid.", nameof(phone));
+    }
 }

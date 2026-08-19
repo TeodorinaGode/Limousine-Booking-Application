@@ -105,7 +105,24 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/admin/routes` (Administrator-only route management), `/admin/vehicles` (Administrator-only vehicle management), `/unauthorized`.
+Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-only), `/admin` (Administrator-only), `/admin/routes` (route management), `/admin/vehicles` (vehicle management), `/admin/drivers` (driver management), `/unauthorized`.
+
+## Running Without Docker, Against a Real PostgreSQL
+
+If Docker isn't available, PostgreSQL 16 can be installed directly (Windows example):
+
+```powershell
+winget install --id PostgreSQL.PostgreSQL.16 --accept-package-agreements --accept-source-agreements --silent
+```
+
+This installs and starts `postgresql-x64-16` as a Windows service (default superuser `postgres` / `postgres`) — it will keep running in the background afterward, same as on any machine with Postgres installed. Then:
+
+```powershell
+$env:PGPASSWORD = "postgres"
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -h localhost -p 5432 -U postgres -c "CREATE DATABASE limousine_booking;"
+```
+
+...and run the backend as described above (`ConnectionStrings__DefaultConnection` pointing at `Password=postgres`) followed by `dotnet ef database update`. This is exactly how Prompts 5 and 6 were verified end-to-end in the environment this was built in.
 
 ## API Endpoints
 
@@ -128,6 +145,13 @@ Open `http://localhost:5173`. Routes: `/` (public), `/login`, `/driver` (Driver-
 | `PUT /api/admin/vehicles/{id}` | `Administrator` | Full update, including `isActive` |
 | `PUT /api/admin/vehicles/{id}/activate` | `Administrator` | Convenience toggle |
 | `PUT /api/admin/vehicles/{id}/deactivate` | `Administrator` | Convenience toggle. Never deletes the vehicle |
+| `GET /api/admin/drivers` | `Administrator` | List drivers. Query: `search`, `isActive`, `isAvailable`, `hasVehicle`, `sortBy` (`firstName`\|`lastName`\|`email`\|`createdAt`), `sortDirection`, `page`, `pageSize` (max 100) |
+| `GET /api/admin/drivers/{id}` | `Administrator` | Get one driver (+ user info + current vehicle), or `404` |
+| `POST /api/admin/drivers` | `Administrator` | Creates the linked User (Role=Driver, password hashed) and Driver profile together. `409` on duplicate email or a vehicle already assigned elsewhere |
+| `PUT /api/admin/drivers/{id}` | `Administrator` | Full update (name, email, phone, active status, vehicle). Role can never be changed here |
+| `PUT /api/admin/drivers/{id}/activate` | `Administrator` | Convenience toggle — also reactivates the linked User's login |
+| `PUT /api/admin/drivers/{id}/deactivate` | `Administrator` | Convenience toggle — also deactivates the linked User's login. Never deletes either record |
+| `PUT /api/admin/drivers/{id}/password` | `Administrator` | `{ newPassword }` → resets the linked User's password (hashed, never returned) |
 
 `TestController` exists purely to verify authentication/authorization end-to-end (including from Swagger); it isn't part of the product API surface and can be removed once real protected endpoints exist.
 
@@ -185,8 +209,15 @@ Frontend tests use Vitest + React Testing Library.
 - **Vehicle registration uniqueness is global** (active AND inactive vehicles), unlike Route's active-only duplicate rule — a deliberate difference: Prompt 2 already put an unconditional unique index on `Vehicle.RegistrationNumber`, and a real license plate identifies one physical vehicle permanently (unlike a route, which is just a reusable city pair). Registration numbers are also normalized (trimmed, internal whitespace collapsed, uppercased) *before storage*, not just for comparison — the DB's plain unique index is sufficient without needing `citext` or a functional index.
 - **Vehicle type stays free text with `<datalist>` suggestions** (Sedan/SUV/Van/Limousine/Minivan) rather than an enum, matching the spec's "keep it extensible" note and Prompt 2's original string-typed column.
 - **Swagger XML doc comments span two assemblies**: DTOs live in `LimousineBooking.Application`, not `LimousineBooking.Api`, so both projects now set `GenerateDocumentationFile`, and `Program.cs` calls `IncludeXmlComments` for both — Swashbuckle only picks up comments from assemblies you explicitly point it at, regardless of which project's types appear in a controller signature. (`CS1591` is suppressed in both projects since most existing public members still lack doc comments.)
+- **Driver creation is atomic without an explicit transaction**: `DriverService.CreateAsync` adds the new `User` and `Driver` to the same scoped `DbContext` and calls `SaveChangesAsync()` exactly once — EF Core already wraps a single `SaveChanges` call covering multiple pending inserts in one database transaction, so a manual `BeginTransaction`/`Commit` would be redundant. This works because both entities use client-generated GUIDs (assigned at construction, not by the database), so `Driver.UserId` can reference the new `User.Id` before either has been persisted.
+- **Vehicle assignment is "prevent, not reassign"**: attempting to assign a vehicle that already has another driver returns `409` with a clear message, rather than silently stealing it from the other driver — the spec explicitly asked for the safer of the two options.
+- **Vehicle registration uniqueness stays global; new domain methods added for Prompt 6**: `User.UpdateProfile(...)`, `User.SetPasswordHash(...)`, and `Driver.UpdatePhone(...)` — none existed before since Prompt 3 only needed `Activate`/`Deactivate`. Both `User` and `Driver` also gained lightweight format validation (a loose email regex, a loose international-friendly phone regex) in their shared `Validate` helpers, so "invalid email"/"invalid phone" is enforced at the domain layer, not just via `[EmailAddress]`/`[Required]` on the DTOs.
+- **Deactivating a driver also deactivates their `User` (blocks login), and activating symmetrically re-enables it** — the spec only stated the deactivation half explicitly, but leaving an "active" driver locked out of login (or a "deactivated" driver still able to log in) would be an inconsistent state the spec doesn't intend. `User.IsActive` and `Driver.IsActive` remain two separate columns on two separate aggregates (auth concern vs. business-profile concern) — the driver-management endpoints just choose to always keep them in sync.
+- **`DriverResponse` is used for both the list and single-driver endpoints** — the spec's field lists for "get all" and "get by id" are identical, so a separate `DriverDetailsResponse` type would just duplicate it. The spec's "future bookings/schedule" placeholder section for the driver-details page was intentionally left out of the DTO, per the instruction not to implement it yet.
+- **Password reset is a dedicated endpoint** (`PUT /api/admin/drivers/{id}/password`) reusing `IPasswordService` from Prompt 3 — no second hashing mechanism, no password ever included in `DriverResponse`.
+- **A real local PostgreSQL is now used for manual verification** (see **Running Without Docker, Against a Real PostgreSQL** above) — installed via `winget` since Docker wasn't available in this environment. All Prompt 5/6 flows described in this README (login, route/vehicle/driver CRUD, duplicate detection, deactivation blocking login, password reset) were exercised live against it, not just via mocked tests.
 
 ## Known Issues / Follow-ups
 
-- **Docker was not available in the environment this was built in** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles are written to spec but not verified end-to-end with an actual `docker compose up`. Likewise, no local PostgreSQL was available to run `dotnet ef database update` or exercise the admin CRUD endpoints against a real database — this was substituted with (a) inspecting generated migration SQL where relevant, (b) `dotnet ef migrations has-pending-model-changes` (confirms Prompts 4 and 5 needed no migration), and (c) mocked/`WebApplicationFactory`-based tests that don't require a live database.
-- Customer booking APIs, automatic driver assignment, notifications, and the admin/driver dashboards are all deliberately unimplemented — scoped for later steps. The future `GET /api/public/routes` endpoint mentioned in Prompt 4 was **not** added, per its own instruction not to implement it yet.
+- **Docker was still not available in this environment** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles remain written-to-spec but unverified via an actual `docker compose up`. A real local PostgreSQL install (see above) covers the database side instead.
+- Customer booking APIs, automatic driver assignment, notifications, and the admin/driver dashboards are all deliberately unimplemented — scoped for later steps. The future `GET /api/public/routes` endpoint mentioned in Prompt 4 was **not** added, per its own instruction not to implement it yet. Driver availability *scheduling* (Prompt 7) is also not implemented — Prompt 6 only exposes the current `IsAvailable` flag as read-only in the driver list/details.

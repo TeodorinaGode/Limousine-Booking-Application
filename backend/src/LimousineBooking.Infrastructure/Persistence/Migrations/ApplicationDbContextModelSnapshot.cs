@@ -333,15 +333,30 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<DateTime?>("NextAttemptAt")
+                        .HasColumnType("timestamptz");
+
                     b.Property<string>("NotificationType")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ProcessingStartedAt")
+                        .HasColumnType("timestamptz");
+
                     b.Property<string>("Recipient")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
 
                     b.Property<DateTime?>("SentAt")
                         .HasColumnType("timestamptz");
@@ -354,6 +369,12 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("SentAt");
+
+                    b.HasIndex("Status", "NextAttemptAt");
 
                     b.ToTable("Notifications", (string)null);
                 });

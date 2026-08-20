@@ -74,6 +74,16 @@ function AdminHomePage() {
           </section>
 
           <section style={{ marginTop: "1.5rem" }}>
+            <h2>Notifications</h2>
+            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+              <p>Pending: {dashboard.notifications.pending}</p>
+              <p>Retrying: {dashboard.notifications.retrying}</p>
+              <p>Failed: {dashboard.notifications.failed}</p>
+              <p>Sent today: {dashboard.notifications.sentToday}</p>
+            </div>
+          </section>
+
+          <section style={{ marginTop: "1.5rem" }}>
             <h2>Upcoming Bookings</h2>
             {dashboard.upcomingBookings.length === 0 ? (
               <p>No upcoming bookings.</p>

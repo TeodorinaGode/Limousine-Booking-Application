@@ -1,5 +1,6 @@
 using LimousineBooking.Application.Bookings;
 using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Application.Notifications;
 using LimousineBooking.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,6 +25,8 @@ public class AdminBookingServiceTests
     private readonly Mock<IAvailabilityEvaluationService> _availabilityEvaluationService = new();
     private readonly Mock<IAutomaticAssignmentService> _automaticAssignmentService = new();
     private readonly Mock<IAssignmentHistoryRepository> _assignmentHistoryRepository = new();
+    private readonly Mock<INotificationService> _notificationService = new();
+    private readonly Mock<INotificationRepository> _notificationRepository = new();
     private readonly Mock<ITransactionRunner> _transactionRunner = new();
     private readonly Mock<ICurrentUserService> _currentUserService = new();
     private readonly Mock<IDateTimeProvider> _dateTimeProvider = new();
@@ -41,6 +44,7 @@ public class AdminBookingServiceTests
         _assignmentHistoryRepository.Setup(r => r.GetByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<DomainAssignmentHistory>());
         _assignmentHistoryRepository.Setup(r => r.AddAsync(It.IsAny<DomainAssignmentHistory>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _automaticAssignmentService.Setup(s => s.AssignBookingAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _notificationRepository.Setup(r => r.GetSummaryAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(new OutboxSummaryCounts());
         _currentUserService.Setup(c => c.UserId).Returns(AdminUserId);
         _dateTimeProvider.Setup(d => d.UtcNow).Returns(FixedUtcNow);
     }
@@ -54,6 +58,8 @@ public class AdminBookingServiceTests
         _availabilityEvaluationService.Object,
         _automaticAssignmentService.Object,
         _assignmentHistoryRepository.Object,
+        _notificationService.Object,
+        _notificationRepository.Object,
         _transactionRunner.Object,
         _currentUserService.Object,
         _dateTimeProvider.Object,
@@ -318,6 +324,7 @@ public class AdminBookingServiceTests
         Assert.True(result.Succeeded);
         Assert.Equal(BookingStatus.Cancelled.ToString(), result.Booking!.Status);
         Assert.Equal("Customer requested cancellation", result.Booking.CancellationReason);
+        _notificationService.Verify(n => n.NotifyCustomerCancelledAsync(booking, It.IsAny<DomainRoute>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -380,6 +387,10 @@ public class AdminBookingServiceTests
         _assignmentHistoryRepository.Verify(r => r.AddAsync(
             It.Is<DomainAssignmentHistory>(h => h.DriverId == driver.Id && h.AssignmentType == AssignmentType.Manual && h.AssignedByUserId == AdminUserId),
             It.IsAny<CancellationToken>()), Times.Once);
+        // First-time manual assignment notifies customer + driver, not the reassignment set.
+        _notificationService.Verify(n => n.NotifyCustomerAssignedAsync(booking, It.IsAny<DomainRoute>(), driver, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyDriverAssignedAsync(booking, It.IsAny<DomainRoute>(), driver, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyReassignedAsync(It.IsAny<DomainBooking>(), It.IsAny<DomainRoute>(), It.IsAny<DomainDriver>(), It.IsAny<DomainDriver>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -531,10 +542,13 @@ public class AdminBookingServiceTests
     [Fact]
     public async Task AssignDriverAsync_ReassignmentKeepsPreviousHistory()
     {
-        var (booking, _) = MakeBooking();
+        var (booking, route) = MakeBooking();
         var oldDriver = MakeDriver();
         var newDriver = MakeDriver();
         booking.ConfirmAutomaticAssignment(oldDriver.Id, oldDriver.CurrentVehicleId!.Value);
+        // GetByIdWithDetailsAsync always Includes Driver when DriverId is set — the
+        // reassignment notification needs that nav property to know who to notify.
+        SetProperty(booking, nameof(DomainBooking.Driver), oldDriver);
         SetupBooking(booking);
         AllowAssignment(newDriver);
 
@@ -545,6 +559,8 @@ public class AdminBookingServiceTests
         // A new history row is added; the old one (written by AutomaticAssignmentService,
         // not this test) is never touched — AddAsync is the only write this service performs.
         _assignmentHistoryRepository.Verify(r => r.AddAsync(It.IsAny<DomainAssignmentHistory>(), It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyReassignedAsync(booking, route, oldDriver, newDriver, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyCustomerAssignedAsync(It.IsAny<DomainBooking>(), It.IsAny<DomainRoute>(), It.IsAny<DomainDriver>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]

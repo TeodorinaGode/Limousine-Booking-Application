@@ -53,3 +53,7 @@ export function cancelBooking(id: string, data: CancelBookingRequest, accessToke
 export function getDashboard(accessToken: string): Promise<AdminDashboardDto> {
   return apiRequest<AdminDashboardDto>("/admin/bookings/dashboard", { accessToken });
 }
+
+export function resendConfirmation(id: string, accessToken: string): Promise<AdminBookingDetailDto> {
+  return apiRequest<AdminBookingDetailDto>(`/admin/bookings/${id}/notifications/confirmation/resend`, { method: "POST", accessToken });
+}

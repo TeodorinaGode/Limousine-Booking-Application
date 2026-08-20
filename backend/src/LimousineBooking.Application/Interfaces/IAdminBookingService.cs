@@ -20,4 +20,7 @@ public interface IAdminBookingService
     Task<AdminBookingOperationResult> AutoAssignAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<AdminDashboardResponse> GetDashboardAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Re-enqueues the confirmation email using the booking's current state. Read-only — never touches status/assignment, never creates a duplicate booking.</summary>
+    Task<AdminBookingOperationResult> ResendConfirmationAsync(Guid id, CancellationToken cancellationToken = default);
 }

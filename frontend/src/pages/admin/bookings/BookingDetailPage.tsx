@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { assignDriver, autoAssign, cancelBooking, getBookingById, updateBooking } from "../../../services/adminBookingService";
+import { assignDriver, autoAssign, cancelBooking, getBookingById, resendConfirmation, updateBooking } from "../../../services/adminBookingService";
 import { getDrivers } from "../../../services/driverService";
 import { getRoutes } from "../../../services/routeService";
 import type { AdminBookingDetailDto, AssignDriverRequest, UpdateBookingRequest } from "../../../types/adminBooking";
@@ -98,6 +98,20 @@ function BookingDetailPage() {
       setSuccessMessage("Automatic assignment completed.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run automatic assignment.");
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!accessToken || !id) return;
+    setError(null);
+    setIsBusy(true);
+    try {
+      await resendConfirmation(id, accessToken);
+      setSuccessMessage("Confirmation email queued for resend.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend the confirmation email.");
     } finally {
       setIsBusy(false);
     }
@@ -246,6 +260,11 @@ function BookingDetailPage() {
         {canEdit && (
           <button type="button" onClick={handleAutoAssign} disabled={isBusy}>
             Run Automatic Assignment
+          </button>
+        )}
+        {booking.status === "Confirmed" && (
+          <button type="button" onClick={handleResendConfirmation} disabled={isBusy}>
+            Resend Confirmation Email
           </button>
         )}
         {canCancel && (

@@ -27,6 +27,8 @@ public class AdminBookingService : IAdminBookingService
     private readonly IAvailabilityEvaluationService _availabilityEvaluationService;
     private readonly IAutomaticAssignmentService _automaticAssignmentService;
     private readonly IAssignmentHistoryRepository _assignmentHistoryRepository;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationRepository _notificationRepository;
     private readonly ITransactionRunner _transactionRunner;
     private readonly ICurrentUserService _currentUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -42,6 +44,8 @@ public class AdminBookingService : IAdminBookingService
         IAvailabilityEvaluationService availabilityEvaluationService,
         IAutomaticAssignmentService automaticAssignmentService,
         IAssignmentHistoryRepository assignmentHistoryRepository,
+        INotificationService notificationService,
+        INotificationRepository notificationRepository,
         ITransactionRunner transactionRunner,
         ICurrentUserService currentUserService,
         IDateTimeProvider dateTimeProvider,
@@ -56,6 +60,8 @@ public class AdminBookingService : IAdminBookingService
         _availabilityEvaluationService = availabilityEvaluationService;
         _automaticAssignmentService = automaticAssignmentService;
         _assignmentHistoryRepository = assignmentHistoryRepository;
+        _notificationService = notificationService;
+        _notificationRepository = notificationRepository;
         _transactionRunner = transactionRunner;
         _currentUserService = currentUserService;
         _dateTimeProvider = dateTimeProvider;
@@ -215,11 +221,31 @@ public class AdminBookingService : IAdminBookingService
         if (conflictReason is not null)
             return AdminBookingOperationResult.Failure(AdminBookingError.Conflict, conflictReason);
 
+        // Captured before the assignment is overwritten — this is the only
+        // moment the previous driver is still known, and reassignment-away
+        // notifications need it.
+        var previousDriverId = booking.DriverId;
+        var previousDriver = booking.Driver;
+
         booking.ConfirmManualAssignment(driver.Id, vehicle.Id);
 
         await _assignmentHistoryRepository.AddAsync(
             new Domain.Entities.AssignmentHistory(booking.Id, driver.Id, vehicle.Id, AssignmentType.Manual, _currentUserService.UserId, _dateTimeProvider.UtcNow),
             cancellationToken);
+
+        if (previousDriverId is null)
+        {
+            // First-time manual assignment (section 37: "Administrator manually
+            // assigns driver" — distinct from reassignment's own notification set).
+            await _notificationService.NotifyCustomerAssignedAsync(booking, booking.Route, driver, cancellationToken);
+            await _notificationService.NotifyDriverAssignedAsync(booking, booking.Route, driver, cancellationToken);
+        }
+        else if (previousDriverId != driver.Id && previousDriver is not null)
+        {
+            await _notificationService.NotifyReassignedAsync(booking, booking.Route, previousDriver, driver, cancellationToken);
+        }
+        // Re-selecting the same driver that was already assigned is a no-op for
+        // everyone involved — nothing to notify.
 
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
@@ -241,6 +267,10 @@ public class AdminBookingService : IAdminBookingService
             return AdminBookingOperationResult.Failure(AdminBookingError.Conflict, "Completed bookings cannot be cancelled.");
 
         booking.Cancel(request.Reason, _currentUserService.UserId, _dateTimeProvider.UtcNow);
+
+        if (booking.Route is not null)
+            await _notificationService.NotifyCustomerCancelledAsync(booking, booking.Route, cancellationToken);
+
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
@@ -263,11 +293,29 @@ public class AdminBookingService : IAdminBookingService
         return AdminBookingOperationResult.Success(await ToDetailAsync(booking, cancellationToken));
     }
 
+    public async Task<AdminBookingOperationResult> ResendConfirmationAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var booking = await _bookingRepository.GetByIdWithDetailsAsync(id, cancellationToken);
+        if (booking is null)
+            return AdminBookingOperationResult.Failure(AdminBookingError.NotFound, "Booking not found.");
+        if (booking.Route is null)
+            return AdminBookingOperationResult.Failure(AdminBookingError.Conflict, "The booking's route could not be loaded.");
+
+        await _notificationService.ResendConfirmationAsync(booking, booking.Route, cancellationToken);
+        await _bookingRepository.SaveChangesAsync(cancellationToken);
+
+        return AdminBookingOperationResult.Success(await ToDetailAsync(booking, cancellationToken));
+    }
+
     public async Task<AdminDashboardResponse> GetDashboardAsync(CancellationToken cancellationToken = default)
     {
-        var today = DateOnly.FromDateTime(Common.SwissTimeZone.ConvertFromUtc(_dateTimeProvider.UtcNow));
-        var counts = await _bookingRepository.GetDashboardCountsAsync(today, cancellationToken);
-        var upcoming = await _bookingRepository.GetUpcomingAsync(today, 10, cancellationToken);
+        var todayLocal = DateOnly.FromDateTime(Common.SwissTimeZone.ConvertFromUtc(_dateTimeProvider.UtcNow));
+        var startOfTodayUtc = TimeZoneInfo.ConvertTimeToUtc(
+            DateTime.SpecifyKind(todayLocal.ToDateTime(TimeOnly.MinValue), DateTimeKind.Unspecified), Common.SwissTimeZone.Instance);
+
+        var counts = await _bookingRepository.GetDashboardCountsAsync(todayLocal, cancellationToken);
+        var upcoming = await _bookingRepository.GetUpcomingAsync(todayLocal, 10, cancellationToken);
+        var notificationSummary = await _notificationRepository.GetSummaryAsync(startOfTodayUtc, cancellationToken);
 
         return new AdminDashboardResponse
         {
@@ -278,7 +326,8 @@ public class AdminBookingService : IAdminBookingService
             ConfirmedBookings = counts.ConfirmedBookings,
             CancelledBookings = counts.CancelledBookings,
             UpcomingTripsCount = counts.UpcomingTripsCount,
-            UpcomingBookings = upcoming.Select(ToUpcomingItem).ToList()
+            UpcomingBookings = upcoming.Select(ToUpcomingItem).ToList(),
+            Notifications = notificationSummary
         };
     }
 

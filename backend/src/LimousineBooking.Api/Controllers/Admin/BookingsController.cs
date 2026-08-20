@@ -98,6 +98,19 @@ public class BookingsController : ControllerBase
         return result.Succeeded ? Ok(result.Booking) : MapError(result);
     }
 
+    /// <summary>
+    /// Re-enqueues the booking confirmation email using its current state. Does
+    /// not change status, does not re-run assignment, and never creates a
+    /// duplicate booking — it only queues one more Notification row.
+    /// </summary>
+    /// <response code="404">No booking exists with the given id.</response>
+    [HttpPost("{id:guid}/notifications/confirmation/resend")]
+    public async Task<ActionResult<AdminBookingDetailResponse>> ResendConfirmation(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _adminBookingService.ResendConfirmationAsync(id, cancellationToken);
+        return result.Succeeded ? Ok(result.Booking) : MapError(result);
+    }
+
     private ActionResult MapError(AdminBookingOperationResult result) => result.Error switch
     {
         AdminBookingError.NotFound => NotFound(new { message = result.ErrorMessage }),

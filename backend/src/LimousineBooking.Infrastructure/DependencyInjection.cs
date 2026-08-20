@@ -2,6 +2,7 @@ using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Entities;
 using LimousineBooking.Infrastructure.Authentication;
 using LimousineBooking.Infrastructure.Common;
+using LimousineBooking.Infrastructure.Email;
 using LimousineBooking.Infrastructure.Persistence;
 using LimousineBooking.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
 
         services.AddHttpContextAccessor();
 
@@ -37,10 +39,18 @@ public static class DependencyInjection
         services.AddScoped<IDriverAvailabilityRepository, DriverAvailabilityRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IAssignmentHistoryRepository, AssignmentHistoryRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<ITransactionRunner, TransactionRunner>();
+        services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
 
-        // Further external service integrations (email, notifications, etc.)
-        // will be registered here as they are introduced in subsequent steps.
+        // Real SMTP delivery only when explicitly enabled — otherwise the
+        // dev-mode logger stands in, so the whole notification pipeline is
+        // exercisable without a real email account (see EmailSettings.Enabled).
+        var emailSettings = configuration.GetSection(EmailSettings.SectionName).Get<EmailSettings>() ?? new EmailSettings();
+        if (emailSettings.Enabled)
+            services.AddScoped<IEmailService, SmtpEmailService>();
+        else
+            services.AddScoped<IEmailService, LoggingEmailService>();
 
         return services;
     }

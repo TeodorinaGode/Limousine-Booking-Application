@@ -1,3 +1,5 @@
+using LimousineBooking.Application.Notifications;
+
 namespace LimousineBooking.Application.Bookings;
 
 /// <summary>Operational counters + an upcoming-trips glance for the admin dashboard — not a reporting/analytics feature.</summary>
@@ -12,6 +14,8 @@ public class AdminDashboardResponse
     public int UpcomingTripsCount { get; set; }
 
     public IReadOnlyList<UpcomingBookingItem> UpcomingBookings { get; set; } = Array.Empty<UpcomingBookingItem>();
+
+    public OutboxSummaryCounts Notifications { get; set; } = new();
 }
 
 public class UpcomingBookingItem

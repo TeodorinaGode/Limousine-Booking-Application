@@ -236,4 +236,29 @@ describe("BookingDetailPage", () => {
     expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Cancel Booking" })).not.toBeInTheDocument();
   });
+
+  it("resends the confirmation email for a confirmed booking", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(makeBooking({ status: "Confirmed" }));
+    mockedAdminBookingService.resendConfirmation.mockResolvedValue(makeBooking({ status: "Confirmed" }));
+    const user = userEvent.setup();
+
+    renderPage();
+    await screen.findByText("LM-20261225-123456", { exact: false });
+
+    await user.click(screen.getByRole("button", { name: "Resend Confirmation Email" }));
+
+    await waitFor(() => {
+      expect(mockedAdminBookingService.resendConfirmation).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111", "test-token");
+    });
+    expect(await screen.findByRole("status")).toHaveTextContent("Confirmation email queued for resend.");
+  });
+
+  it("does not show the resend button for a pending booking", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(makeBooking({ status: "Pending", requiresManualAssignment: true }));
+
+    renderPage();
+    await screen.findByText("LM-20261225-123456", { exact: false });
+
+    expect(screen.queryByRole("button", { name: "Resend Confirmation Email" })).not.toBeInTheDocument();
+  });
 });

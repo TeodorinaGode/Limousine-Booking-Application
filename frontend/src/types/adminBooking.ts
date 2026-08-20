@@ -115,6 +115,13 @@ export interface UpcomingBookingItemDto {
   status: string;
 }
 
+export interface NotificationSummaryDto {
+  pending: number;
+  retrying: number;
+  failed: number;
+  sentToday: number;
+}
+
 export interface AdminDashboardDto {
   totalBookings: number;
   todaysBookings: number;
@@ -124,4 +131,5 @@ export interface AdminDashboardDto {
   cancelledBookings: number;
   upcomingTripsCount: number;
   upcomingBookings: UpcomingBookingItemDto[];
+  notifications: NotificationSummaryDto;
 }

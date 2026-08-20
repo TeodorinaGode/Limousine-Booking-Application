@@ -28,6 +28,7 @@ public class AutomaticAssignmentServiceTests
     private readonly Mock<IDriverRepository> _driverRepository = new();
     private readonly Mock<IAvailabilityEvaluationService> _availabilityEvaluationService = new();
     private readonly Mock<IAssignmentHistoryRepository> _assignmentHistoryRepository = new();
+    private readonly Mock<INotificationService> _notificationService = new();
     private readonly Mock<ITransactionRunner> _transactionRunner = new();
     private readonly Mock<IDateTimeProvider> _dateTimeProvider = new();
 
@@ -51,6 +52,7 @@ public class AutomaticAssignmentServiceTests
         _driverRepository.Object,
         _availabilityEvaluationService.Object,
         _assignmentHistoryRepository.Object,
+        _notificationService.Object,
         _transactionRunner.Object,
         _dateTimeProvider.Object,
         Options.Create(settings ?? new BookingSettings()),
@@ -139,6 +141,20 @@ public class AutomaticAssignmentServiceTests
         _bookingRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Fact]
+    public async Task AssignBookingAsync_OnSuccess_NotifiesCustomerConfirmedAndDriver()
+    {
+        var (booking, route) = MakeBooking(new DateOnly(2026, 9, 10), new TimeOnly(14, 0));
+        var driver = MakeDriver();
+        SetupDefaults(booking, new[] { driver });
+
+        await CreateService().AssignBookingAsync(booking.Id);
+
+        _notificationService.Verify(n => n.NotifyCustomerBookingConfirmedAsync(booking, route, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyDriverAssignedAsync(booking, route, driver, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyCustomerBookingPendingAsync(It.IsAny<DomainBooking>(), It.IsAny<DomainRoute>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     // ---- No driver available ----
 
     [Fact]
@@ -155,6 +171,19 @@ public class AutomaticAssignmentServiceTests
         Assert.True(booking.RequiresManualAssignment);
         Assert.False(string.IsNullOrWhiteSpace(booking.ManualAssignmentReason));
         _bookingRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AssignBookingAsync_OnFailure_NotifiesCustomerPendingAndAdmin()
+    {
+        var (booking, route) = MakeBooking(new DateOnly(2026, 9, 10), new TimeOnly(14, 0));
+        SetupDefaults(booking, Array.Empty<DomainDriver>());
+
+        await CreateService().AssignBookingAsync(booking.Id);
+
+        _notificationService.Verify(n => n.NotifyCustomerBookingPendingAsync(booking, route, It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyAdminManualAssignmentRequiredAsync(booking, route, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        _notificationService.Verify(n => n.NotifyCustomerBookingConfirmedAsync(It.IsAny<DomainBooking>(), It.IsAny<DomainRoute>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     // ---- Outside schedule / no schedule ----

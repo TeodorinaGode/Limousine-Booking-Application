@@ -5,6 +5,7 @@ using LimousineBooking.Application;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Infrastructure;
 using LimousineBooking.Infrastructure.Authentication;
+using LimousineBooking.Infrastructure.BackgroundServices;
 using LimousineBooking.Infrastructure.Persistence;
 using LimousineBooking.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,14 @@ builder.Services.AddControllers()
 
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// The "Testing" environment (WebApplicationFactory-based integration tests)
+// never needs a live background poller — it would just add DB traffic and
+// log noise against a database the tests don't otherwise touch.
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddHostedService<NotificationOutboxWorker>();
+}
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

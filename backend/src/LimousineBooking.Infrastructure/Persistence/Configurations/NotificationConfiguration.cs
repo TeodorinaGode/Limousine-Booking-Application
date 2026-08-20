@@ -41,6 +41,26 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.Property(n => n.ErrorMessage)
             .HasMaxLength(1000);
 
+        builder.Property(n => n.Payload)
+            .IsRequired()
+            .HasColumnType("text");
+
+        builder.Property(n => n.RetryCount)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(n => n.NextAttemptAt)
+            .HasColumnType("timestamptz");
+
+        builder.Property(n => n.ProcessingStartedAt)
+            .HasColumnType("timestamptz");
+
         builder.HasIndex(n => n.BookingId);
+
+        // The background worker's main query: due Pending/stuck-Processing messages.
+        builder.HasIndex(n => new { n.Status, n.NextAttemptAt });
+
+        builder.HasIndex(n => n.CreatedAt);
+        builder.HasIndex(n => n.SentAt);
     }
 }

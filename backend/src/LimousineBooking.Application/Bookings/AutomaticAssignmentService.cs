@@ -22,6 +22,7 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
     private readonly IDriverRepository _driverRepository;
     private readonly IAvailabilityEvaluationService _availabilityEvaluationService;
     private readonly IAssignmentHistoryRepository _assignmentHistoryRepository;
+    private readonly INotificationService _notificationService;
     private readonly ITransactionRunner _transactionRunner;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly BookingSettings _settings;
@@ -32,6 +33,7 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
         IDriverRepository driverRepository,
         IAvailabilityEvaluationService availabilityEvaluationService,
         IAssignmentHistoryRepository assignmentHistoryRepository,
+        INotificationService notificationService,
         ITransactionRunner transactionRunner,
         IDateTimeProvider dateTimeProvider,
         IOptions<BookingSettings> settings,
@@ -41,6 +43,7 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
         _driverRepository = driverRepository;
         _availabilityEvaluationService = availabilityEvaluationService;
         _assignmentHistoryRepository = assignmentHistoryRepository;
+        _notificationService = notificationService;
         _transactionRunner = transactionRunner;
         _dateTimeProvider = dateTimeProvider;
         _settings = settings.Value;
@@ -111,6 +114,12 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
             new AssignmentHistory(booking.Id, selected.Id, selected.CurrentVehicleId!.Value, AssignmentType.Automatic, assignedByUserId: null, _dateTimeProvider.UtcNow),
             cancellationToken);
 
+        // Enqueued before SaveChangesAsync so the notification rows ride along
+        // in the same transaction as the assignment itself (transactional outbox
+        // — see Notification's summary).
+        await _notificationService.NotifyCustomerBookingConfirmedAsync(booking, booking.Route, cancellationToken);
+        await _notificationService.NotifyDriverAssignedAsync(booking, booking.Route, selected, cancellationToken);
+
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
@@ -123,6 +132,13 @@ public class AutomaticAssignmentService : IAutomaticAssignmentService
     private async Task<bool> FailAsync(Booking booking, Guid bookingId, int candidateCount, string reason, CancellationToken cancellationToken)
     {
         booking.MarkRequiresManualAssignment(reason);
+
+        if (booking.Route is not null)
+        {
+            await _notificationService.NotifyCustomerBookingPendingAsync(booking, booking.Route, cancellationToken);
+            await _notificationService.NotifyAdminManualAssignmentRequiredAsync(booking, booking.Route, reason, cancellationToken);
+        }
+
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(

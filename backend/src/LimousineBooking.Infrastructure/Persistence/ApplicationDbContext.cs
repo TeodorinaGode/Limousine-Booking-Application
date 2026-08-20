@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<PaymentWebhookEvent> PaymentWebhookEvents => Set<PaymentWebhookEvent>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+    public DbSet<Location> Locations => Set<Location>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

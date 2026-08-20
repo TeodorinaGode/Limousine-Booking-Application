@@ -238,5 +238,14 @@
   "seo": {
     "homeTitle": "ROI Limousinen | Service de chauffeur et limousine premium",
     "homeDescription": "Services premium de limousine et de chauffeur depuis la Suisse pour les transferts aéroport, les voyages d'affaires, les visites de ville et les trajets privés."
+  },
+  "serviceAreaMap": {
+    "eyebrow": "Notre zone de service",
+    "title": "Service de chauffeur en Suisse et à travers l'Europe",
+    "subtitle": "De la Suisse vers les principales destinations européennes, ROI Limousinen propose un transport premium avec chauffeur pour vos voyages professionnels et privés.",
+    "regionLabel": "Carte interactive de la zone de service de ROI Limousinen",
+    "availableDestinations": "Destinations disponibles",
+    "bookThisRoute": "Réserver ce trajet",
+    "mainDestinations": "Destinations principales"
   }
 }

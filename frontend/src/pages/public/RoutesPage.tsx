@@ -1,19 +1,32 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getActiveRoutes } from "../../services/bookingService";
+import { getLocations } from "../../services/locationService";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import type { PublicRouteDto } from "../../types/booking";
+import type { PublicLocationsDto } from "../../types/location";
 
-/** Public Routes/Destinations page (Prompt 17, section 9) — lists only active routes (the public API already excludes inactive ones, section 9/40), with real duration/price from the backend, never hard-coded (section 8). */
+const ServiceAreaMap = lazy(() => import("../../components/ServiceAreaMap"));
+
+/**
+ * Public Routes/Destinations page (Prompt 17, section 9) — lists only active
+ * routes (the public API already excludes inactive ones, section 9/40), with
+ * real duration/price from the backend, never hard-coded (section 8). The
+ * interactive map (Prompt 19, section 10) shares `selectedRouteId` with this
+ * list: clicking a route card highlights it on the map, and clicking a route
+ * on the map highlights the matching card, via one piece of state lifted here.
+ */
 function RoutesPage() {
   const { t } = useTranslation("site");
   usePageMeta(`${t("routesPage.title")} | ${t("footer.description")}`, t("routesPage.subtitle"));
 
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
+  const [locationsData, setLocationsData] = useState<PublicLocationsDto | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +42,10 @@ function RoutesPage() {
         setIsLoading(false);
       }
     })();
+    getLocations().then(setLocationsData).catch(() => undefined);
   }, []);
+
+  const showMap = locationsData && locationsData.enabled && locationsData.locations.length > 0;
 
   return (
     <div>
@@ -55,6 +71,50 @@ function RoutesPage() {
           ) : routes.length === 0 ? (
             <div className="empty-state">
               <p className="empty-state__title">{t("routesPage.noRoutes")}</p>
+            </div>
+          ) : showMap ? (
+            <div className="service-area-layout">
+              <Suspense fallback={<div className="service-area-map__skeleton" />}>
+                <ServiceAreaMap
+                  locations={locationsData.locations}
+                  routes={routes}
+                  defaultLatitude={locationsData.defaultLatitude}
+                  defaultLongitude={locationsData.defaultLongitude}
+                  defaultZoom={locationsData.defaultZoom}
+                  selectedRouteId={selectedRouteId}
+                  onSelectRoute={setSelectedRouteId}
+                  height={460}
+                />
+              </Suspense>
+              <div className="stack service-area-layout__list">
+                {routes.map((route) => (
+                  <article
+                    className={`content-card route-list-item${route.id === selectedRouteId ? " route-list-item--active" : ""}`}
+                    key={route.id}
+                    onClick={() => setSelectedRouteId(route.id)}
+                  >
+                    <div className="trip-card__route" style={{ marginBottom: 0 }}>
+                      <span>{route.departureLocation}</span>
+                      <span className="trip-card__arrow">&rarr;</span>
+                      <span>{route.destination}</span>
+                    </div>
+                    <p className="content-card__meta">
+                      <span>{t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m</span>
+                    </p>
+                    <p className="trip-card__price" style={{ marginTop: 0 }}>
+                      {t("routesTeaser.from")} {route.price.toFixed(2)} {route.currency}
+                    </p>
+                    <Link
+                      to="/booking"
+                      state={{ routeId: route.id }}
+                      className="btn-secondary"
+                      style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}
+                    >
+                      {t("routesTeaser.bookThisRoute")}
+                    </Link>
+                  </article>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="grid grid--3">

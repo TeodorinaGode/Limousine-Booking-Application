@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IPaymentWebhookEventRepository, PaymentWebhookEventRepository>();
         services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
+        services.AddScoped<ILocationRepository, LocationRepository>();
 
         // Real SMTP delivery only when explicitly enabled — otherwise the
         // dev-mode logger stands in, so the whole notification pipeline is

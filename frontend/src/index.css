@@ -1526,3 +1526,186 @@ tbody tr:last-child td {
     margin-bottom: var(--space-8);
   }
 }
+
+/* ---- Service area map (Prompt 19) ---- */
+.service-area-map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.service-area-map__canvas {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.service-area-map__skeleton {
+  height: 420px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+@media (max-width: 640px) {
+  .service-area-map__canvas,
+  .service-area-map__skeleton {
+    height: 380px;
+  }
+}
+
+.map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+.map-marker--city {
+  color: var(--color-accent-strong);
+  font-size: 1.1rem;
+}
+.map-marker--airport {
+  font-size: 1rem;
+}
+.map-marker--destination {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.leaflet-container {
+  background: var(--color-surface) !important;
+  font-family: var(--font-sans);
+}
+.leaflet-popup-content-wrapper {
+  background: var(--color-surface-elevated) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.leaflet-popup-tip {
+  background: var(--color-surface-elevated) !important;
+}
+.leaflet-popup-content {
+  margin: var(--space-3) var(--space-4) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(8, 8, 8, 0.7) !important;
+  color: var(--color-text-muted) !important;
+}
+.leaflet-control-attribution a {
+  color: var(--color-text-secondary) !important;
+}
+
+.map-popup__name {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.map-popup__meta {
+  margin: 2px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+.map-popup__desc {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+.map-popup__routes {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.map-popup__routes-label {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+.map-popup__route-button {
+  font-size: 0.78rem;
+  padding: 0.5em 0.8em;
+  text-align: left;
+}
+.map-popup__cta {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.map-route-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  justify-content: space-between;
+}
+.map-route-card__route {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.map-route-card__meta {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.map-location-list {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+.map-location-list__title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+.map-location-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.service-area-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+@media (min-width: 900px) {
+  .service-area-layout {
+    grid-template-columns: 3fr 2fr;
+    align-items: start;
+  }
+  .service-area-layout__list {
+    max-height: 640px;
+    overflow-y: auto;
+  }
+}
+.route-list-item {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.route-list-item--active {
+  border-color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+}

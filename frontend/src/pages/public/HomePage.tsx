@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getActiveRoutes } from "../../services/bookingService";
 import { getActiveVehicles } from "../../services/publicVehicleService";
+import { getLocations } from "../../services/locationService";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
@@ -12,6 +13,9 @@ import { useCompanyInfo } from "../../hooks/useCompanyInfo";
 import { SERVICES } from "../../config/services";
 import type { PublicRouteDto } from "../../types/booking";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
+import type { PublicLocationsDto } from "../../types/location";
+
+const ServiceAreaMap = lazy(() => import("../../components/ServiceAreaMap"));
 
 const TRUST_ITEMS = [
   { key: "chauffeur", icon: "🎩" },
@@ -29,10 +33,12 @@ function HomePage() {
 
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [vehicles, setVehicles] = useState<PublicVehicleDto[]>([]);
+  const [locationsData, setLocationsData] = useState<PublicLocationsDto | null>(null);
 
   useEffect(() => {
     getActiveRoutes().then(setRoutes).catch(() => undefined);
     getActiveVehicles().then(setVehicles).catch(() => undefined);
+    getLocations().then(setLocationsData).catch(() => undefined);
   }, []);
 
   return (
@@ -132,6 +138,28 @@ function HomePage() {
           )}
         </div>
       </section>
+
+      {locationsData && locationsData.enabled && locationsData.locations.length > 0 && (
+        <section className="section">
+          <div className="container section--center">
+            <p className="section__eyebrow">{t("serviceAreaMap.eyebrow")}</p>
+            <h2 className="section__title">{t("serviceAreaMap.title")}</h2>
+            <p className="section__subtitle">{t("serviceAreaMap.subtitle")}</p>
+          </div>
+          <div className="container">
+            <Suspense fallback={<div className="service-area-map__skeleton" />}>
+              <ServiceAreaMap
+                locations={locationsData.locations}
+                routes={routes}
+                defaultLatitude={locationsData.defaultLatitude}
+                defaultLongitude={locationsData.defaultLongitude}
+                defaultZoom={locationsData.defaultZoom}
+                height={380}
+              />
+            </Suspense>
+          </div>
+        </section>
+      )}
 
       <section className="section section--elevated">
         <div className="container">

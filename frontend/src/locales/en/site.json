@@ -238,5 +238,14 @@
   "seo": {
     "homeTitle": "ROI Limousinen | Premium Chauffeur & Limousine Service",
     "homeDescription": "Premium limousine and chauffeur services from Switzerland for airport transfers, corporate travel, city tours and private journeys."
+  },
+  "serviceAreaMap": {
+    "eyebrow": "Our Service Area",
+    "title": "Chauffeur Services Across Switzerland and Europe",
+    "subtitle": "From Switzerland to major destinations across Europe, ROI Limousinen provides premium chauffeur transportation for business and private journeys.",
+    "regionLabel": "Interactive map of ROI Limousinen's service area",
+    "availableDestinations": "Available destinations",
+    "bookThisRoute": "Book This Route",
+    "mainDestinations": "Main Destinations"
   }
 }

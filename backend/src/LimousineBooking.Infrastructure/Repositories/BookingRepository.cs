@@ -25,7 +25,13 @@ public class BookingRepository : IBookingRepository
             .Include(b => b.Route)
             .Include(b => b.Driver).ThenInclude(d => d!.User)
             .Include(b => b.Vehicle)
+            .Include(b => b.Payments)
             .SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
+
+    public Task<Booking?> GetByReferenceAsync(string bookingReference, CancellationToken cancellationToken = default) =>
+        _dbContext.Bookings
+            .Include(b => b.Route)
+            .SingleOrDefaultAsync(b => b.BookingReference == bookingReference, cancellationToken);
 
     public async Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchAsync(AdminBookingSearchQuery query, CancellationToken cancellationToken = default)
     {
@@ -33,6 +39,7 @@ public class BookingRepository : IBookingRepository
             .Include(b => b.Route)
             .Include(b => b.Driver).ThenInclude(d => d!.User)
             .Include(b => b.Vehicle)
+            .Include(b => b.Payments)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(query.Search))
@@ -69,6 +76,19 @@ public class BookingRepository : IBookingRepository
             "requiresmanual" => bookings.Where(b => b.RequiresManualAssignment),
             _ => bookings
         };
+
+        // "notStarted" = no payment attempt exists yet; a named status = at least
+        // one attempt reached that status (a booking with a Paid attempt is never
+        // also matched by "failed", since MarkPaid/MarkFailed are mutually exclusive
+        // terminal states on a single attempt — see Payment's transition guards).
+        if (!string.IsNullOrWhiteSpace(query.PaymentStatus) && !string.Equals(query.PaymentStatus, "all", StringComparison.OrdinalIgnoreCase))
+        {
+            bookings = query.PaymentStatus.ToLowerInvariant() == "notstarted"
+                ? bookings.Where(b => !b.Payments.Any())
+                : Enum.TryParse<PaymentStatus>(query.PaymentStatus, ignoreCase: true, out var paymentStatus)
+                    ? bookings.Where(b => b.Payments.Any(p => p.Status == paymentStatus))
+                    : bookings;
+        }
 
         var totalCount = await bookings.CountAsync(cancellationToken);
 

@@ -23,4 +23,7 @@ public interface IAdminBookingService
 
     /// <summary>Re-enqueues the confirmation email using the booking's current state. Read-only — never touches status/assignment, never creates a duplicate booking.</summary>
     Task<AdminBookingOperationResult> ResendConfirmationAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>Refunds the booking's Paid payment via the payment provider — never automatic, always an explicit administrator action (section 32/33).</summary>
+    Task<AdminBookingOperationResult> RefundPaymentAsync(Guid id, CancellationToken cancellationToken = default);
 }

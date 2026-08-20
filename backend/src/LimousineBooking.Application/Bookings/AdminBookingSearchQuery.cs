@@ -24,6 +24,9 @@ public class AdminBookingSearchQuery
     /// <summary>One of: all (default), automatic, manual, requiresManual. Unknown values behave as "all".</summary>
     public string? AssignmentFilter { get; set; }
 
+    /// <summary>One of: all (default), notStarted, pending, processing, paid, failed, cancelled, refunded.</summary>
+    public string? PaymentStatus { get; set; }
+
     /// <summary>
     /// One of: bookingDate, pickupTime, createdAt, customerName, status.
     /// Unknown values fall back to the default (bookingDate then pickupTime,

@@ -105,7 +105,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Routes: `/` (public), `/booking` (public — anonymous multi-step booking form), `/login`, `/driver` (Driver-only), `/driver/availability` (current status + schedule), `/admin` (Administrator-only — dashboard statistics, upcoming trips, and a notification summary), `/admin/routes`, `/admin/vehicles`, `/admin/drivers`, `/admin/drivers/{id}` (details + read-only schedule), `/admin/bookings` (search/filter/sort/paginate), `/admin/bookings/{id}` (detail, edit, assign/reassign, cancel, resend confirmation email), `/unauthorized`.
+Open `http://localhost:5173`. Routes: `/` (public), `/booking` (public — anonymous multi-step booking form, ending in a "Pay Now" step), `/booking/payment/{bookingReference}?token=...` (public — check/retry payment status from a saved link), `/booking/payment/success` / `/booking/payment/cancelled` (public — Stripe/fake-checkout redirect targets), `/login`, `/driver` (Driver-only), `/driver/availability` (current status + schedule), `/admin` (Administrator-only — dashboard statistics, upcoming trips, and a notification summary), `/admin/routes`, `/admin/vehicles`, `/admin/drivers`, `/admin/drivers/{id}` (details + read-only schedule), `/admin/bookings` (search/filter/sort/paginate, including by payment status), `/admin/bookings/{id}` (detail, edit, assign/reassign, cancel, resend confirmation email, payment history + refund), `/admin/reports` (includes a Payments metrics section), `/unauthorized`.
 
 ## Running Without Docker, Against a Real PostgreSQL
 
@@ -170,6 +170,12 @@ $env:PGPASSWORD = "postgres"
 | `POST /api/admin/bookings/{id}/notifications/confirmation/resend` | `Administrator` | Re-enqueues the confirmation email using the booking's current state. Never changes status/assignment, never creates a duplicate booking |
 | `GET /api/admin/notifications/failed` | `Administrator` | Paginated list of notifications that exhausted all retries. Never exposes SMTP credentials or raw rendered email bodies |
 | `POST /api/admin/notifications/{id}/retry` | `Administrator` | Resets retry state and puts the notification back into `Pending` for the background worker to pick up. Never sends the email itself. `404` if not found |
+| `POST /api/public/bookings/{bookingReference}/payment` | none | `?token=` (the booking's `PublicAccessToken`, not the reference alone). Starts a payment attempt for the amount snapshotted on the booking — reuses a still-open Checkout Session instead of creating a duplicate (double-click/multi-tab protection). `404` on a wrong/missing token, `409` (`BOOKING_CANCELLED`/`BOOKING_NOT_PAYABLE`/`BOOKING_ALREADY_PAID`) if the booking can't be paid right now |
+| `POST /api/public/bookings/{bookingReference}/payment/retry` | none | Same auth/validation as above, but always opens a brand-new attempt (never reuses an open session) — for after a `Failed`/`Cancelled` attempt. Every prior attempt is kept for audit |
+| `GET /api/public/bookings/{bookingReference}/payment` | none | `?token=` → the most recent attempt's `{ status, amount, currency, paidAt }`. Only the webhook ever marks a payment `Paid`, so this always reflects the provider's actual confirmation, never client-side assumption. `404` if no attempt exists yet or the token doesn't match |
+| `POST /api/payments/webhook` | none (provider-verified) | Stripe (or the fake provider's simulated) webhook delivery. Verifies `Stripe-Signature`, is idempotent on `ProviderEventId` (a unique DB index turns a duplicate delivery into a no-op), and is the *only* code path that ever marks a payment `Paid`/`Failed`/`Cancelled` |
+| `POST /api/admin/bookings/{id}/refund` | `Administrator` | Refunds the booking's `Paid` payment via the active payment provider, then marks it `Refunded`. Never automatic — always an explicit admin action. `409` if there's no `Paid` payment to refund |
+| `GET /api/admin/reports/payments` | `Administrator` | Same `dateFrom`/`dateTo` convention as the other reports. Payment-attempt counts by status (Pending/Processing merged as "in flight") + `paidRevenue` (currently-`Paid` attempts) and `refundedAmount` (currently-`Refunded` attempts) — kept as two always-separate figures, never netted against each other or against `ReportSummaryResponse`'s booking-price-based revenue |
 
 `TestController` exists purely to verify authentication/authorization end-to-end (including from Swagger); it isn't part of the product API surface and can be removed once real protected endpoints exist.
 
@@ -199,6 +205,41 @@ By default `EmailSettings:Enabled` is `false` in `appsettings.json`, which makes
 4. Inspect `GET /api/admin/notifications/failed` and `POST /api/admin/notifications/{id}/retry` via Swagger to see the admin-facing side.
 
 To test against a real inbox, set `EmailSettings:Enabled=true` plus `Host`/`Port`/`Username`/`Password`/`FromEmail` (e.g. via environment variables — never commit real credentials) and `SmtpEmailService` takes over automatically.
+
+## Testing Payments Locally (No Real Stripe Account Needed)
+
+By default `PaymentSettings:Enabled` is `false` in `appsettings.json`, which makes the API use `FakePaymentService` instead of the real Stripe SDK — `CreateCheckoutSessionAsync` returns a link to a dev-only page (`FakeCheckoutController`, `GET /api/payments/fake-checkout/{sessionId}`) with three buttons ("Simulate Successful Payment", "Simulate Failed Payment", "Simulate Session Expired"). Clicking one calls **the exact same `IPaymentWebhookService.HandleWebhookAsync` code path a real Stripe webhook delivery would hit** — only the transport (HTTP form POST vs. a signed Stripe request) is faked; no payment *processing* logic is bypassed. To exercise the full flow end-to-end:
+
+1. Run the backend as usual and create a booking (`POST /api/public/bookings`) — note the response's `bookingReference` and `accessToken`.
+2. `POST /api/public/bookings/{bookingReference}/payment?token={accessToken}` → returns `{ paymentId, checkoutUrl, expiresAt }`.
+3. Open `checkoutUrl` in a browser (or `curl`/Swagger it) and click **Simulate Successful Payment** — you'll be redirected to `PaymentSettings:SuccessUrl` with `?ref=...&token=...` appended.
+4. `GET /api/public/bookings/{bookingReference}/payment?token={accessToken}` now returns `"status": "Paid"`, and the `PaymentSucceeded` email was enqueued (see **Testing Emails Locally** above to watch it "send").
+5. As an admin, `GET /api/admin/bookings/{id}` shows the `payment`/`paymentHistory` fields, and `POST /api/admin/bookings/{id}/refund` refunds it (via `FakePaymentService.RefundAsync`, which always succeeds) and marks it `Refunded`.
+
+`FakeCheckoutController` 404s on every action whenever real Stripe is active (`PaymentSettings:Enabled=true`), so it's structurally inert outside local dev/tests — it can't be reached in a real deployment.
+
+### Configuring Real Stripe (Test Mode)
+
+Set these via environment variables or `dotnet user-secrets` — **never** commit them to `appsettings.json` (the file always ships with empty values, matching the `Jwt:SecretKey`/`EmailSettings:Password` convention):
+
+```
+PaymentSettings__Enabled=true
+PaymentSettings__SecretKey=sk_test_...           # Stripe Dashboard → Developers → API keys (test mode)
+PaymentSettings__WebhookSecret=whsec_...         # see below
+PaymentSettings__SuccessUrl=http://localhost:5173/booking/payment/success
+PaymentSettings__CancelUrl=http://localhost:5173/booking/payment/cancelled
+```
+
+If `Enabled=true` but `SecretKey`/`WebhookSecret` are blank, the API **fails fast at startup** (`InvalidOperationException`) rather than silently falling back to the fake provider — payments are never accidentally left unconfigured in what looks like a production setup.
+
+**Local webhook delivery** (only needed when `Enabled=true` — the fake provider above needs none of this): install the [Stripe CLI](https://stripe.com/docs/stripe-cli), then:
+
+```
+stripe login
+stripe listen --forward-to localhost:5099/api/payments/webhook
+```
+
+This prints a `whsec_...` value — set it as `PaymentSettings__WebhookSecret` for that session. Trigger test events with `stripe trigger checkout.session.completed`, or actually complete a Checkout Session using [Stripe's test card numbers](https://stripe.com/docs/testing) (e.g. `4242 4242 4242 4242`, any future expiry, any CVC).
 
 ## Running Tests
 
@@ -298,7 +339,24 @@ Frontend tests use Vitest + React Testing Library.
 - **Booking creation is provably immune to email outages** — not just "designed to be," but structurally: the HTTP request path only ever inserts a `Notification` row (a plain `INSERT`), it never calls `IEmailService`. Only the background worker does that, entirely outside any request. Verified live: `LoggingEmailService` (dev mode) always "succeeds" so the pipeline is fully exercisable without SMTP; a simulated `Failed` notification was created directly and successfully retried via `POST /api/admin/notifications/{id}/retry` without touching the booking.
 - **New indexes (Prompt 11)**: `Notifications(Status, NextAttemptAt)` (the worker's main due-message query), `Notifications(CreatedAt)`, `Notifications(SentAt)` (the dashboard's "sent today" count).
 
+### Prompt 15 — Online Payments and Payment Management
+
+- **`IPaymentService` is the one abstraction the Application layer depends on for the payment provider** — `StripePaymentService`/`FakePaymentService` (Infrastructure) are its only implementations, and Stripe SDK types (`Stripe.Checkout.Session`, `Stripe.Event`, ...) never appear outside `StripePaymentService`. This mirrors `IEmailService`'s Prompt 11 pattern exactly.
+- **`PaymentStatus` is fully independent of `BookingStatus`** — a successful payment never touches `Booking.Status`. The existing automatic-assignment flow already confirms bookings independently of any payment concept, and the spec explicitly permitted integrating "without introducing conflicting states" rather than inventing a second state machine.
+- **A new `Booking.PublicAccessToken` field (256 bits, `RandomNumberGenerator`-generated, base64url) was added** because the existing `BookingReference` (`LM-{date}-{6-digit random}`, ~1,000,000 possibilities/day) isn't cryptographically strong enough to gate payment-status disclosure per the spec's explicit warning against guessable references. This is purely additive — every existing endpoint/behavior is unchanged; only the new public payment endpoints require it (alongside `bookingReference`), compared in constant time (`CryptographicOperations.FixedTimeEquals`) to prevent timing attacks.
+- **Payment amount is always `Booking.Price` at the moment a `Payment` row is created** — never re-read from `Route.Price` (which can change after the booking was made) and never accepted from the request body (`POST .../payment` takes only `bookingReference` + `token`, structurally no amount field to override).
+- **A booking can have multiple `Payment` rows over time** (a failed/expired attempt followed by a successful retry) — at most one should ever reach `Paid`, enforced by `PublicPaymentService` (rejects starting a new attempt once a `Paid` one exists), not a database constraint, since failed/cancelled attempts are kept for audit. A repeat "start payment" call reuses a still-open, non-expired session instead of creating a duplicate (double-click/multi-tab protection) — retry always opens a fresh attempt instead.
+- **Only the webhook (`PaymentWebhookService`) ever marks a payment `Paid`/`Failed`/`Cancelled`** — never the request/redirect path a browser takes back from Checkout. `PaymentWebhookEvent` (insert-only, unique index on `ProviderEventId`) makes duplicate delivery a no-op: a second delivery's `SaveChangesAsync()` fails the unique constraint, which `IPaymentWebhookEventRepository.IsDuplicateEventError(Exception)` recognizes (inspecting the exception chain for Postgres SQLSTATE `23505`, kept entirely in Infrastructure so Application never references `Npgsql` directly) and treated as "already processed." Applying the event is wrapped in the same `ITransactionRunner.RunSerializableAsync` used by automatic/manual assignment (Prompt 9/10), and defense-in-depth beyond the event-id dedup: a payment already in a terminal state (`Paid`/`Refunded`) never regresses however many times an event replays.
+- **Cancelling a booking marks any open (`Pending`/`Processing`) payment `Cancelled`** but never touches a `Paid` one, and never triggers an automatic refund — refunds are always an explicit admin action (`POST /api/admin/bookings/{id}/refund`), prepared but never automatic per the spec.
+- **Reports keep `paidRevenue` and `refundedAmount` as two always-separate figures** (`GET /api/admin/reports/payments`), never netted against each other or mixed into `ReportSummaryResponse`'s existing booking-price-based `grossRevenue`/`completedRevenue` — those measure a booking's price snapshot, this measures money the payment provider actually captured or returned.
+- **`FakePaymentService`/`FakeCheckoutController`** (see **Testing Payments Locally** above) let the entire checkout→webhook→paid flow run without a Stripe account, in both automated tests and live manual verification — selected automatically whenever `PaymentSettings:Enabled=false` (the default), and structurally 404s on every action once real Stripe is active. Fixed one bug found during live verification: the fake checkout's "Simulate Successful Payment" button initially posted `outcome=success`, but `FakePaymentService.ParseWebhookEventAsync` only recognized `"completed"` — the mismatch made the webhook silently no-op (event recorded, but no `MarkPaid` call) instead of erroring, which is why this was caught by *live* end-to-end verification rather than the unit tests (which construct the payload directly and never hit this string mismatch).
+- **`PaymentSettings.Enabled=true` without `SecretKey`/`WebhookSecret` throws at startup** rather than silently falling back to the fake provider — mirrors `EmailSettings`'s Prompt 11 fail-fast convention; a production deployment can never end up "configured for Stripe" but actually running the dev simulator.
+- **New indexes**: unique on `Payments.ProviderCheckoutSessionId` and `Payments.ProviderPaymentId` (idempotency/lookup), plain on `Payments.BookingId`/`Status`/`CreatedAt`/`PaidAt` (admin filtering, reports), unique on `PaymentWebhookEvents.ProviderEventId` (the idempotency guarantee itself), and unique on `Bookings.PublicAccessToken`.
+- **Migration backfill for pre-existing bookings**: the new `Bookings.PublicAccessToken` column is `NOT NULL` with a unique index, so the `AddPayments` migration backfills a unique value (`gen_random_uuid()` x2, concatenated) for every row that predates the column, before creating the index — otherwise applying the migration against a database with more than one existing booking would fail on the first unique-constraint violation (every pre-existing row would otherwise default to the same empty string).
+- **"Do not implement" list honored**: no customer accounts, saved cards, recurring payments/subscriptions, crypto, buy-now-pay-later, multiple providers, corporate billing, promo codes/discounts, complex invoicing, automatic refunds, or SMS — exactly as scoped.
+
 ## Known Issues / Follow-ups
 
 - **Docker was still not available in this environment** (`docker` is not installed), so `docker-compose.yml` and both Dockerfiles remain written-to-spec but unverified via an actual `docker compose up`. A real local PostgreSQL install (see above) covers the database side instead.
-- SMS/WhatsApp/push notifications, notification preferences, online payment, reports, driver ride-status management, the driver mobile app, live tracking, reviews, and promo codes are all deliberately unimplemented — scoped for later steps, per Prompt 11's explicit "do not implement" list. The `NotificationChannel` enum already has a comment marking where `Sms` would be added without a breaking schema change.
+- SMS/WhatsApp/push notifications, notification preferences, customer accounts/saved cards/recurring payments, live tracking, reviews, and promo codes are all deliberately unimplemented — scoped for later steps (or explicitly out of scope), per each prompt's own "do not implement" list. The `NotificationChannel` enum already has a comment marking where `Sms` would be added without a breaking schema change.
+- **Real Stripe was never exercised against this environment's sandbox** (no outbound internet access to Stripe's API) — `StripePaymentService` was written and compiled against the `Stripe.net` SDK's actual types, but only `FakePaymentService`/`FakeCheckoutController` were live-verified end-to-end here; a real Stripe test-mode account should be used to confirm `StripePaymentService` itself before production use.

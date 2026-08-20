@@ -24,6 +24,8 @@ public interface IReportService
 
     Task<AssignmentReportResponse> GetAssignmentReportAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
 
+    Task<PaymentReportResponse> GetPaymentReportAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<UnassignedBookingItem>> GetUnassignedBookingsAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<UpcomingOperationItem>> GetUpcomingOperationsAsync(string? period, CancellationToken cancellationToken = default);

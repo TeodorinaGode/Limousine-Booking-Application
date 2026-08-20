@@ -33,4 +33,7 @@ public interface INotificationService
 
     /// <summary>Re-enqueues the confirmation email using the booking's current state — read-only, never touches booking status/assignment.</summary>
     Task ResendConfirmationAsync(Booking booking, Route route, CancellationToken cancellationToken = default);
+
+    /// <summary>Customer — an online payment for the booking was confirmed by the payment webhook. Includes the paid amount, never Stripe/internal payment details.</summary>
+    Task NotifyPaymentSucceededAsync(Booking booking, Route route, Payment payment, CancellationToken cancellationToken = default);
 }

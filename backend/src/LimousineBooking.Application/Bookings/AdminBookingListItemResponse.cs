@@ -23,4 +23,7 @@ public class AdminBookingListItemResponse
 
     /// <summary>"Automatic", "Manual", or "Unassigned".</summary>
     public string Assignment { get; set; } = string.Empty;
+
+    /// <summary>"NotStarted" if no payment attempt exists yet, otherwise the most recent attempt's status.</summary>
+    public string PaymentStatus { get; set; } = string.Empty;
 }

@@ -4,6 +4,10 @@ public class BookingResponse
 {
     public Guid Id { get; set; }
     public string BookingReference { get; set; } = string.Empty;
+
+    /// <summary>Required (alongside BookingReference) by every public payment endpoint — treat as a secret; never log it.</summary>
+    public string AccessToken { get; set; } = string.Empty;
+
     public string Status { get; set; } = string.Empty;
 
     public BookingRouteSummary Route { get; set; } = new();

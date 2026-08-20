@@ -18,6 +18,10 @@ const VARIANT_BY_STATUS: Record<string, string> = {
   failed: "cancelled",
   sent: "completed",
   retrying: "warn",
+  notstarted: "pending",
+  processing: "warn",
+  paid: "completed",
+  refunded: "warn",
 };
 
 /** Renders any backend status string as a muted, monochrome badge — status is always conveyed by the text itself too, never color alone (section 46). */

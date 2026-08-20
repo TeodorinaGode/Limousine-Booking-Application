@@ -51,6 +51,31 @@ public class AdminBookingDetailResponse
     public DateTime UpdatedAt { get; set; }
 
     public IReadOnlyList<AssignmentHistoryItem> AssignmentHistory { get; set; } = Array.Empty<AssignmentHistoryItem>();
+
+    /// <summary>The most recent payment attempt, or null if payment was never started. Never exposes Stripe identifiers.</summary>
+    public AdminPaymentSummary? Payment { get; set; }
+
+    /// <summary>Every attempt, most recent first — failed/expired attempts are kept for audit (section 37).</summary>
+    public IReadOnlyList<AdminPaymentHistoryItem> PaymentHistory { get; set; } = Array.Empty<AdminPaymentHistoryItem>();
+}
+
+public class AdminPaymentSummary
+{
+    public string Status { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
+    public DateTime? PaidAt { get; set; }
+}
+
+public class AdminPaymentHistoryItem
+{
+    public string Status { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public DateTime? PaidAt { get; set; }
+    public string? FailureReason { get; set; }
 }
 
 public class AssignmentHistoryItem

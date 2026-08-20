@@ -1,6 +1,7 @@
 using LimousineBooking.Application.Bookings;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Notifications;
+using LimousineBooking.Application.Payments;
 using LimousineBooking.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ using DomainAssignmentHistory = LimousineBooking.Domain.Entities.AssignmentHisto
 using DomainRideStatusHistory = LimousineBooking.Domain.Entities.RideStatusHistory;
 using DomainBooking = LimousineBooking.Domain.Entities.Booking;
 using DomainDriver = LimousineBooking.Domain.Entities.Driver;
+using DomainPayment = LimousineBooking.Domain.Entities.Payment;
 using DomainRoute = LimousineBooking.Domain.Entities.Route;
 using DomainUser = LimousineBooking.Domain.Entities.User;
 using DomainVehicle = LimousineBooking.Domain.Entities.Vehicle;
@@ -29,6 +31,8 @@ public class AdminBookingServiceTests
     private readonly Mock<IRideStatusHistoryRepository> _rideStatusHistoryRepository = new();
     private readonly Mock<INotificationService> _notificationService = new();
     private readonly Mock<INotificationRepository> _notificationRepository = new();
+    private readonly Mock<IPaymentRepository> _paymentRepository = new();
+    private readonly Mock<IPaymentService> _paymentService = new();
     private readonly Mock<ITransactionRunner> _transactionRunner = new();
     private readonly Mock<ICurrentUserService> _currentUserService = new();
     private readonly Mock<IDateTimeProvider> _dateTimeProvider = new();
@@ -48,6 +52,10 @@ public class AdminBookingServiceTests
         _rideStatusHistoryRepository.Setup(r => r.GetByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<DomainRideStatusHistory>());
         _automaticAssignmentService.Setup(s => s.AssignBookingAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _notificationRepository.Setup(r => r.GetSummaryAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(new OutboxSummaryCounts());
+        _paymentRepository.Setup(r => r.GetLatestByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((DomainPayment?)null);
+        _paymentRepository.Setup(r => r.GetByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<DomainPayment>());
+        _paymentRepository.Setup(r => r.GetPaidByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((DomainPayment?)null);
+        _paymentRepository.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _currentUserService.Setup(c => c.UserId).Returns(AdminUserId);
         _dateTimeProvider.Setup(d => d.UtcNow).Returns(FixedUtcNow);
     }
@@ -64,6 +72,8 @@ public class AdminBookingServiceTests
         _rideStatusHistoryRepository.Object,
         _notificationService.Object,
         _notificationRepository.Object,
+        _paymentRepository.Object,
+        _paymentService.Object,
         _transactionRunner.Object,
         _currentUserService.Object,
         _dateTimeProvider.Object,
@@ -371,6 +381,83 @@ public class AdminBookingServiceTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AdminBookingError.Conflict, result.Error);
+    }
+
+    [Fact]
+    public async Task CancelAsync_OpenPaymentAttempt_IsMarkedCancelled_PaidPaymentIsUntouched()
+    {
+        var (booking, _) = MakeBooking();
+        SetupBooking(booking);
+        var openPayment = new DomainPayment(booking.Id, PaymentProvider.Stripe, booking.Price, booking.Currency);
+        openPayment.AttachCheckoutSession("cs_open", "https://checkout.example/cs_open", FixedUtcNow.AddMinutes(15));
+        _paymentRepository.Setup(r => r.GetLatestByBookingIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(openPayment);
+
+        var result = await CreateService().CancelAsync(booking.Id, new CancelBookingRequest());
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(PaymentStatus.Cancelled, openPayment.Status);
+    }
+
+    [Fact]
+    public async Task CancelAsync_PaidPayment_IsNeverAutomaticallyRefundedOrCancelled()
+    {
+        var (booking, _) = MakeBooking();
+        SetupBooking(booking);
+        var paidPayment = new DomainPayment(booking.Id, PaymentProvider.Stripe, booking.Price, booking.Currency);
+        paidPayment.MarkPaid("pi_1", FixedUtcNow);
+        _paymentRepository.Setup(r => r.GetLatestByBookingIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(paidPayment);
+
+        var result = await CreateService().CancelAsync(booking.Id, new CancelBookingRequest());
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(PaymentStatus.Paid, paidPayment.Status);
+        _paymentService.Verify(s => s.RefundAsync(It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ---- Payment refund ----
+
+    [Fact]
+    public async Task RefundPaymentAsync_PaidPayment_RefundsViaProviderAndMarksRefunded()
+    {
+        var (booking, _) = MakeBooking();
+        SetupBooking(booking);
+        var paidPayment = new DomainPayment(booking.Id, PaymentProvider.Stripe, booking.Price, booking.Currency);
+        paidPayment.MarkPaid("pi_1", FixedUtcNow);
+        _paymentRepository.Setup(r => r.GetPaidByBookingIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(paidPayment);
+        _paymentService.Setup(s => s.RefundAsync("pi_1", booking.Price, booking.Currency, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaymentProviderRefund { ProviderRefundId = "re_1", Succeeded = true });
+
+        var result = await CreateService().RefundPaymentAsync(booking.Id);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(PaymentStatus.Refunded, paidPayment.Status);
+        _paymentService.Verify(s => s.RefundAsync("pi_1", booking.Price, booking.Currency, It.IsAny<CancellationToken>()), Times.Once);
+        _paymentRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RefundPaymentAsync_NoPaidPayment_ReturnsConflict()
+    {
+        var (booking, _) = MakeBooking();
+        SetupBooking(booking);
+        _paymentRepository.Setup(r => r.GetPaidByBookingIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync((DomainPayment?)null);
+
+        var result = await CreateService().RefundPaymentAsync(booking.Id);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(AdminBookingError.Conflict, result.Error);
+        _paymentService.Verify(s => s.RefundAsync(It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RefundPaymentAsync_UnknownBooking_ReturnsNotFound()
+    {
+        _bookingRepository.Setup(r => r.GetByIdWithDetailsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((DomainBooking?)null);
+
+        var result = await CreateService().RefundPaymentAsync(Guid.NewGuid());
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(AdminBookingError.NotFound, result.Error);
     }
 
     // ---- Manual assignment ----

@@ -52,6 +52,7 @@ function BookingsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Pending,Confirmed");
   const [assignmentFilter, setAssignmentFilter] = useState("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [driverId, setDriverId] = useState("");
@@ -83,6 +84,7 @@ function BookingsPage() {
           vehicleId: vehicleId || undefined,
           routeId: routeId || undefined,
           assignmentFilter,
+          paymentStatus: paymentStatusFilter,
           sortBy,
           sortDirection,
           page,
@@ -97,7 +99,7 @@ function BookingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken, search, status, assignmentFilter, dateFrom, dateTo, driverId, vehicleId, routeId, sortBy, sortDirection, page]);
+  }, [accessToken, search, status, assignmentFilter, paymentStatusFilter, dateFrom, dateTo, driverId, vehicleId, routeId, sortBy, sortDirection, page]);
 
   useEffect(() => {
     loadBookings();
@@ -182,6 +184,26 @@ function BookingsPage() {
             <option value="automatic">Automatically Assigned</option>
             <option value="manual">Manually Assigned</option>
             <option value="requiresManual">Requires Manual Assignment</option>
+          </select>
+        </label>
+
+        <label>
+          Payment:{" "}
+          <select
+            value={paymentStatusFilter}
+            onChange={(e) => {
+              setPage(1);
+              setPaymentStatusFilter(e.target.value);
+            }}
+          >
+            <option value="all">All</option>
+            <option value="notStarted">Not Started</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="paid">Paid</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
           </select>
         </label>
 
@@ -323,6 +345,7 @@ function BookingsPage() {
               <th>Price</th>
               <th>Status</th>
               <th>Ride Status</th>
+              <th>Payment</th>
               <th>Driver</th>
               <th>Vehicle</th>
               <th>Assignment</th>
@@ -350,6 +373,9 @@ function BookingsPage() {
                 </td>
                 <td>
                   <StatusBadge status={booking.rideStatus} />
+                </td>
+                <td>
+                  <StatusBadge status={booking.paymentStatus} />
                 </td>
                 <td>{booking.driverName ?? "—"}</td>
                 <td>{booking.vehicleDescription ?? "—"}</td>

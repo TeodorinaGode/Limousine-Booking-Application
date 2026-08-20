@@ -111,6 +111,19 @@ public class BookingsController : ControllerBase
         return result.Succeeded ? Ok(result.Booking) : MapError(result);
     }
 
+    /// <summary>
+    /// Refunds the booking's Paid payment via the payment provider. Never automatic —
+    /// always an explicit administrator action (section 32/33 of the payments spec).
+    /// </summary>
+    /// <response code="404">No booking exists with the given id.</response>
+    /// <response code="409">The booking has no Paid payment to refund.</response>
+    [HttpPost("{id:guid}/refund")]
+    public async Task<ActionResult<AdminBookingDetailResponse>> Refund(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _adminBookingService.RefundPaymentAsync(id, cancellationToken);
+        return result.Succeeded ? Ok(result.Booking) : MapError(result);
+    }
+
     private ActionResult MapError(AdminBookingOperationResult result) => result.Error switch
     {
         AdminBookingError.NotFound => NotFound(new { message = result.ErrorMessage }),

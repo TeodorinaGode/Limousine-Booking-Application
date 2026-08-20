@@ -68,6 +68,7 @@ public class ReportsAuthorizationTests : IClassFixture<WebApplicationFactory<Pro
         new object[] { "/api/admin/reports/passengers" },
         new object[] { "/api/admin/reports/status-distribution" },
         new object[] { "/api/admin/reports/assignments" },
+        new object[] { "/api/admin/reports/payments" },
         new object[] { "/api/admin/reports/unassigned" },
         new object[] { "/api/admin/reports/upcoming" },
         new object[] { "/api/admin/reports/cancellations" },

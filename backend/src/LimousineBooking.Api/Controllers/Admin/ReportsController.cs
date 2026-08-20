@@ -108,6 +108,15 @@ public class ReportsController : ControllerBase
         return Ok(await _reportService.GetAssignmentReportAsync(range, cancellationToken));
     }
 
+    [HttpGet("payments")]
+    public async Task<ActionResult<PaymentReportResponse>> GetPayments([FromQuery] ReportDateRangeQuery query, CancellationToken cancellationToken)
+    {
+        if (!TryResolveRange(query, out var range, out var problem))
+            return problem;
+
+        return Ok(await _reportService.GetPaymentReportAsync(range, cancellationToken));
+    }
+
     /// <summary>Bookings currently requiring manual assignment — a current-state view, not scoped to a date filter (section 25).</summary>
     [HttpGet("unassigned")]
     public async Task<ActionResult<IReadOnlyList<UnassignedBookingItem>>> GetUnassigned([FromQuery] int page = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)

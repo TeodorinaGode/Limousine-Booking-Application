@@ -11,6 +11,9 @@ public interface IBookingRepository
     /// <summary>Includes Route, Driver (+ Driver.User), and Vehicle — everything the assignment service and admin endpoints need without a second round trip.</summary>
     Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 
+    /// <summary>Includes Route — used by the public payment endpoints, which are keyed by BookingReference (+ PublicAccessToken), never by internal Guid Id.</summary>
+    Task<Booking?> GetByReferenceAsync(string bookingReference, CancellationToken cancellationToken = default);
+
     Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchAsync(AdminBookingSearchQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>

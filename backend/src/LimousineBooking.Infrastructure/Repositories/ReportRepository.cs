@@ -65,6 +65,27 @@ public class ReportRepository : IReportRepository
         return result ?? new AssignmentCountAggregate();
     }
 
+    public async Task<PaymentAggregate> GetPaymentAggregateAsync(DateTime fromUtc, DateTime toUtcExclusive, CancellationToken cancellationToken = default)
+    {
+        var result = await _dbContext.Payments
+            .Where(p => p.CreatedAt >= fromUtc && p.CreatedAt < toUtcExclusive)
+            .GroupBy(p => 1)
+            .Select(g => new PaymentAggregate
+            {
+                Total = g.Count(),
+                Successful = g.Count(p => p.Status == PaymentStatus.Paid),
+                Failed = g.Count(p => p.Status == PaymentStatus.Failed),
+                Pending = g.Count(p => p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing),
+                Cancelled = g.Count(p => p.Status == PaymentStatus.Cancelled),
+                Refunded = g.Count(p => p.Status == PaymentStatus.Refunded),
+                PaidRevenue = g.Where(p => p.Status == PaymentStatus.Paid).Sum(p => (decimal?)p.Amount) ?? 0m,
+                RefundedAmount = g.Where(p => p.Status == PaymentStatus.Refunded).Sum(p => (decimal?)p.Amount) ?? 0m
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return result ?? new PaymentAggregate();
+    }
+
     public async Task<IReadOnlyList<RevenueByDayItem>> GetRevenueByDayAsync(DateOnly fromLocal, DateOnly toLocal, CancellationToken cancellationToken = default) =>
         await _dbContext.Bookings
             .Where(b => b.TravelDate >= fromLocal && b.TravelDate <= toLocal)

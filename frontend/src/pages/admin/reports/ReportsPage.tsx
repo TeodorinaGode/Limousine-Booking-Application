@@ -11,6 +11,7 @@ import {
   getCancellationReport,
   getDriverActivity,
   getPassengerReport,
+  getPaymentReport,
   getPopularRoutes,
   getRevenueByDay,
   getStatusDistribution,
@@ -30,6 +31,7 @@ import type {
   CancellationReportDto,
   DriverActivityDto,
   PassengerReportDto,
+  PaymentReportDto,
   PopularRouteDto,
   ReportSummaryDto,
   RevenueByDayDto,
@@ -80,6 +82,7 @@ function ReportsPage() {
   const [statusDistribution, setStatusDistribution] = useState<BookingStatusDistributionDto[]>([]);
   const [assignments, setAssignments] = useState<AssignmentReportDto | null>(null);
   const [cancellations, setCancellations] = useState<CancellationReportDto | null>(null);
+  const [payments, setPayments] = useState<PaymentReportDto | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +109,7 @@ function ReportsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const [summaryResult, revenueResult, trendResult, routesResult, driversResult, vehiclesResult, passengersResult, statusResult, assignmentsResult, cancellationsResult] =
+      const [summaryResult, revenueResult, trendResult, routesResult, driversResult, vehiclesResult, passengersResult, statusResult, assignmentsResult, cancellationsResult, paymentsResult] =
         await Promise.all([
           getSummary({ dateFrom, dateTo }, accessToken),
           getRevenueByDay({ dateFrom, dateTo }, accessToken),
@@ -118,6 +121,7 @@ function ReportsPage() {
           getStatusDistribution({ dateFrom, dateTo }, accessToken),
           getAssignmentReport({ dateFrom, dateTo }, accessToken),
           getCancellationReport({ dateFrom, dateTo }, accessToken),
+          getPaymentReport({ dateFrom, dateTo }, accessToken),
         ]);
       setSummary(summaryResult);
       setRevenueByDay(revenueResult);
@@ -129,6 +133,7 @@ function ReportsPage() {
       setStatusDistribution(statusResult);
       setAssignments(assignmentsResult);
       setCancellations(cancellationsResult);
+      setPayments(paymentsResult);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load reports.");
     } finally {
@@ -435,6 +440,24 @@ function ReportsPage() {
                     </ul>
                   </>
                 )}
+              </section>
+            )}
+
+            {payments && (
+              <section style={{ marginBottom: "1.5rem" }}>
+                <h2>Payments</h2>
+                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+                  <MetricCard label="Payment Attempts" value={payments.totalPaymentAttempts} />
+                  <MetricCard label="Successful" value={payments.successfulPayments} />
+                  <MetricCard label="Failed" value={payments.failedPayments} />
+                  <MetricCard label="Pending" value={payments.pendingPayments} />
+                  <MetricCard label="Cancelled" value={payments.cancelledPayments} />
+                  <MetricCard label="Refunded" value={payments.refundedPayments} />
+                </div>
+                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                  <MetricCard label="Paid Revenue" value={`${payments.currency} ${payments.paidRevenue.toFixed(2)}`} />
+                  <MetricCard label="Refunded Amount" value={`${payments.currency} ${payments.refundedAmount.toFixed(2)}`} />
+                </div>
               </section>
             )}
           </>

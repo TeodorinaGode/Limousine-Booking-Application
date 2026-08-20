@@ -32,6 +32,18 @@ public class PassengerAggregate
     public int MaximumPassengers { get; set; }
 }
 
+public class PaymentAggregate
+{
+    public int Total { get; set; }
+    public int Successful { get; set; }
+    public int Failed { get; set; }
+    public int Pending { get; set; }
+    public int Cancelled { get; set; }
+    public int Refunded { get; set; }
+    public decimal PaidRevenue { get; set; }
+    public decimal RefundedAmount { get; set; }
+}
+
 public class AssignmentBaseAggregate
 {
     public int TotalNonCancelled { get; set; }

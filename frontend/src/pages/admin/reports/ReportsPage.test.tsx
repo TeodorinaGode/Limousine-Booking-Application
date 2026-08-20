@@ -13,6 +13,7 @@ import type {
   CancellationReportDto,
   DriverActivityDto,
   PassengerReportDto,
+  PaymentReportDto,
   PopularRouteDto,
   ReportSummaryDto,
   RevenueByDayDto,
@@ -104,6 +105,19 @@ beforeEach(() => {
     cancellationsByDay: [],
     cancellationsByReason: [],
   } as CancellationReportDto);
+  mockedReportService.getPaymentReport.mockResolvedValue({
+    dateFrom: "2026-09-01",
+    dateTo: "2026-09-15",
+    totalPaymentAttempts: 0,
+    successfulPayments: 0,
+    failedPayments: 0,
+    pendingPayments: 0,
+    cancelledPayments: 0,
+    refundedPayments: 0,
+    paidRevenue: 0,
+    refundedAmount: 0,
+    currency: "CHF",
+  } as PaymentReportDto);
   mockedReportService.getUnassignedBookings.mockResolvedValue([] as UnassignedBookingDto[]);
   mockedReportService.getUpcomingOperations.mockResolvedValue([] as UpcomingOperationDto[]);
   mockedAdminBookingService.getBookings.mockResolvedValue({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0 });
@@ -116,6 +130,28 @@ describe("ReportsPage", () => {
     expect(await screen.findByText("125")).toBeInTheDocument();
     expect(screen.getByText("CHF 18500.00")).toBeInTheDocument();
     expect(screen.getByText("CHF 13200.00")).toBeInTheDocument();
+  });
+
+  it("loads and displays the payment metrics", async () => {
+    mockedReportService.getPaymentReport.mockResolvedValue({
+      dateFrom: "2026-09-01",
+      dateTo: "2026-09-15",
+      totalPaymentAttempts: 12,
+      successfulPayments: 8,
+      failedPayments: 2,
+      pendingPayments: 1,
+      cancelledPayments: 0,
+      refundedPayments: 1,
+      paidRevenue: 1440,
+      refundedAmount: 180,
+      currency: "CHF",
+    } as PaymentReportDto);
+
+    renderPage();
+
+    expect(await screen.findByText("Payments")).toBeInTheDocument();
+    expect(screen.getByText("CHF 1440.00")).toBeInTheDocument();
+    expect(screen.getByText("CHF 180.00")).toBeInTheDocument();
   });
 
   it("shows an error when reports fail to load", async () => {
@@ -203,6 +239,7 @@ describe("ReportsPage", () => {
           driverName: "Dev Driver",
           vehicleDescription: "Mercedes-Benz E-Class - BS 999001",
           assignment: "Automatic",
+          paymentStatus: "Paid",
         },
       ],
       page: 1,

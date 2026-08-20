@@ -22,6 +22,7 @@ export function getBookings(params: AdminBookingSearchParams, accessToken: strin
       vehicleId: params.vehicleId,
       routeId: params.routeId,
       assignmentFilter: params.assignmentFilter,
+      paymentStatus: params.paymentStatus,
       sortBy: params.sortBy,
       sortDirection: params.sortDirection,
       page: params.page,
@@ -56,4 +57,8 @@ export function getDashboard(accessToken: string): Promise<AdminDashboardDto> {
 
 export function resendConfirmation(id: string, accessToken: string): Promise<AdminBookingDetailDto> {
   return apiRequest<AdminBookingDetailDto>(`/admin/bookings/${id}/notifications/confirmation/resend`, { method: "POST", accessToken });
+}
+
+export function refundPayment(id: string, accessToken: string): Promise<AdminBookingDetailDto> {
+  return apiRequest<AdminBookingDetailDto>(`/admin/bookings/${id}/refund`, { method: "POST", accessToken });
 }

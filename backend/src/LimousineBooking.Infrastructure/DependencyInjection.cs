@@ -1,8 +1,10 @@
 using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Application.Payments;
 using LimousineBooking.Domain.Entities;
 using LimousineBooking.Infrastructure.Authentication;
 using LimousineBooking.Infrastructure.Common;
 using LimousineBooking.Infrastructure.Email;
+using LimousineBooking.Infrastructure.Payments;
 using LimousineBooking.Infrastructure.Persistence;
 using LimousineBooking.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -23,6 +25,7 @@ public static class DependencyInjection
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
 
         services.AddHttpContextAccessor();
 
@@ -44,6 +47,8 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<ITransactionRunner, TransactionRunner>();
         services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IPaymentWebhookEventRepository, PaymentWebhookEventRepository>();
 
         // Real SMTP delivery only when explicitly enabled — otherwise the
         // dev-mode logger stands in, so the whole notification pipeline is
@@ -53,6 +58,27 @@ public static class DependencyInjection
             services.AddScoped<IEmailService, SmtpEmailService>();
         else
             services.AddScoped<IEmailService, LoggingEmailService>();
+
+        // FakePaymentService stands in for Stripe unless payments are explicitly
+        // enabled (section 51/52) — chosen so local dev/tests never need a real
+        // Stripe account, while production must configure real keys or fail fast
+        // (never silently bypass payments).
+        var paymentSettings = configuration.GetSection(PaymentSettings.SectionName).Get<PaymentSettings>() ?? new PaymentSettings();
+        if (paymentSettings.Enabled)
+        {
+            if (string.IsNullOrWhiteSpace(paymentSettings.SecretKey) || string.IsNullOrWhiteSpace(paymentSettings.WebhookSecret))
+            {
+                throw new InvalidOperationException(
+                    "PaymentSettings.Enabled is true but SecretKey/WebhookSecret are not configured. " +
+                    "Set them via environment variables or User Secrets — never in appsettings.json.");
+            }
+
+            services.AddScoped<IPaymentService, StripePaymentService>();
+        }
+        else
+        {
+            services.AddScoped<IPaymentService, FakePaymentService>();
+        }
 
         return services;
     }

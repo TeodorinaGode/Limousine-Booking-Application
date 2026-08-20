@@ -1,6 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/public/HomePage";
 import BookingPage from "../pages/public/BookingPage";
+import PaymentStatusPage from "../pages/public/PaymentStatusPage";
+import PaymentSuccessPage from "../pages/public/PaymentSuccessPage";
+import PaymentCancelledPage from "../pages/public/PaymentCancelledPage";
 import LoginPage from "../pages/auth/LoginPage";
 import UnauthorizedPage from "../pages/public/UnauthorizedPage";
 import NotFoundPage from "../pages/public/NotFoundPage";
@@ -24,6 +27,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/booking" element={<BookingPage />} />
+      <Route path="/booking/payment/success" element={<PaymentSuccessPage />} />
+      <Route path="/booking/payment/cancelled" element={<PaymentCancelledPage />} />
+      <Route path="/booking/payment/:bookingReference" element={<PaymentStatusPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route

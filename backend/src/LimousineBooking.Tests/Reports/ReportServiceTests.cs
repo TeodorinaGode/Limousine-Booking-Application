@@ -68,6 +68,34 @@ public class ReportServiceTests
     }
 
     [Fact]
+    public async Task GetPaymentReportAsync_MapsAggregateAndKeepsPaidRevenueSeparateFromRefundedAmount()
+    {
+        _reportRepository.Setup(r => r.GetPaymentAggregateAsync(Range.FromUtc, Range.ToUtcExclusive, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PaymentAggregate
+            {
+                Total = 12,
+                Successful = 6,
+                Failed = 2,
+                Pending = 2,
+                Cancelled = 1,
+                Refunded = 1,
+                PaidRevenue = 1080m,
+                RefundedAmount = 180m
+            });
+
+        var report = await CreateService().GetPaymentReportAsync(Range);
+
+        Assert.Equal(12, report.TotalPaymentAttempts);
+        Assert.Equal(6, report.SuccessfulPayments);
+        Assert.Equal(2, report.FailedPayments);
+        Assert.Equal(2, report.PendingPayments);
+        Assert.Equal(1, report.CancelledPayments);
+        Assert.Equal(1, report.RefundedPayments);
+        Assert.Equal(1080m, report.PaidRevenue);
+        Assert.Equal(180m, report.RefundedAmount);
+    }
+
+    [Fact]
     public async Task GetPopularRoutesAsync_ComputesPercentageOfTotalBookings()
     {
         _reportRepository.Setup(r => r.GetRouteAggregatesAsync(Range.FromLocal, Range.ToLocal, It.IsAny<CancellationToken>()))

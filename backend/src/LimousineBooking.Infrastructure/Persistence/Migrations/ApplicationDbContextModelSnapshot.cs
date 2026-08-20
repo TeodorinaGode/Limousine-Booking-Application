@@ -138,6 +138,11 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<string>("PublicAccessToken")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<bool>("RequiresManualAssignment")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -177,6 +182,9 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.HasIndex("CustomerEmail");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("PublicAccessToken")
+                        .IsUnique();
 
                     b.HasIndex("RequiresManualAssignment");
 
@@ -386,6 +394,116 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.HasIndex("Status", "NextAttemptAt");
 
                     b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("LimousineBooking.Domain.Entities.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CheckoutExpiresAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ProviderCheckoutSessionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ProviderPaymentId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("PaidAt");
+
+                    b.HasIndex("ProviderCheckoutSessionId")
+                        .IsUnique();
+
+                    b.HasIndex("ProviderPaymentId")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("Payments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Payments_Amount", "\"Amount\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("LimousineBooking.Domain.Entities.PaymentWebhookEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ProviderEventId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProviderEventId")
+                        .IsUnique();
+
+                    b.ToTable("PaymentWebhookEvents", (string)null);
                 });
 
             modelBuilder.Entity("LimousineBooking.Domain.Entities.RideStatusHistory", b =>
@@ -702,6 +820,17 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("LimousineBooking.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("LimousineBooking.Domain.Entities.Booking", "Booking")
+                        .WithMany("Payments")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
             modelBuilder.Entity("LimousineBooking.Domain.Entities.RideStatusHistory", b =>
                 {
                     b.HasOne("LimousineBooking.Domain.Entities.Booking", "Booking")
@@ -716,6 +845,8 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("LimousineBooking.Domain.Entities.Booking", b =>
                 {
                     b.Navigation("Notifications");
+
+                    b.Navigation("Payments");
 
                     b.Navigation("RideStatusHistory");
 

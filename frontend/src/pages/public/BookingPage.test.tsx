@@ -4,12 +4,15 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import BookingPage from "./BookingPage";
 import * as bookingService from "../../services/bookingService";
+import * as paymentService from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 vi.mock("../../services/bookingService");
+vi.mock("../../services/paymentService");
 
 const mockedBookingService = vi.mocked(bookingService);
+const mockedPaymentService = vi.mocked(paymentService);
 
 function makeRoute(overrides: Partial<PublicRouteDto> = {}): PublicRouteDto {
   return {
@@ -36,6 +39,7 @@ function makeBooking(overrides: Partial<BookingDto> = {}): BookingDto {
     notes: null,
     price: 180,
     currency: "CHF",
+    accessToken: "test-access-token",
     ...overrides,
   };
 }
@@ -205,5 +209,45 @@ describe("BookingPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Bookings require at least 120 minutes of lead time.");
     expect(screen.queryByText("Booking Confirmed")).not.toBeInTheDocument();
+  });
+
+  it("starts a payment attempt when Pay Now is clicked", async () => {
+    mockedBookingService.createBooking.mockResolvedValue(makeBooking({ status: "Confirmed", accessToken: "abc-token" }));
+    mockedPaymentService.createPayment.mockResolvedValue({
+      paymentId: "p1",
+      checkoutUrl: "https://checkout.example/cs_test_1",
+      expiresAt: "2026-12-25T15:00:00Z",
+    });
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByLabelText("Route");
+
+    await fillStep1(user);
+    await fillStep2(user);
+    await fillStep3(user);
+    await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
+    await screen.findByText("Booking Confirmed");
+
+    await user.click(screen.getByRole("button", { name: "Pay Now" }));
+
+    await waitFor(() => expect(mockedPaymentService.createPayment).toHaveBeenCalledWith("LM-20261225-123456", "abc-token"));
+  });
+
+  it("shows an error when starting payment fails", async () => {
+    mockedBookingService.createBooking.mockResolvedValue(makeBooking({ status: "Confirmed" }));
+    mockedPaymentService.createPayment.mockRejectedValue(new ApiError(409, "This booking has already been paid."));
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByLabelText("Route");
+
+    await fillStep1(user);
+    await fillStep2(user);
+    await fillStep3(user);
+    await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
+    await screen.findByText("Booking Confirmed");
+
+    await user.click(screen.getByRole("button", { name: "Pay Now" }));
+
+    expect(await screen.findByText("This booking has already been paid.")).toBeInTheDocument();
   });
 });

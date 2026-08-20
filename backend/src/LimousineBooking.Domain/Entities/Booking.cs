@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using LimousineBooking.Domain.Common;
 using LimousineBooking.Domain.Enums;
 using BookingAssignmentType = LimousineBooking.Domain.Enums.AssignmentType;
@@ -7,6 +8,15 @@ namespace LimousineBooking.Domain.Entities;
 public class Booking : AuditableEntity
 {
     public string BookingReference { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// A cryptographically random per-booking secret (never derived from
+    /// BookingReference, which is only a 6-digit random suffix — too small a
+    /// space to treat as a security boundary). Required, alongside
+    /// BookingReference, by every public payment endpoint so payment status
+    /// cannot be read by guessing a reference (see IPublicPaymentService).
+    /// </summary>
+    public string PublicAccessToken { get; private set; } = string.Empty;
 
     public string CustomerFirstName { get; private set; } = string.Empty;
     public string CustomerLastName { get; private set; } = string.Empty;
@@ -57,6 +67,9 @@ public class Booking : AuditableEntity
     public ICollection<RideStatusHistory> RideStatusHistory { get; private set; } = new List<RideStatusHistory>();
     public ICollection<Notification> Notifications { get; private set; } = new List<Notification>();
 
+    /// <summary>Every payment attempt for this booking, oldest first — failed/expired attempts are never deleted (audit trail).</summary>
+    public ICollection<Payment> Payments { get; private set; } = new List<Payment>();
+
     private Booking()
     {
     }
@@ -82,6 +95,7 @@ public class Booking : AuditableEntity
         ValidateEditableFields(customerFirstName, customerLastName, customerEmail, customerPhone, routeId, pickupAddress, passengerCount, price, currency);
 
         BookingReference = bookingReference;
+        PublicAccessToken = GeneratePublicAccessToken();
         CustomerFirstName = customerFirstName;
         CustomerLastName = customerLastName;
         CustomerEmail = customerEmail;
@@ -96,6 +110,13 @@ public class Booking : AuditableEntity
         Notes = notes;
         Status = BookingStatus.Pending;
     }
+
+    /// <summary>256 bits of randomness, base64url-encoded (~43 chars, URL-safe with no padding) — see PublicAccessToken's summary.</summary>
+    private static string GeneratePublicAccessToken() =>
+        Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
 
     /// <summary>
     /// Administrator edit of the fields a customer originally supplied, plus the

@@ -83,6 +83,23 @@ public class BookingTests
     }
 
     [Fact]
+    public void Booking_GeneratesANonEmptyPublicAccessToken()
+    {
+        var booking = CreateValidBooking();
+
+        Assert.False(string.IsNullOrWhiteSpace(booking.PublicAccessToken));
+    }
+
+    [Fact]
+    public void Booking_PublicAccessToken_IsUniquePerInstance()
+    {
+        var first = CreateValidBooking();
+        var second = CreateValidBooking();
+
+        Assert.NotEqual(first.PublicAccessToken, second.PublicAccessToken);
+    }
+
+    [Fact]
     public void Booking_CanExistWithoutDriver()
     {
         var booking = CreateValidBooking();

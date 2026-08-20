@@ -4,6 +4,7 @@ using LimousineBooking.Application.Bookings;
 using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Notifications;
+using LimousineBooking.Application.Payments;
 using LimousineBooking.Application.Reports;
 using LimousineBooking.Application.Routes;
 using LimousineBooking.Application.Vehicles;
@@ -18,6 +19,7 @@ public static class DependencyInjection
     {
         services.Configure<BookingSettings>(configuration.GetSection(BookingSettings.SectionName));
         services.Configure<NotificationSettings>(configuration.GetSection(NotificationSettings.SectionName));
+        services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
 
         services.AddScoped<IAuthService, LoginHandler>();
         services.AddScoped<IRouteService, RouteService>();
@@ -31,6 +33,8 @@ public static class DependencyInjection
         services.AddScoped<IAdminBookingService, AdminBookingService>();
         services.AddScoped<IDriverBookingService, DriverBookingService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IPublicPaymentService, PublicPaymentService>();
+        services.AddScoped<IPaymentWebhookService, PaymentWebhookService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAdminNotificationService, AdminNotificationService>();
         services.AddScoped<INotificationOutboxProcessor, NotificationOutboxProcessor>();

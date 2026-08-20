@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { createBooking, getActiveRoutes } from "../../services/bookingService";
+import { createPayment } from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import { APP_BRAND_NAME } from "../../config/brand";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
@@ -92,6 +93,8 @@ function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<BookingDto | null>(null);
+  const [isStartingPayment, setIsStartingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -151,6 +154,19 @@ function BookingPage() {
     }
   };
 
+  const handlePayNow = async () => {
+    if (!confirmedBooking || isStartingPayment) return;
+    setPaymentError(null);
+    setIsStartingPayment(true);
+    try {
+      const checkout = await createPayment(confirmedBooking.bookingReference, confirmedBooking.accessToken);
+      window.location.href = checkout.checkoutUrl;
+    } catch (err) {
+      setPaymentError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Failed to start payment.");
+      setIsStartingPayment(false);
+    }
+  };
+
   if (confirmedBooking) {
     const isConfirmed = confirmedBooking.status === "Confirmed";
     const statusMessage = isConfirmed
@@ -200,6 +216,21 @@ function BookingPage() {
               : "A member of our team will contact you to confirm the details of your ride."}
           </p>
           <p className="text-muted" style={{ fontSize: "0.8rem" }}>A confirmation has been sent to your email.</p>
+
+          <div className="card" style={{ marginTop: "var(--space-8)", textAlign: "left" }}>
+            <h2 style={{ marginTop: 0 }}>Payment</h2>
+            <p>
+              Amount due: {confirmedBooking.price.toFixed(2)} {confirmedBooking.currency}
+            </p>
+            {paymentError && <p role="alert">{paymentError}</p>}
+            <button type="button" onClick={handlePayNow} disabled={isStartingPayment}>
+              {isStartingPayment ? "Redirecting to payment..." : "Pay Now"}
+            </button>
+            <p className="text-muted" style={{ fontSize: "0.8rem", marginTop: "var(--space-3)" }}>
+              You can also pay later using the link{" "}
+              <Link to={`/booking/payment/${confirmedBooking.bookingReference}?token=${confirmedBooking.accessToken}`}>here</Link>.
+            </p>
+          </div>
         </div>
         <p style={{ marginTop: "var(--space-6)" }}>
           <Link to="/">Return to home</Link>

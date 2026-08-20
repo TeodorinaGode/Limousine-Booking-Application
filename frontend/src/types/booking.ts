@@ -37,4 +37,6 @@ export interface BookingDto {
   notes: string | null;
   price: number;
   currency: string;
+  /** Bearer secret for the public payment endpoints — BookingReference alone is not a secure access boundary. */
+  accessToken: string;
 }

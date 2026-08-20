@@ -21,6 +21,8 @@ export interface AdminBookingListItemDto {
   vehicleDescription: string | null;
   /** "Automatic" | "Manual" | "Unassigned" */
   assignment: string;
+  /** "NotStarted" if no payment attempt exists yet, otherwise the most recent attempt's status. */
+  paymentStatus: string;
 }
 
 export interface AssignmentHistoryItemDto {
@@ -35,6 +37,23 @@ export interface RideStatusHistoryEntryDto {
   previousStatus: string;
   newStatus: string;
   changedAt: string;
+}
+
+export interface AdminPaymentSummaryDto {
+  status: string;
+  amount: number;
+  currency: string;
+  provider: string;
+  paidAt: string | null;
+}
+
+export interface AdminPaymentHistoryItemDto {
+  status: string;
+  amount: number;
+  currency: string;
+  createdAt: string;
+  paidAt: string | null;
+  failureReason: string | null;
 }
 
 export interface AdminBookingDetailDto {
@@ -72,6 +91,10 @@ export interface AdminBookingDetailDto {
   createdAt: string;
   updatedAt: string;
   assignmentHistory: AssignmentHistoryItemDto[];
+  /** The most recent payment attempt, or null if payment was never started. */
+  payment: AdminPaymentSummaryDto | null;
+  /** Every payment attempt, most recent first. */
+  paymentHistory: AdminPaymentHistoryItemDto[];
 }
 
 export interface AdminBookingSearchParams {
@@ -85,6 +108,8 @@ export interface AdminBookingSearchParams {
   routeId?: string;
   /** all | automatic | manual | requiresManual */
   assignmentFilter?: string;
+  /** all | notStarted | pending | processing | paid | failed | cancelled | refunded */
+  paymentStatus?: string;
   sortBy?: string;
   sortDirection?: string;
   page?: number;

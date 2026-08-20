@@ -60,6 +60,8 @@ function makeBooking(overrides: Partial<AdminBookingDetailDto> = {}): AdminBooki
     createdAt: "2026-08-19T10:00:00Z",
     updatedAt: "2026-08-19T10:00:00Z",
     assignmentHistory: [],
+    payment: null,
+    paymentHistory: [],
     ...overrides,
   };
 }
@@ -227,6 +229,72 @@ describe("BookingDetailPage", () => {
     await user.click(screen.getByRole("button", { name: "Cancel Booking" }));
 
     expect(mockedAdminBookingService.cancelBooking).not.toHaveBeenCalled();
+  });
+
+  it("shows the payment section with a refund button for a Paid payment", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(
+      makeBooking({ payment: { status: "Paid", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
+    );
+
+    renderPage();
+
+    expect(await screen.findByText("Paid")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Refund Payment" })).toBeInTheDocument();
+  });
+
+  it("does not show a refund button when there is no Paid payment", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(
+      makeBooking({ payment: { status: "Failed", amount: 180, currency: "CHF", provider: "Stripe", paidAt: null } })
+    );
+
+    renderPage();
+
+    await screen.findByText("Failed");
+    expect(screen.queryByRole("button", { name: "Refund Payment" })).not.toBeInTheDocument();
+  });
+
+  it("shows a message when no payment has been started", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(makeBooking({ payment: null }));
+
+    renderPage();
+
+    expect(await screen.findByText("No payment has been started for this booking.")).toBeInTheDocument();
+  });
+
+  it("refunds the payment after confirmation", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(
+      makeBooking({ payment: { status: "Paid", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
+    );
+    mockedAdminBookingService.refundPayment.mockResolvedValue(
+      makeBooking({ payment: { status: "Refunded", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
+    );
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const user = userEvent.setup();
+
+    renderPage();
+    await screen.findByRole("button", { name: "Refund Payment" });
+
+    await user.click(screen.getByRole("button", { name: "Refund Payment" }));
+
+    await waitFor(() => {
+      expect(mockedAdminBookingService.refundPayment).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111", "test-token");
+    });
+    expect(await screen.findByText("Refunded")).toBeInTheDocument();
+  });
+
+  it("does not refund when the confirmation is declined", async () => {
+    mockedAdminBookingService.getBookingById.mockResolvedValue(
+      makeBooking({ payment: { status: "Paid", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
+    );
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    const user = userEvent.setup();
+
+    renderPage();
+    await screen.findByRole("button", { name: "Refund Payment" });
+
+    await user.click(screen.getByRole("button", { name: "Refund Payment" }));
+
+    expect(mockedAdminBookingService.refundPayment).not.toHaveBeenCalled();
   });
 
   it("hides edit/assign/cancel actions for a cancelled booking", async () => {

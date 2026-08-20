@@ -20,6 +20,13 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasIndex(b => b.BookingReference)
             .IsUnique();
 
+        builder.Property(b => b.PublicAccessToken)
+            .IsRequired()
+            .HasMaxLength(64);
+
+        builder.HasIndex(b => b.PublicAccessToken)
+            .IsUnique();
+
         builder.Property(b => b.CustomerFirstName)
             .IsRequired()
             .HasMaxLength(100);
@@ -146,6 +153,11 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasMany(b => b.Notifications)
             .WithOne(n => n.Booking)
             .HasForeignKey(n => n.BookingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(b => b.Payments)
+            .WithOne(p => p.Booking)
+            .HasForeignKey(p => p.BookingId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

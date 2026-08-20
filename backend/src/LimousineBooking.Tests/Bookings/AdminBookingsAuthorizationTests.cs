@@ -67,6 +67,7 @@ public class AdminBookingsAuthorizationTests : IClassFixture<WebApplicationFacto
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/auto-assign")]
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/cancel")]
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/notifications/confirmation/resend")]
+    [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/refund")]
     public async Task UnauthenticatedRequest_IsRejected(string method, string path)
     {
         var response = await CreateAuthorizedClient(null).SendAsync(new HttpRequestMessage(new HttpMethod(method), path));
@@ -83,6 +84,7 @@ public class AdminBookingsAuthorizationTests : IClassFixture<WebApplicationFacto
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/auto-assign")]
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/cancel")]
     [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/notifications/confirmation/resend")]
+    [InlineData("POST", "/api/admin/bookings/00000000-0000-0000-0000-000000000000/refund")]
     public async Task DriverToken_CannotAccessAdminBookingApis(string method, string path)
     {
         var client = CreateAuthorizedClient(CreateToken(UserRole.Driver));

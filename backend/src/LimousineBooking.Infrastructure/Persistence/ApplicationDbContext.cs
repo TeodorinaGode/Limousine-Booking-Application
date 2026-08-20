@@ -21,6 +21,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AssignmentHistory> AssignmentHistories => Set<AssignmentHistory>();
     public DbSet<RideStatusHistory> RideStatusHistories => Set<RideStatusHistory>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<PaymentWebhookEvent> PaymentWebhookEvents => Set<PaymentWebhookEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

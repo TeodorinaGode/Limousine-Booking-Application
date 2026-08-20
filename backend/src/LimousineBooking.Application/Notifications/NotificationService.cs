@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using DomainBooking = LimousineBooking.Domain.Entities.Booking;
 using DomainDriver = LimousineBooking.Domain.Entities.Driver;
 using DomainNotification = LimousineBooking.Domain.Entities.Notification;
+using DomainPayment = LimousineBooking.Domain.Entities.Payment;
 using DomainRoute = LimousineBooking.Domain.Entities.Route;
 
 namespace LimousineBooking.Application.Notifications;
@@ -105,6 +106,17 @@ public class NotificationService : INotificationService
 
     public Task ResendConfirmationAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default) =>
         EnqueueAsync(NotificationType.BookingConfirmation, booking, booking.CustomerEmail, "BookingConfirmed", TripFields(booking, route), cancellationToken);
+
+    public Task NotifyPaymentSucceededAsync(DomainBooking booking, DomainRoute route, DomainPayment payment, CancellationToken cancellationToken = default)
+    {
+        var fields = TripFields(booking, route);
+        fields["PaidAmount"] = payment.Amount.ToString("0.00", CultureInfo.InvariantCulture);
+        fields["PaidCurrency"] = payment.Currency;
+        fields["DriverName"] = booking.Driver?.User is null ? "To be assigned" : $"{booking.Driver.User.FirstName} {booking.Driver.User.LastName}";
+        fields["VehicleDescription"] = booking.Vehicle is null ? "To be assigned" : $"{booking.Vehicle.Make} {booking.Vehicle.Model} - {booking.Vehicle.RegistrationNumber}";
+
+        return EnqueueAsync(NotificationType.PaymentSucceeded, booking, booking.CustomerEmail, "PaymentSucceeded", fields, cancellationToken);
+    }
 
     private async Task EnqueueAsync(
         NotificationType notificationType, DomainBooking booking, string recipientEmail, string templateName,

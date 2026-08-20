@@ -17,6 +17,9 @@ public interface IReportRepository
 
     Task<AssignmentCountAggregate> GetAssignmentCountsAsync(DateTime fromUtc, DateTime toUtcExclusive, CancellationToken cancellationToken = default);
 
+    /// <summary>Payment attempts created in range, grouped by their CURRENT status — Pending/Processing are reported together as "in flight".</summary>
+    Task<PaymentAggregate> GetPaymentAggregateAsync(DateTime fromUtc, DateTime toUtcExclusive, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<RevenueByDayItem>> GetRevenueByDayAsync(DateOnly fromLocal, DateOnly toLocal, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<BookingsByDayItem>> GetBookingsByDayAsync(DateOnly fromLocal, DateOnly toLocal, CancellationToken cancellationToken = default);

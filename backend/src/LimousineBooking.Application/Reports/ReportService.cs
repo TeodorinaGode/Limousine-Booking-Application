@@ -164,6 +164,25 @@ public class ReportService : IReportService
         };
     }
 
+    public async Task<PaymentReportResponse> GetPaymentReportAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default)
+    {
+        var agg = await _reportRepository.GetPaymentAggregateAsync(range.FromUtc, range.ToUtcExclusive, cancellationToken);
+
+        return new PaymentReportResponse
+        {
+            DateFrom = range.FromLocal,
+            DateTo = range.ToLocal,
+            TotalPaymentAttempts = agg.Total,
+            SuccessfulPayments = agg.Successful,
+            FailedPayments = agg.Failed,
+            PendingPayments = agg.Pending,
+            CancelledPayments = agg.Cancelled,
+            RefundedPayments = agg.Refunded,
+            PaidRevenue = agg.PaidRevenue,
+            RefundedAmount = agg.RefundedAmount
+        };
+    }
+
     public Task<IReadOnlyList<UnassignedBookingItem>> GetUnassignedBookingsAsync(int page, int pageSize, CancellationToken cancellationToken = default) =>
         _reportRepository.GetUnassignedBookingsAsync(page, pageSize, cancellationToken);
 

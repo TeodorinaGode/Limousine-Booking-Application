@@ -18,6 +18,9 @@ public enum NotificationType
 
     RideCompleted,
 
+    /// <summary>Customer — an online payment for the booking was confirmed by the payment provider.</summary>
+    PaymentSucceeded,
+
     /// <summary>Driver — newly assigned to a booking (first assignment, admin assignment, or the new driver in a reassignment).</summary>
     DriverAssignment,
 

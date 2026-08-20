@@ -136,6 +136,20 @@ export interface CancellationReasonDto {
   count: number;
 }
 
+export interface PaymentReportDto {
+  dateFrom: string;
+  dateTo: string;
+  totalPaymentAttempts: number;
+  successfulPayments: number;
+  failedPayments: number;
+  pendingPayments: number;
+  cancelledPayments: number;
+  refundedPayments: number;
+  paidRevenue: number;
+  refundedAmount: number;
+  currency: string;
+}
+
 export interface CancellationReportDto {
   dateFrom: string;
   dateTo: string;

@@ -122,6 +122,7 @@ public class PublicBookingService : IPublicBookingService
     {
         Id = booking.Id,
         BookingReference = booking.BookingReference,
+        AccessToken = booking.PublicAccessToken,
         Status = booking.Status.ToString(),
         Route = new BookingRouteSummary
         {

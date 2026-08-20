@@ -6,6 +6,7 @@ import type {
   CancellationReportDto,
   DriverActivityDto,
   PassengerReportDto,
+  PaymentReportDto,
   PopularRouteDto,
   ReportDateRangeParams,
   ReportSummaryDto,
@@ -57,6 +58,10 @@ export function getStatusDistribution(
 
 export function getAssignmentReport(params: ReportDateRangeParams, accessToken: string): Promise<AssignmentReportDto> {
   return apiRequest<AssignmentReportDto>("/admin/reports/assignments", { accessToken, query: params });
+}
+
+export function getPaymentReport(params: ReportDateRangeParams, accessToken: string): Promise<PaymentReportDto> {
+  return apiRequest<PaymentReportDto>("/admin/reports/payments", { accessToken, query: params });
 }
 
 export function getUnassignedBookings(

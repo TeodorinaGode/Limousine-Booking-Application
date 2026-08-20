@@ -43,6 +43,7 @@ function makeBooking(overrides: Partial<AdminBookingListItemDto> = {}): AdminBoo
     driverName: "Dev Driver",
     vehicleDescription: "Mercedes-Benz V-Class - BS 123456",
     assignment: "Automatic",
+    paymentStatus: "Paid",
     ...overrides,
   };
 }
@@ -157,6 +158,31 @@ describe("BookingsPage", () => {
         "test-token"
       );
     });
+  });
+
+  it("filters by payment status", async () => {
+    mockedAdminBookingService.getBookings.mockResolvedValue(pagedResult([]));
+    const user = userEvent.setup();
+
+    renderPage();
+    await waitFor(() => expect(mockedAdminBookingService.getBookings).toHaveBeenCalled());
+
+    await user.selectOptions(screen.getByLabelText("Payment:"), "paid");
+
+    await waitFor(() => {
+      expect(mockedAdminBookingService.getBookings).toHaveBeenLastCalledWith(
+        expect.objectContaining({ paymentStatus: "paid" }),
+        "test-token"
+      );
+    });
+  });
+
+  it("shows the payment status column", async () => {
+    mockedAdminBookingService.getBookings.mockResolvedValue(pagedResult([makeBooking({ paymentStatus: "NotStarted" })]));
+
+    renderPage();
+
+    expect(await screen.findByText("NotStarted")).toBeInTheDocument();
   });
 
   it("links to the booking detail page", async () => {

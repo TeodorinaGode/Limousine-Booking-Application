@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { assignDriver, autoAssign, cancelBooking, getBookingById, resendConfirmation, updateBooking } from "../../../services/adminBookingService";
+import { assignDriver, autoAssign, cancelBooking, getBookingById, refundPayment, resendConfirmation, updateBooking } from "../../../services/adminBookingService";
 import { getDrivers } from "../../../services/driverService";
 import { getRoutes } from "../../../services/routeService";
 import AdminNav from "../../../components/AdminNav";
@@ -114,6 +114,23 @@ function BookingDetailPage() {
       setSuccessMessage("Confirmation email queued for resend.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to resend the confirmation email.");
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleRefund = async () => {
+    if (!accessToken || !id) return;
+    const confirmed = window.confirm("Refund this payment via the payment provider? This cannot be undone.");
+    if (!confirmed) return;
+
+    setError(null);
+    setIsBusy(true);
+    try {
+      setBooking(await refundPayment(id, accessToken));
+      setSuccessMessage("Payment refunded.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to refund the payment.");
     } finally {
       setIsBusy(false);
     }
@@ -238,6 +255,58 @@ function BookingDetailPage() {
         <p>Driver: {booking.driverName ?? "Not assigned"}</p>
         <p>Vehicle: {booking.vehicleDescription ?? "Not assigned"}</p>
         <p>Assignment: {booking.assignmentType ?? "Unassigned"}</p>
+      </section>
+
+      <section style={{ marginBottom: "1.5rem" }}>
+        <h2>Payment</h2>
+        {booking.payment ? (
+          <>
+            <div className="row">
+              <StatusBadge status={booking.payment.status} />
+              <span>
+                {booking.payment.amount.toFixed(2)} {booking.payment.currency}
+              </span>
+              <span>{booking.payment.provider}</span>
+              {booking.payment.paidAt && <span>Paid {formatDateTime(booking.payment.paidAt)}</span>}
+            </div>
+            {booking.payment.status === "Paid" && (
+              <button type="button" className="btn-danger" style={{ marginTop: "var(--space-3)" }} onClick={handleRefund} disabled={isBusy}>
+                Refund Payment
+              </button>
+            )}
+          </>
+        ) : (
+          <p>No payment has been started for this booking.</p>
+        )}
+
+        {booking.paymentHistory.length > 0 && (
+          <table style={{ marginTop: "var(--space-4)" }}>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Created</th>
+                <th>Paid At</th>
+                <th>Failure Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {booking.paymentHistory.map((entry, index) => (
+                <tr key={index}>
+                  <td>
+                    <StatusBadge status={entry.status} />
+                  </td>
+                  <td>
+                    {entry.amount.toFixed(2)} {entry.currency}
+                  </td>
+                  <td>{formatDateTime(entry.createdAt)}</td>
+                  <td>{entry.paidAt ? formatDateTime(entry.paidAt) : "—"}</td>
+                  <td>{entry.failureReason ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
 
       {booking.assignmentHistory.length > 0 && (

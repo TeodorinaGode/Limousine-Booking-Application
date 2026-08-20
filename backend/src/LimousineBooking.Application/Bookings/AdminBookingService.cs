@@ -1,10 +1,12 @@
 using LimousineBooking.Application.Common;
 using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Application.Payments;
 using LimousineBooking.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using DomainBooking = LimousineBooking.Domain.Entities.Booking;
 using DomainDriver = LimousineBooking.Domain.Entities.Driver;
+using DomainPayment = LimousineBooking.Domain.Entities.Payment;
 using DomainVehicle = LimousineBooking.Domain.Entities.Vehicle;
 
 namespace LimousineBooking.Application.Bookings;
@@ -30,6 +32,8 @@ public class AdminBookingService : IAdminBookingService
     private readonly IRideStatusHistoryRepository _rideStatusHistoryRepository;
     private readonly INotificationService _notificationService;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IPaymentRepository _paymentRepository;
+    private readonly IPaymentService _paymentService;
     private readonly ITransactionRunner _transactionRunner;
     private readonly ICurrentUserService _currentUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -48,6 +52,8 @@ public class AdminBookingService : IAdminBookingService
         IRideStatusHistoryRepository rideStatusHistoryRepository,
         INotificationService notificationService,
         INotificationRepository notificationRepository,
+        IPaymentRepository paymentRepository,
+        IPaymentService paymentService,
         ITransactionRunner transactionRunner,
         ICurrentUserService currentUserService,
         IDateTimeProvider dateTimeProvider,
@@ -65,6 +71,8 @@ public class AdminBookingService : IAdminBookingService
         _rideStatusHistoryRepository = rideStatusHistoryRepository;
         _notificationService = notificationService;
         _notificationRepository = notificationRepository;
+        _paymentRepository = paymentRepository;
+        _paymentService = paymentService;
         _transactionRunner = transactionRunner;
         _currentUserService = currentUserService;
         _dateTimeProvider = dateTimeProvider;
@@ -271,6 +279,14 @@ public class AdminBookingService : IAdminBookingService
 
         booking.Cancel(request.Reason, _currentUserService.UserId, _dateTimeProvider.UtcNow);
 
+        // An open (Pending/Processing) payment attempt no longer has anything to pay
+        // for — close it out so it doesn't linger as a stale checkout session. A Paid
+        // payment is untouched here: cancelling the booking never triggers an automatic
+        // refund (section 32/33 — refunds are always an explicit administrator action).
+        var openPayment = await _paymentRepository.GetLatestByBookingIdAsync(booking.Id, cancellationToken);
+        if (openPayment is not null && openPayment.Status is PaymentStatus.Pending or PaymentStatus.Processing)
+            openPayment.MarkCancelled();
+
         if (booking.Route is not null)
             await _notificationService.NotifyCustomerCancelledAsync(booking, booking.Route, cancellationToken);
 
@@ -279,6 +295,28 @@ public class AdminBookingService : IAdminBookingService
         _logger.LogInformation(
             "Booking {BookingReference} cancelled by administrator {AdminUserId}. Reason: {Reason}",
             booking.BookingReference, _currentUserService.UserId, request.Reason ?? "(none given)");
+
+        return AdminBookingOperationResult.Success(await ToDetailAsync(booking, cancellationToken));
+    }
+
+    public async Task<AdminBookingOperationResult> RefundPaymentAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var booking = await _bookingRepository.GetByIdWithDetailsAsync(id, cancellationToken);
+        if (booking is null)
+            return AdminBookingOperationResult.Failure(AdminBookingError.NotFound, "Booking not found.");
+
+        var payment = await _paymentRepository.GetPaidByBookingIdAsync(booking.Id, cancellationToken);
+        if (payment is null || string.IsNullOrWhiteSpace(payment.ProviderPaymentId))
+            return AdminBookingOperationResult.Failure(AdminBookingError.Conflict, "This booking has no paid payment to refund.");
+
+        await _paymentService.RefundAsync(payment.ProviderPaymentId, payment.Amount, payment.Currency, cancellationToken);
+        payment.MarkRefunded();
+
+        await _paymentRepository.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Payment for booking {BookingReference} refunded by administrator {AdminUserId}. Amount: {Amount} {Currency}",
+            booking.BookingReference, _currentUserService.UserId, payment.Amount, payment.Currency);
 
         return AdminBookingOperationResult.Success(await ToDetailAsync(booking, cancellationToken));
     }
@@ -370,6 +408,32 @@ public class AdminBookingService : IAdminBookingService
     private static string FormatVehicleDescription(DomainVehicle? vehicle) =>
         vehicle is null ? string.Empty : $"{vehicle.Make} {vehicle.Model} - {vehicle.RegistrationNumber}";
 
+    /// <summary>"NotStarted" if no attempt exists yet, else the most recent attempt's status — booking.Payments must already be loaded (see BookingRepository's Include).</summary>
+    private static string GetPaymentStatusDisplay(DomainBooking booking)
+    {
+        var latest = booking.Payments.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+        return latest is null ? "NotStarted" : latest.Status.ToString();
+    }
+
+    private static AdminPaymentSummary ToPaymentSummary(DomainPayment payment) => new()
+    {
+        Status = payment.Status.ToString(),
+        Amount = payment.Amount,
+        Currency = payment.Currency,
+        Provider = payment.Provider.ToString(),
+        PaidAt = payment.PaidAt
+    };
+
+    private static AdminPaymentHistoryItem ToPaymentHistoryItem(DomainPayment payment) => new()
+    {
+        Status = payment.Status.ToString(),
+        Amount = payment.Amount,
+        Currency = payment.Currency,
+        CreatedAt = payment.CreatedAt,
+        PaidAt = payment.PaidAt,
+        FailureReason = payment.FailureReason
+    };
+
     private static AdminBookingListItemResponse ToListItem(DomainBooking booking) => new()
     {
         Id = booking.Id,
@@ -390,7 +454,8 @@ public class AdminBookingService : IAdminBookingService
         RideStatus = booking.RideStatus.ToString(),
         DriverName = booking.Driver is null ? null : FormatDriverName(booking.Driver),
         VehicleDescription = booking.Vehicle is null ? null : FormatVehicleDescription(booking.Vehicle),
-        Assignment = booking.AssignmentType?.ToString() ?? "Unassigned"
+        Assignment = booking.AssignmentType?.ToString() ?? "Unassigned",
+        PaymentStatus = GetPaymentStatusDisplay(booking)
     };
 
     private static UpcomingBookingItem ToUpcomingItem(DomainBooking booking) => new()
@@ -457,6 +522,10 @@ public class AdminBookingService : IAdminBookingService
             ? booking.PickupTime
             : TimeOnly.FromDateTime(booking.TravelDate.ToDateTime(booking.PickupTime).AddMinutes(route.EstimatedDurationMinutes));
 
+        var paymentAttempts = await _paymentRepository.GetByBookingIdAsync(booking.Id, cancellationToken);
+        var paymentHistoryItems = paymentAttempts.Select(ToPaymentHistoryItem).ToList();
+        var latestPayment = paymentAttempts.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+
         return new AdminBookingDetailResponse
         {
             Id = booking.Id,
@@ -495,7 +564,9 @@ public class AdminBookingService : IAdminBookingService
             CancelledByEmail = cancelledByEmail,
             CreatedAt = booking.CreatedAt,
             UpdatedAt = booking.UpdatedAt,
-            AssignmentHistory = historyItems
+            AssignmentHistory = historyItems,
+            Payment = latestPayment is null ? null : ToPaymentSummary(latestPayment),
+            PaymentHistory = paymentHistoryItems
         };
     }
 }

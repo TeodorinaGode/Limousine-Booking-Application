@@ -1,0 +1,17 @@
+{
+  "summary": "Zusammenfassung",
+  "revenue": "Umsatz",
+  "operations": "Betrieb",
+  "bookingsTrend": "Buchungstrend",
+  "revenueTrend": "Umsatztrend",
+  "popularRoutes": "Beliebte Strecken",
+  "driverActivity": "Fahreraktivität",
+  "vehicleUsage": "Fahrzeugnutzung",
+  "passengers": "Passagiere",
+  "statusDistribution": "Statusverteilung",
+  "cancellations": "Stornierungen",
+  "payments": "Zahlungen",
+  "exportCsv": "CSV exportieren",
+  "dateFrom": "Von",
+  "dateTo": "Bis"
+}

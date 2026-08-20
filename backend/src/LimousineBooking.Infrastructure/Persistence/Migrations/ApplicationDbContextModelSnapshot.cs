@@ -115,6 +115,13 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("DriverId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasDefaultValue("en");
+
                     b.Property<string>("ManualAssignmentReason")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -644,6 +651,10 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LanguageCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
 
                     b.Property<string>("LastName")
                         .IsRequired()

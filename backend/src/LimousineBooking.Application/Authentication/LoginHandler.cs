@@ -49,7 +49,8 @@ public class LoginHandler : IAuthService
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Role = user.Role.ToString()
+                Role = user.Role.ToString(),
+                LanguageCode = user.LanguageCode
             }
         };
 

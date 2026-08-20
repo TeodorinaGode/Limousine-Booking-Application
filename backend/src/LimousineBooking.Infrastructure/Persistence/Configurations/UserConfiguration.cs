@@ -39,6 +39,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.IsActive)
             .IsRequired();
 
+        builder.Property(u => u.LanguageCode)
+            .HasMaxLength(2);
+
         builder.Property(u => u.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");

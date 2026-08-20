@@ -315,11 +315,33 @@ public class ReportServiceTests
                 }
             });
 
-        var csv = await CreateService().ExportBookingsCsvAsync(Range);
+        var csv = await CreateService().ExportBookingsCsvAsync(Range, "en");
         var lines = csv.TrimEnd('\r', '\n').Split('\n');
 
         Assert.Equal(2, lines.Length);
         Assert.StartsWith("Booking Reference,Date,Time,Route,Customer,Driver,Vehicle,Passengers,Price,Currency,Status,Ride Status", lines[0]);
         Assert.Contains("LM-000001", lines[1]);
+    }
+
+    [Fact]
+    public async Task ExportBookingsCsvAsync_German_UsesLocalizedHeadersButNeverTranslatesData()
+    {
+        _reportRepository.Setup(r => r.GetBookingReportRowsAsync(Range.FromLocal, Range.ToLocal, It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<BookingReportRow>
+            {
+                new()
+                {
+                    BookingReference = "LM-000001", Date = new DateOnly(2026, 9, 5), Time = new TimeOnly(9, 0),
+                    Route = "Basel - Zurich", Customer = "Jane Doe", Driver = "Dev Driver", Vehicle = "Mercedes E-Class - BS 1",
+                    Passengers = 2, Price = 180m, Currency = "CHF", Status = "Confirmed", RideStatus = "Upcoming"
+                }
+            });
+
+        var csv = await CreateService().ExportBookingsCsvAsync(Range, "de");
+        var lines = csv.TrimEnd('\r', '\n').Split('\n');
+
+        Assert.StartsWith("Buchungsnummer,Datum,Zeit,Route,Kunde,Fahrer,Fahrzeug,Passagiere,Preis,Währung,Status,Fahrtstatus", lines[0]);
+        Assert.Contains("Confirmed", lines[1]);
+        Assert.Contains("Basel - Zurich", lines[1]);
     }
 }

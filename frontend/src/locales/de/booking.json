@@ -1,0 +1,58 @@
+{
+  "hero": {
+    "eyebrow": "Privater Chauffeurservice",
+    "title1": "Ihre Reise.",
+    "title2": "Unsere Priorität.",
+    "subtitle": "Premium-Chauffeurtransport in der ganzen Schweiz — diskret, zuverlässig und exklusiv für Sie reserviert.",
+    "strip": "Geschäftsreisen · Flughafentransfers · Private Anlässe"
+  },
+  "title": "Fahrt buchen",
+  "steps": {
+    "trip": "Fahrt",
+    "pickupDetails": "Abholdetails",
+    "yourInformation": "Ihre Angaben",
+    "reviewConfirm": "Überprüfen & Bestätigen"
+  },
+  "selectRoute": "Strecke",
+  "departure": "Abfahrt",
+  "destination": "Ziel",
+  "date": "Buchungsdatum",
+  "time": "Abholzeit",
+  "approxMinutes": "Ca. {{count}} Min.",
+  "pickupAddress": "Abholadresse",
+  "pickupAddressPlaceholder": "Abholadresse eingeben",
+  "passengers": "Anzahl Passagiere",
+  "notes": "Notizen (optional)",
+  "notesPlaceholder": "Optionale Notizen",
+  "firstName": "Vorname",
+  "lastName": "Nachname",
+  "email": "E-Mail",
+  "phone": "Telefon",
+  "review": "Überprüfen & Bestätigen",
+  "estimatedPrice": "Voraussichtlicher Preis",
+  "confirmBooking": "Buchung bestätigen",
+  "submitting": "Wird gesendet...",
+  "success": {
+    "confirmedTitle": "Buchung bestätigt",
+    "pendingTitle": "Buchung erhalten",
+    "confirmedMessage": "Ihre Buchung wurde bestätigt.",
+    "pendingMessage": "Ihre Buchungsanfrage wurde erhalten und wartet auf Bestätigung.",
+    "trip": "Fahrt",
+    "dateTime": "Datum & Uhrzeit",
+    "pickupAddress": "Abholadresse",
+    "passengers": "Passagiere",
+    "price": "Preis",
+    "confirmedFooter": "Wir freuen uns darauf, Sie zu fahren.",
+    "pendingFooter": "Ein Mitglied unseres Teams wird Sie kontaktieren, um die Details Ihrer Fahrt zu bestätigen.",
+    "emailSent": "Eine Bestätigung wurde an Ihre E-Mail-Adresse gesendet.",
+    "returnHome": "Zurück zur Startseite"
+  },
+  "payment": {
+    "title": "Zahlung",
+    "amountDue": "Fälliger Betrag: {{amount}}",
+    "payNow": "Jetzt bezahlen",
+    "redirecting": "Weiterleitung zur Zahlung...",
+    "payLaterNotice": "Sie können auch später über diesen Link bezahlen",
+    "here": "hier"
+  }
+}

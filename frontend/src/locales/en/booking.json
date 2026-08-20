@@ -1,0 +1,58 @@
+{
+  "hero": {
+    "eyebrow": "Private Chauffeur Service",
+    "title1": "Your journey.",
+    "title2": "Our priority.",
+    "subtitle": "Premium chauffeur transportation across Switzerland — discreet, reliable, and reserved exclusively for you.",
+    "strip": "Executive Transportation · Airport Transfers · Private Events"
+  },
+  "title": "Book Your Ride",
+  "steps": {
+    "trip": "Trip",
+    "pickupDetails": "Pickup Details",
+    "yourInformation": "Your Information",
+    "reviewConfirm": "Review & Confirm"
+  },
+  "selectRoute": "Route",
+  "departure": "Departure",
+  "destination": "Destination",
+  "date": "Booking date",
+  "time": "Pickup time",
+  "approxMinutes": "Approx. {{count}} min",
+  "pickupAddress": "Pickup address",
+  "pickupAddressPlaceholder": "Enter pickup address",
+  "passengers": "Number of passengers",
+  "notes": "Notes (optional)",
+  "notesPlaceholder": "Optional notes",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "email": "Email",
+  "phone": "Phone",
+  "review": "Review & Confirm",
+  "estimatedPrice": "Estimated price",
+  "confirmBooking": "Confirm Booking",
+  "submitting": "Submitting...",
+  "success": {
+    "confirmedTitle": "Booking Confirmed",
+    "pendingTitle": "Booking Received",
+    "confirmedMessage": "Your booking has been confirmed.",
+    "pendingMessage": "Your booking request has been received and is awaiting confirmation.",
+    "trip": "Trip",
+    "dateTime": "Date & time",
+    "pickupAddress": "Pickup address",
+    "passengers": "Passengers",
+    "price": "Price",
+    "confirmedFooter": "We look forward to driving you.",
+    "pendingFooter": "A member of our team will contact you to confirm the details of your ride.",
+    "emailSent": "A confirmation has been sent to your email.",
+    "returnHome": "Return to home"
+  },
+  "payment": {
+    "title": "Payment",
+    "amountDue": "Amount due: {{amount}}",
+    "payNow": "Pay Now",
+    "redirecting": "Redirecting to payment...",
+    "payLaterNotice": "You can also pay later using the link",
+    "here": "here"
+  }
+}

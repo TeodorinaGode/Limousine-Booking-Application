@@ -1,0 +1,66 @@
+{
+  "brand": {
+    "tagline": "Privater Chauffeurservice"
+  },
+  "nav": {
+    "home": "Startseite",
+    "routes": "Strecken",
+    "bookARide": "Fahrt buchen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "logout": "Abmelden"
+  },
+  "languageSelector": {
+    "label": "Sprache wählen",
+    "en": "EN",
+    "de": "DE",
+    "fr": "FR",
+    "it": "IT"
+  },
+  "buttons": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "refresh": "Aktualisieren",
+    "close": "Schließen",
+    "tryAgain": "Erneut versuchen",
+    "viewDetails": "Ansehen"
+  },
+  "status": {
+    "booking": {
+      "Pending": "Ausstehend",
+      "Confirmed": "Bestätigt",
+      "PendingManualAssignment": "Ausstehend (manuelle Zuweisung)",
+      "Cancelled": "Storniert",
+      "Assigned": "Zugewiesen",
+      "OnTheWay": "Unterwegs",
+      "PassengerPickedUp": "Fahrgast abgeholt",
+      "Completed": "Abgeschlossen"
+    },
+    "ride": {
+      "Upcoming": "Bevorstehend",
+      "OnTheWay": "Unterwegs",
+      "PassengerPickedUp": "Fahrgast abgeholt",
+      "Completed": "Abgeschlossen",
+      "Cancelled": "Storniert"
+    },
+    "payment": {
+      "Pending": "Ausstehend",
+      "Processing": "In Bearbeitung",
+      "Paid": "Bezahlt",
+      "Failed": "Fehlgeschlagen",
+      "Cancelled": "Storniert",
+      "Refunded": "Erstattet",
+      "NotStarted": "Nicht gestartet"
+    }
+  },
+  "misc": {
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen.",
+    "currency": "CHF"
+  }
+}

@@ -1,11 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import BookingPage from "./BookingPage";
 import * as bookingService from "../../services/bookingService";
 import * as paymentService from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
+import { AuthProvider } from "../../context/AuthContext";
+import i18n, { DEFAULT_LANGUAGE } from "../../i18n/i18n";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 vi.mock("../../services/bookingService");
@@ -47,7 +49,9 @@ function makeBooking(overrides: Partial<BookingDto> = {}): BookingDto {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <BookingPage />
+      <AuthProvider>
+        <BookingPage />
+      </AuthProvider>
     </MemoryRouter>
   );
 }
@@ -81,6 +85,10 @@ async function fillStep3(user: ReturnType<typeof userEvent.setup>) {
 beforeEach(() => {
   vi.clearAllMocks();
   mockedBookingService.getActiveRoutes.mockResolvedValue([makeRoute()]);
+});
+
+afterEach(async () => {
+  await i18n.changeLanguage(DEFAULT_LANGUAGE);
 });
 
 describe("BookingPage", () => {
@@ -194,6 +202,22 @@ describe("BookingPage", () => {
     await screen.findByText("Booking Confirmed");
     expect(screen.queryByText(/driver/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/vehicle/i)).not.toBeInTheDocument();
+  });
+
+  it("preserves entered booking details when the language is switched mid-flow", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByLabelText("Route");
+
+    await fillStep1(user);
+    await user.type(screen.getByLabelText("Pickup address"), "Bahnhofplatz 1, Basel");
+
+    await user.click(screen.getByRole("button", { name: "DE" }));
+    await screen.findByLabelText("Abholadresse");
+
+    // The pickup-address value survives the language switch even though the
+    // field's own label just changed language (section 40).
+    expect(screen.getByLabelText("Abholadresse")).toHaveValue("Bahnhofplatz 1, Basel");
   });
 
   it("shows the server error and stays on the review step when submission fails", async () => {

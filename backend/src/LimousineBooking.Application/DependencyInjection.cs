@@ -1,3 +1,4 @@
+using LimousineBooking.Application.Account;
 using LimousineBooking.Application.Authentication;
 using LimousineBooking.Application.Availability;
 using LimousineBooking.Application.Bookings;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
 
         services.AddScoped<IAuthService, LoginHandler>();
+        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRouteService, RouteService>();
         services.AddScoped<IVehicleService, VehicleService>();
         services.AddScoped<IDriverService, DriverService>();

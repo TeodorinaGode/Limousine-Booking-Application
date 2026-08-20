@@ -27,6 +27,11 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasIndex(b => b.PublicAccessToken)
             .IsUnique();
 
+        builder.Property(b => b.LanguageCode)
+            .IsRequired()
+            .HasMaxLength(2)
+            .HasDefaultValue(Domain.Common.SupportedLanguages.Default);
+
         builder.Property(b => b.CustomerFirstName)
             .IsRequired()
             .HasMaxLength(100);

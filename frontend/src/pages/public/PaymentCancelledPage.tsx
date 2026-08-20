@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { retryPayment } from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import { APP_BRAND_NAME } from "../../config/brand";
 
 function PaymentCancelledPage() {
+  const { t } = useTranslation(["payment", "common"]);
   const [searchParams] = useSearchParams();
   const bookingReference = searchParams.get("ref") ?? "";
   const token = searchParams.get("token") ?? "";
@@ -20,7 +22,7 @@ function PaymentCancelledPage() {
       const checkout = await retryPayment(bookingReference, token);
       window.location.href = checkout.checkoutUrl;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Failed to start payment.");
+      setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : t("common:misc.error"));
       setIsBusy(false);
     }
   };
@@ -31,17 +33,17 @@ function PaymentCancelledPage() {
         <Link to="/">{APP_BRAND_NAME}</Link>
       </p>
       <div className="card">
-        <h1>Payment Cancelled</h1>
-        <p role="status">Your payment was not completed. Your booking has not been charged.</p>
+        <h1>{t("payment:cancelledTitle")}</h1>
+        <p role="status">{t("payment:cancelledMessage")}</p>
         {error && <p role="alert">{error}</p>}
         {bookingReference && token && (
           <button type="button" onClick={handleRetry} disabled={isBusy}>
-            {isBusy ? "Redirecting to payment..." : "Try Again"}
+            {isBusy ? t("payment:redirecting") : t("common:buttons.tryAgain")}
           </button>
         )}
       </div>
       <p style={{ marginTop: "var(--space-6)" }}>
-        <Link to="/">Return to home</Link>
+        <Link to="/">{t("payment:returnHome")}</Link>
       </p>
     </div>
   );

@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "dashboard": "Übersicht",
+    "bookings": "Buchungen",
+    "drivers": "Fahrer",
+    "vehicles": "Fahrzeuge",
+    "routes": "Strecken",
+    "reports": "Berichte"
+  },
+  "brand": {
+    "suffix": "Verwaltung"
+  },
+  "dashboard": {
+    "title": "Übersicht"
+  },
+  "bookings": {
+    "title": "Buchungen",
+    "description": "Kundenreservierungen und bevorstehende Fahrten verwalten.",
+    "payment": "Zahlung",
+    "refundPayment": "Zahlung erstatten"
+  },
+  "reports": {
+    "title": "Berichte",
+    "description": "Überblick über Geschäft und Betrieb.",
+    "payments": "Zahlungen"
+  }
+}

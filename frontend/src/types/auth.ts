@@ -6,6 +6,8 @@ export interface AuthenticatedUser {
   firstName: string;
   lastName: string;
   role: UserRole;
+  /** Null if the user has never saved a preference — the frontend then falls back to the browser's language. */
+  languageCode: string | null;
 }
 
 export interface LoginRequest {

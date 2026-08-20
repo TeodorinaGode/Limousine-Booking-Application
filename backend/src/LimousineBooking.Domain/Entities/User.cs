@@ -12,6 +12,14 @@ public class User : AuditableEntity
     public UserRole Role { get; private set; }
     public bool IsActive { get; private set; } = true;
 
+    /// <summary>
+    /// The user's saved language preference (en/de/fr/it) — null means "no preference
+    /// saved yet, use the browser's language" (section 20: language selection is never
+    /// required at account creation). Once set, this drives both the UI on login and
+    /// which language this user's emails are rendered in.
+    /// </summary>
+    public string? LanguageCode { get; private set; }
+
     public Driver? Driver { get; private set; }
 
     private User()
@@ -52,6 +60,10 @@ public class User : AuditableEntity
 
         PasswordHash = passwordHash;
     }
+
+    /// <summary>Null clears the preference (back to "use the browser's language"); a non-null value is normalized via <see cref="Common.SupportedLanguages.Normalize"/> — an unsupported code silently becomes "en" rather than being rejected.</summary>
+    public void SetLanguage(string? languageCode) =>
+        LanguageCode = languageCode is null ? null : Common.SupportedLanguages.Normalize(languageCode);
 
     public void Deactivate() => IsActive = false;
 

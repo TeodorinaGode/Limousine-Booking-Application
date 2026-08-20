@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getPaymentStatus } from "../../services/paymentService";
 import { APP_BRAND_NAME } from "../../config/brand";
 import type { PublicPaymentStatusDto } from "../../types/payment";
@@ -8,6 +9,7 @@ const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 15;
 
 function PaymentSuccessPage() {
+  const { t } = useTranslation(["payment", "common"]);
   const [searchParams] = useSearchParams();
   const bookingReference = searchParams.get("ref") ?? "";
   const token = searchParams.get("token") ?? "";
@@ -19,7 +21,7 @@ function PaymentSuccessPage() {
 
   useEffect(() => {
     if (!bookingReference || !token) {
-      setError("This payment link is missing required information.");
+      setError(t("payment:missingLink"));
       return;
     }
 
@@ -44,7 +46,7 @@ function PaymentSuccessPage() {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load payment status.");
+        if (!cancelled) setError(err instanceof Error ? err.message : t("common:misc.error"));
       }
     };
 
@@ -53,6 +55,7 @@ function PaymentSuccessPage() {
       cancelled = true;
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingReference, token]);
 
   const isPaid = status?.status === "Paid";
@@ -70,33 +73,30 @@ function PaymentSuccessPage() {
             <div aria-hidden="true" style={{ fontSize: "1.5rem", marginBottom: "var(--space-3)" }}>
               ✓
             </div>
-            <h1>Payment Successful</h1>
+            <h1>{t("payment:successTitle")}</h1>
             <p role="status">
-              Your payment of {status!.amount.toFixed(2)} {status!.currency} has been confirmed.
+              {t("payment:successMessage", { amount: `${status!.amount.toFixed(2)} ${status!.currency}` })}
             </p>
           </>
         ) : gaveUp ? (
           <>
-            <h1>Confirming Payment</h1>
-            <p role="status">
-              We're still waiting for confirmation from the payment provider. This can take a moment — please check back shortly, or view the
-              current status below.
-            </p>
+            <h1>{t("payment:confirming")}</h1>
+            <p role="status">{t("payment:stillWaiting")}</p>
             {bookingReference && (
               <p>
-                <Link to={`/booking/payment/${bookingReference}?token=${token}`}>Check payment status</Link>
+                <Link to={`/booking/payment/${bookingReference}?token=${token}`}>{t("payment:checkStatus")}</Link>
               </p>
             )}
           </>
         ) : (
           <>
-            <h1>Confirming Payment</h1>
-            <p role="status">Please wait while we confirm your payment...</p>
+            <h1>{t("payment:confirming")}</h1>
+            <p role="status">{t("payment:pleaseWait")}</p>
           </>
         )}
       </div>
       <p style={{ marginTop: "var(--space-6)" }}>
-        <Link to="/">Return to home</Link>
+        <Link to="/">{t("payment:returnHome")}</Link>
       </p>
     </div>
   );

@@ -662,6 +662,39 @@ tbody tr:last-child td {
   }
 }
 
+/* ---- Language selector ---- */
+
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.language-selector__option {
+  padding: 0.35em 0.6em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--color-border);
+  cursor: pointer;
+}
+.language-selector__option:last-child {
+  border-right: none;
+}
+.language-selector__option:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+.language-selector__option--active {
+  color: var(--color-text-primary);
+  background: var(--color-surface-elevated);
+}
+
 /* ---- Containers ---- */
 
 .container {

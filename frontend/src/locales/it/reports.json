@@ -1,0 +1,17 @@
+{
+  "summary": "Riepilogo",
+  "revenue": "Ricavi",
+  "operations": "Operazioni",
+  "bookingsTrend": "Andamento prenotazioni",
+  "revenueTrend": "Andamento ricavi",
+  "popularRoutes": "Tratte popolari",
+  "driverActivity": "Attività autisti",
+  "vehicleUsage": "Utilizzo veicoli",
+  "passengers": "Passeggeri",
+  "statusDistribution": "Distribuzione stato",
+  "cancellations": "Cancellazioni",
+  "payments": "Pagamenti",
+  "exportCsv": "Esporta CSV",
+  "dateFrom": "Da",
+  "dateTo": "A"
+}

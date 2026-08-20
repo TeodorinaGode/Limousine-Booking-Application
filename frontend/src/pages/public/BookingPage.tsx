@@ -1,9 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { createBooking, getActiveRoutes } from "../../services/bookingService";
 import { createPayment } from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import { APP_BRAND_NAME } from "../../config/brand";
+import LanguageSelector from "../../components/LanguageSelector";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -37,52 +40,56 @@ const initialValues: FormValues = {
 
 type Step = 1 | 2 | 3 | 4;
 
-const STEP_TITLES: Record<Step, string> = {
-  1: "Trip",
-  2: "Pickup Details",
-  3: "Your Information",
-  4: "Review & Confirm",
-};
+function stepTitles(t: TFunction): Record<Step, string> {
+  return {
+    1: t("booking:steps.trip"),
+    2: t("booking:steps.pickupDetails"),
+    3: t("booking:steps.yourInformation"),
+    4: t("booking:steps.reviewConfirm"),
+  };
+}
 
-function validateStep1(values: FormValues): Record<string, string> {
+function validateStep1(values: FormValues, t: TFunction): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!values.routeId) errors.routeId = "Please select a route.";
+  if (!values.routeId) errors.routeId = t("validation:selectRoute");
   if (!values.bookingDate) {
-    errors.bookingDate = "Booking date is required.";
+    errors.bookingDate = t("validation:bookingDateRequired");
   } else if (values.bookingDate < new Date().toISOString().slice(0, 10)) {
-    errors.bookingDate = "Booking date must be today or later.";
+    errors.bookingDate = t("validation:bookingDateFuture");
   }
-  if (!values.pickupTime) errors.pickupTime = "Pickup time is required.";
+  if (!values.pickupTime) errors.pickupTime = t("validation:pickupTimeRequired");
   return errors;
 }
 
-function validateStep2(values: FormValues): Record<string, string> {
+function validateStep2(values: FormValues, t: TFunction): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!values.pickupAddress.trim()) errors.pickupAddress = "Pickup address is required.";
+  if (!values.pickupAddress.trim()) errors.pickupAddress = t("validation:pickupAddressRequired");
   if (!Number.isFinite(values.passengerCount) || values.passengerCount < 1) {
-    errors.passengerCount = "At least one passenger is required.";
+    errors.passengerCount = t("validation:passengersRequired");
   }
   return errors;
 }
 
-function validateStep3(values: FormValues): Record<string, string> {
+function validateStep3(values: FormValues, t: TFunction): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!values.customerFirstName.trim()) errors.customerFirstName = "First name is required.";
-  if (!values.customerLastName.trim()) errors.customerLastName = "Last name is required.";
+  if (!values.customerFirstName.trim()) errors.customerFirstName = t("validation:firstNameRequired");
+  if (!values.customerLastName.trim()) errors.customerLastName = t("validation:lastNameRequired");
   if (!values.customerEmail.trim()) {
-    errors.customerEmail = "Email is required.";
+    errors.customerEmail = t("validation:emailRequired");
   } else if (!EMAIL_PATTERN.test(values.customerEmail.trim())) {
-    errors.customerEmail = "Enter a valid email address.";
+    errors.customerEmail = t("validation:emailInvalid");
   }
   if (!values.customerPhone.trim()) {
-    errors.customerPhone = "Phone number is required.";
+    errors.customerPhone = t("validation:phoneRequired");
   } else if (!PHONE_PATTERN.test(values.customerPhone.trim())) {
-    errors.customerPhone = "Enter a valid phone number.";
+    errors.customerPhone = t("validation:phoneInvalid");
   }
   return errors;
 }
 
 function BookingPage() {
+  const { t, i18n } = useTranslation(["booking", "common", "validation"]);
+
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -103,12 +110,12 @@ function BookingPage() {
       try {
         setRoutes(await getActiveRoutes());
       } catch (err) {
-        setLoadError(err instanceof Error ? err.message : "Failed to load routes.");
+        setLoadError(err instanceof Error ? err.message : t("common:misc.error"));
       } finally {
         setIsLoadingRoutes(false);
       }
     })();
-  }, []);
+  }, [t]);
 
   const selectedRoute = routes.find((r) => r.id === values.routeId);
 
@@ -116,7 +123,7 @@ function BookingPage() {
     event.preventDefault();
 
     const stepErrors =
-      step === 1 ? validateStep1(values) : step === 2 ? validateStep2(values) : validateStep3(values);
+      step === 1 ? validateStep1(values, t) : step === 2 ? validateStep2(values, t) : validateStep3(values, t);
     setErrors(stepErrors);
     if (Object.keys(stepErrors).length > 0) return;
 
@@ -143,11 +150,15 @@ function BookingPage() {
         customerEmail: values.customerEmail.trim(),
         customerPhone: values.customerPhone.trim(),
         notes: values.notes.trim() || undefined,
+        // Captured once, at booking creation, so the confirmation email uses the
+        // language the customer was actually looking at — not whatever their
+        // browser happens to report later when the outbox worker sends it.
+        languageCode: i18n.resolvedLanguage,
       });
       setConfirmedBooking(booking);
     } catch (err) {
       setSubmitError(
-        err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Failed to create the booking."
+        err instanceof ApiError ? err.message : err instanceof Error ? err.message : t("common:misc.error")
       );
     } finally {
       setIsSubmitting(false);
@@ -162,16 +173,14 @@ function BookingPage() {
       const checkout = await createPayment(confirmedBooking.bookingReference, confirmedBooking.accessToken);
       window.location.href = checkout.checkoutUrl;
     } catch (err) {
-      setPaymentError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Failed to start payment.");
+      setPaymentError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : t("common:misc.error"));
       setIsStartingPayment(false);
     }
   };
 
   if (confirmedBooking) {
     const isConfirmed = confirmedBooking.status === "Confirmed";
-    const statusMessage = isConfirmed
-      ? "Your booking has been confirmed."
-      : "Your booking request has been received and is awaiting confirmation.";
+    const statusMessage = isConfirmed ? t("booking:success.confirmedMessage") : t("booking:success.pendingMessage");
 
     return (
       <div className="container container--narrow fade-in" style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)", textAlign: "center" }}>
@@ -182,75 +191,78 @@ function BookingPage() {
             </div>
           )}
           <p className="hero__eyebrow" style={{ marginBottom: "var(--space-4)" }}>
-            {isConfirmed ? "Booking Confirmed" : "Booking Received"}
+            {isConfirmed ? t("booking:success.confirmedTitle") : t("booking:success.pendingTitle")}
           </p>
           <h1 style={{ fontSize: "1.5rem", textTransform: "uppercase" }}>{confirmedBooking.bookingReference}</h1>
           <p role="status" style={{ display: "inline-block" }}>{statusMessage}</p>
 
           <dl style={{ textAlign: "left", marginTop: "var(--space-8)" }}>
-            <dt>Trip</dt>
+            <dt>{t("booking:success.trip")}</dt>
             <dd>
               {confirmedBooking.route.departureLocation} &rarr; {confirmedBooking.route.destination}
             </dd>
 
-            <dt>Date &amp; time</dt>
+            <dt>{t("booking:success.dateTime")}</dt>
             <dd>
               {confirmedBooking.bookingDate} at {confirmedBooking.pickupTime.slice(0, 5)}
             </dd>
 
-            <dt>Pickup address</dt>
+            <dt>{t("booking:success.pickupAddress")}</dt>
             <dd>{confirmedBooking.pickupAddress}</dd>
 
-            <dt>Passengers</dt>
+            <dt>{t("booking:success.passengers")}</dt>
             <dd>{confirmedBooking.passengerCount}</dd>
 
-            <dt>Price</dt>
+            <dt>{t("booking:success.price")}</dt>
             <dd>
               {confirmedBooking.price.toFixed(2)} {confirmedBooking.currency}
             </dd>
           </dl>
 
           <p style={{ marginTop: "var(--space-8)" }}>
-            {isConfirmed
-              ? "We look forward to driving you."
-              : "A member of our team will contact you to confirm the details of your ride."}
+            {isConfirmed ? t("booking:success.confirmedFooter") : t("booking:success.pendingFooter")}
           </p>
-          <p className="text-muted" style={{ fontSize: "0.8rem" }}>A confirmation has been sent to your email.</p>
+          <p className="text-muted" style={{ fontSize: "0.8rem" }}>{t("booking:success.emailSent")}</p>
 
           <div className="card" style={{ marginTop: "var(--space-8)", textAlign: "left" }}>
-            <h2 style={{ marginTop: 0 }}>Payment</h2>
+            <h2 style={{ marginTop: 0 }}>{t("booking:payment.title")}</h2>
             <p>
-              Amount due: {confirmedBooking.price.toFixed(2)} {confirmedBooking.currency}
+              {t("booking:payment.amountDue", { amount: `${confirmedBooking.price.toFixed(2)} ${confirmedBooking.currency}` })}
             </p>
             {paymentError && <p role="alert">{paymentError}</p>}
             <button type="button" onClick={handlePayNow} disabled={isStartingPayment}>
-              {isStartingPayment ? "Redirecting to payment..." : "Pay Now"}
+              {isStartingPayment ? t("booking:payment.redirecting") : t("booking:payment.payNow")}
             </button>
             <p className="text-muted" style={{ fontSize: "0.8rem", marginTop: "var(--space-3)" }}>
-              You can also pay later using the link{" "}
-              <Link to={`/booking/payment/${confirmedBooking.bookingReference}?token=${confirmedBooking.accessToken}`}>here</Link>.
+              {t("booking:payment.payLaterNotice")}{" "}
+              <Link to={`/booking/payment/${confirmedBooking.bookingReference}?token=${confirmedBooking.accessToken}`}>{t("booking:payment.here")}</Link>.
             </p>
           </div>
         </div>
         <p style={{ marginTop: "var(--space-6)" }}>
-          <Link to="/">Return to home</Link>
+          <Link to="/">{t("booking:success.returnHome")}</Link>
         </p>
       </div>
     );
   }
 
+  const titles = stepTitles(t);
+
   return (
     <div className="container container--medium" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-16)" }}>
-      <p className="site-nav__brand" style={{ marginBottom: "var(--space-6)" }}>
-        <Link to="/">{APP_BRAND_NAME}</Link>
-      </p>
-      <h1>Book Your Ride</h1>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
+        <p className="site-nav__brand" style={{ margin: 0 }}>
+          <Link to="/">{APP_BRAND_NAME}</Link>
+        </p>
+        <LanguageSelector />
+      </div>
+      <h1>{t("booking:title")}</h1>
 
       <div className="progress-steps" role="list" aria-label="Booking progress">
         {([1, 2, 3, 4] as const).map((s) => (
           <div key={s} className="progress-step" role="listitem">
             <span className={`progress-step__label${s === step ? " progress-step--active" : ""}${s < step ? " progress-step--done" : ""}`}>
-              0{s} {STEP_TITLES[s]}
+              0{s} {titles[s]}
             </span>
             {s < 4 && <span className={`progress-step__line${s < step ? " progress-step--done" : ""}`} />}
           </div>
@@ -269,9 +281,9 @@ function BookingPage() {
           {step === 1 && (
             <>
               <div className="form-group">
-                <label>Route</label>
+                <label>{t("booking:selectRoute")}</label>
                 {errors.routeId && <p className="form-error">{errors.routeId}</p>}
-                <div className="stack" role="radiogroup" aria-label="Route">
+                <div className="stack" role="radiogroup" aria-label={t("booking:selectRoute")}>
                   {routes.map((route) => {
                     const isSelected = values.routeId === route.id;
                     return (
@@ -289,7 +301,7 @@ function BookingPage() {
                           <span className="trip-card__arrow">&rarr;</span>
                           <span>{route.destination}</span>
                         </div>
-                        <p className="trip-card__meta">Approx. {route.estimatedDurationMinutes} min</p>
+                        <p className="trip-card__meta">{t("booking:approxMinutes", { count: route.estimatedDurationMinutes })}</p>
                         <p className="trip-card__price">
                           {route.price.toFixed(2)} {route.currency}
                         </p>
@@ -301,7 +313,7 @@ function BookingPage() {
 
               <div className="row">
                 <div className="form-group">
-                  <label htmlFor="bookingDate">Booking date</label>
+                  <label htmlFor="bookingDate">{t("booking:date")}</label>
                   <br />
                   <input
                     id="bookingDate"
@@ -313,7 +325,7 @@ function BookingPage() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="pickupTime">Pickup time</label>
+                  <label htmlFor="pickupTime">{t("booking:time")}</label>
                   <br />
                   <input
                     id="pickupTime"
@@ -330,12 +342,12 @@ function BookingPage() {
           {step === 2 && (
             <>
               <div className="form-group">
-                <label htmlFor="pickupAddress">Pickup address</label>
+                <label htmlFor="pickupAddress">{t("booking:pickupAddress")}</label>
                 <br />
                 <input
                   id="pickupAddress"
                   type="text"
-                  placeholder="Enter pickup address"
+                  placeholder={t("booking:pickupAddressPlaceholder")}
                   value={values.pickupAddress}
                   onChange={(e) => setValues({ ...values, pickupAddress: e.target.value })}
                 />
@@ -343,7 +355,7 @@ function BookingPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="passengerCount">Number of passengers</label>
+                <label htmlFor="passengerCount">{t("booking:passengers")}</label>
                 <br />
                 <input
                   id="passengerCount"
@@ -356,11 +368,11 @@ function BookingPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="notes">Notes (optional)</label>
+                <label htmlFor="notes">{t("booking:notes")}</label>
                 <br />
                 <textarea
                   id="notes"
-                  placeholder="Optional notes"
+                  placeholder={t("booking:notesPlaceholder")}
                   value={values.notes}
                   onChange={(e) => setValues({ ...values, notes: e.target.value })}
                 />
@@ -372,7 +384,7 @@ function BookingPage() {
             <>
               <div className="row">
                 <div className="form-group">
-                  <label htmlFor="customerFirstName">First name</label>
+                  <label htmlFor="customerFirstName">{t("booking:firstName")}</label>
                   <br />
                   <input
                     id="customerFirstName"
@@ -384,7 +396,7 @@ function BookingPage() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="customerLastName">Last name</label>
+                  <label htmlFor="customerLastName">{t("booking:lastName")}</label>
                   <br />
                   <input
                     id="customerLastName"
@@ -397,7 +409,7 @@ function BookingPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="customerEmail">Email</label>
+                <label htmlFor="customerEmail">{t("booking:email")}</label>
                 <br />
                 <input
                   id="customerEmail"
@@ -409,7 +421,7 @@ function BookingPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="customerPhone">Phone</label>
+                <label htmlFor="customerPhone">{t("booking:phone")}</label>
                 <br />
                 <input
                   id="customerPhone"
@@ -424,41 +436,41 @@ function BookingPage() {
 
           {step === 4 && selectedRoute && (
             <dl className="card">
-              <dt>Trip</dt>
+              <dt>{t("booking:success.trip")}</dt>
               <dd>
                 {selectedRoute.departureLocation} &rarr; {selectedRoute.destination}
               </dd>
 
-              <dt>Date &amp; time</dt>
+              <dt>{t("booking:success.dateTime")}</dt>
               <dd>
                 {values.bookingDate} at {values.pickupTime}
               </dd>
 
-              <dt>Pickup address</dt>
+              <dt>{t("booking:pickupAddress")}</dt>
               <dd>{values.pickupAddress}</dd>
 
-              <dt>Passengers</dt>
+              <dt>{t("booking:passengers")}</dt>
               <dd>{values.passengerCount}</dd>
 
               {values.notes && (
                 <>
-                  <dt>Notes</dt>
+                  <dt>{t("booking:notes")}</dt>
                   <dd>{values.notes}</dd>
                 </>
               )}
 
-              <dt>Name</dt>
+              <dt>{t("booking:firstName")}</dt>
               <dd>
                 {values.customerFirstName} {values.customerLastName}
               </dd>
 
-              <dt>Email</dt>
+              <dt>{t("booking:email")}</dt>
               <dd>{values.customerEmail}</dd>
 
-              <dt>Phone</dt>
+              <dt>{t("booking:phone")}</dt>
               <dd>{values.customerPhone}</dd>
 
-              <dt>Estimated price</dt>
+              <dt>{t("booking:estimatedPrice")}</dt>
               <dd>
                 {selectedRoute.price.toFixed(2)} {selectedRoute.currency}
               </dd>
@@ -470,14 +482,14 @@ function BookingPage() {
           <div className="row" style={{ marginTop: "var(--space-6)" }}>
             {step > 1 && (
               <button type="button" className="btn-secondary" onClick={goToPreviousStep} disabled={isSubmitting}>
-                Back
+                {t("common:buttons.back")}
               </button>
             )}
             {step < 4 ? (
-              <button type="submit">Next</button>
+              <button type="submit">{t("common:buttons.next")}</button>
             ) : (
               <button type="button" onClick={handleConfirm} disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Confirm Booking"}
+                {isSubmitting ? t("booking:submitting") : t("booking:confirmBooking")}
               </button>
             )}
           </div>

@@ -1,0 +1,66 @@
+{
+  "brand": {
+    "tagline": "Service de chauffeur privé"
+  },
+  "nav": {
+    "home": "Accueil",
+    "routes": "Trajets",
+    "bookARide": "Réserver un trajet",
+    "about": "À propos",
+    "contact": "Contact",
+    "logout": "Déconnexion"
+  },
+  "languageSelector": {
+    "label": "Sélectionner la langue",
+    "en": "EN",
+    "de": "DE",
+    "fr": "FR",
+    "it": "IT"
+  },
+  "buttons": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "refresh": "Actualiser",
+    "close": "Fermer",
+    "tryAgain": "Réessayer",
+    "viewDetails": "Voir"
+  },
+  "status": {
+    "booking": {
+      "Pending": "En attente",
+      "Confirmed": "Confirmée",
+      "PendingManualAssignment": "En attente (attribution manuelle)",
+      "Cancelled": "Annulée",
+      "Assigned": "Attribuée",
+      "OnTheWay": "En route",
+      "PassengerPickedUp": "Passager pris en charge",
+      "Completed": "Terminée"
+    },
+    "ride": {
+      "Upcoming": "À venir",
+      "OnTheWay": "En route",
+      "PassengerPickedUp": "Passager pris en charge",
+      "Completed": "Terminée",
+      "Cancelled": "Annulée"
+    },
+    "payment": {
+      "Pending": "En attente",
+      "Processing": "En cours de traitement",
+      "Paid": "Payée",
+      "Failed": "Échouée",
+      "Cancelled": "Annulée",
+      "Refunded": "Remboursée",
+      "NotStarted": "Non commencée"
+    }
+  },
+  "misc": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite.",
+    "currency": "CHF"
+  }
+}

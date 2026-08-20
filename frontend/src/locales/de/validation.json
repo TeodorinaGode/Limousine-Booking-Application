@@ -1,0 +1,16 @@
+{
+  "required": "Dieses Feld ist erforderlich.",
+  "selectRoute": "Bitte wählen Sie eine Strecke.",
+  "bookingDateRequired": "Buchungsdatum ist erforderlich.",
+  "bookingDateFuture": "Das Buchungsdatum muss heute oder später liegen.",
+  "pickupTimeRequired": "Abholzeit ist erforderlich.",
+  "pickupAddressRequired": "Abholadresse ist erforderlich.",
+  "passengersRequired": "Mindestens ein Passagier ist erforderlich.",
+  "firstNameRequired": "Vorname ist erforderlich.",
+  "lastNameRequired": "Nachname ist erforderlich.",
+  "emailRequired": "E-Mail ist erforderlich.",
+  "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+  "phoneRequired": "Telefonnummer ist erforderlich.",
+  "phoneInvalid": "Geben Sie eine gültige Telefonnummer ein.",
+  "paymentFailed": "Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut."
+}

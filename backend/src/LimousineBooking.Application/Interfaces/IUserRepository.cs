@@ -12,4 +12,6 @@ public interface IUserRepository
     Task<bool> HasDuplicateEmailAsync(string email, Guid? excludeUserId, CancellationToken cancellationToken = default);
 
     Task AddAsync(User user, CancellationToken cancellationToken = default);
+
+    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

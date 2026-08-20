@@ -18,6 +18,8 @@ export interface CreateBookingRequest {
   customerEmail: string;
   customerPhone: string;
   notes?: string;
+  /** The language the customer was using in the booking form — so their confirmation email matches it later. */
+  languageCode?: string;
 }
 
 export interface BookingRouteSummary {

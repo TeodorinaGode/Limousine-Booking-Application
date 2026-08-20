@@ -1,0 +1,66 @@
+{
+  "brand": {
+    "tagline": "Private Chauffeur Service"
+  },
+  "nav": {
+    "home": "Home",
+    "routes": "Routes",
+    "bookARide": "Book a Ride",
+    "about": "About",
+    "contact": "Contact",
+    "logout": "Logout"
+  },
+  "languageSelector": {
+    "label": "Select language",
+    "en": "EN",
+    "de": "DE",
+    "fr": "FR",
+    "it": "IT"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "refresh": "Refresh",
+    "close": "Close",
+    "tryAgain": "Try Again",
+    "viewDetails": "View"
+  },
+  "status": {
+    "booking": {
+      "Pending": "Pending",
+      "Confirmed": "Confirmed",
+      "PendingManualAssignment": "Pending (manual assignment)",
+      "Cancelled": "Cancelled",
+      "Assigned": "Assigned",
+      "OnTheWay": "On the way",
+      "PassengerPickedUp": "Passenger picked up",
+      "Completed": "Completed"
+    },
+    "ride": {
+      "Upcoming": "Upcoming",
+      "OnTheWay": "On the way",
+      "PassengerPickedUp": "Passenger picked up",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    },
+    "payment": {
+      "Pending": "Pending",
+      "Processing": "Processing",
+      "Paid": "Paid",
+      "Failed": "Failed",
+      "Cancelled": "Cancelled",
+      "Refunded": "Refunded",
+      "NotStarted": "Not started"
+    }
+  },
+  "misc": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "currency": "CHF"
+  }
+}

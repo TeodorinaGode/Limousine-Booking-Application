@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { getMyProfile } from "../services/driverBookingService";
 import { APP_BRAND_NAME } from "../config/brand";
-
-const LINKS = [
-  { to: "/driver", label: "Dashboard" },
-  { to: "/driver/schedule", label: "My Schedule" },
-  { to: "/driver/availability", label: "Availability" },
-  { to: "/driver/profile", label: "Profile" },
-];
+import LanguageSelector from "./LanguageSelector";
 
 /** The dark navigation shared by every driver page (section 20/55), with a live availability indicator. */
 function DriverNav() {
   const location = useLocation();
   const { user, accessToken, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation(["driver", "common"]);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+
+  const links = [
+    { to: "/driver", label: t("nav.dashboard") },
+    { to: "/driver/schedule", label: t("nav.mySchedule") },
+    { to: "/driver/availability", label: t("nav.availability") },
+    { to: "/driver/profile", label: t("nav.profile") },
+  ];
 
   useEffect(() => {
     if (!accessToken) return;
@@ -39,15 +42,16 @@ function DriverNav() {
     <nav className="app-nav" aria-label="Driver navigation">
       <div className="app-nav__brand">
         {APP_BRAND_NAME}
-        <span>Driver</span>
+        <span>{t("brand.suffix")}</span>
       </div>
+      <LanguageSelector />
       {isAvailable !== null && (
         <div className={`app-nav__status ${isAvailable ? "badge--active" : "badge--cancelled"}`}>
-          {isAvailable ? "● Available" : "○ Unavailable"}
+          {isAvailable ? `● ${t("status.available")}` : `○ ${t("status.unavailable")}`}
         </div>
       )}
       <div className="app-nav__links">
-        {LINKS.map((link) => (
+        {links.map((link) => (
           <Link
             key={link.to}
             to={link.to}
@@ -60,7 +64,7 @@ function DriverNav() {
       <div className="stack">
         {user && <span className="text-muted" style={{ fontSize: "0.75rem" }}>{user.firstName} {user.lastName}</span>}
         <button type="button" className="btn-secondary" onClick={handleLogout}>
-          Logout
+          {t("common:nav.logout")}
         </button>
       </div>
     </nav>

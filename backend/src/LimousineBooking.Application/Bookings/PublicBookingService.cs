@@ -78,7 +78,8 @@ public class PublicBookingService : IPublicBookingService
                 request.PassengerCount,
                 route.Price,
                 route.Currency,
-                string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim());
+                string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
+                request.LanguageCode);
         }
         catch (ArgumentException ex)
         {
@@ -135,6 +136,7 @@ public class PublicBookingService : IPublicBookingService
         PassengerCount = booking.PassengerCount,
         Notes = booking.Notes,
         Price = booking.Price,
-        Currency = booking.Currency
+        Currency = booking.Currency,
+        LanguageCode = booking.LanguageCode
     };
 }

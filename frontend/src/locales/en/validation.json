@@ -1,0 +1,16 @@
+{
+  "required": "This field is required.",
+  "selectRoute": "Please select a route.",
+  "bookingDateRequired": "Booking date is required.",
+  "bookingDateFuture": "Booking date must be today or later.",
+  "pickupTimeRequired": "Pickup time is required.",
+  "pickupAddressRequired": "Pickup address is required.",
+  "passengersRequired": "At least one passenger is required.",
+  "firstNameRequired": "First name is required.",
+  "lastNameRequired": "Last name is required.",
+  "emailRequired": "Email is required.",
+  "emailInvalid": "Enter a valid email address.",
+  "phoneRequired": "Phone number is required.",
+  "phoneInvalid": "Enter a valid phone number.",
+  "paymentFailed": "Payment failed. Please try again."
+}

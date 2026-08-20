@@ -20,6 +20,8 @@ public class BookingResponse
 
     public decimal Price { get; set; }
     public string Currency { get; set; } = string.Empty;
+
+    public string LanguageCode { get; set; } = string.Empty;
 }
 
 /// <summary>Route detail nested in <see cref="BookingResponse"/> — just enough to confirm the trip, not the full route record.</summary>

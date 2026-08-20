@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Email\Templates\*.html" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Email\Templates\**\*.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

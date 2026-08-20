@@ -1,0 +1,20 @@
+{
+  "statusTitle": "Payment Status",
+  "noPaymentYet": "No payment has been started for this booking yet.",
+  "payNow": "Pay Now",
+  "retryPayment": "Retry Payment",
+  "redirecting": "Redirecting to payment...",
+  "amount": "Amount",
+  "paidAt": "Paid at",
+  "status": "Status",
+  "successTitle": "Payment Successful",
+  "successMessage": "Your payment of {{amount}} has been confirmed.",
+  "confirming": "Confirming Payment",
+  "pleaseWait": "Please wait while we confirm your payment...",
+  "stillWaiting": "We're still waiting for confirmation from the payment provider. This can take a moment — please check back shortly, or view the current status below.",
+  "checkStatus": "Check payment status",
+  "cancelledTitle": "Payment Cancelled",
+  "cancelledMessage": "Your payment was not completed. Your booking has not been charged.",
+  "missingLink": "This payment link is missing required information.",
+  "returnHome": "Return to home"
+}

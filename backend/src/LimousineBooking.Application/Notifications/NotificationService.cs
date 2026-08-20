@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using LimousineBooking.Application.Common;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -41,10 +42,10 @@ public class NotificationService : INotificationService
     }
 
     public Task NotifyCustomerBookingConfirmedAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default) =>
-        EnqueueAsync(NotificationType.BookingConfirmation, booking, booking.CustomerEmail, "BookingConfirmed", TripFields(booking, route), cancellationToken);
+        EnqueueAsync(NotificationType.BookingConfirmation, booking, booking.CustomerEmail, "BookingConfirmed", booking.LanguageCode, TripFields(booking, route), cancellationToken);
 
     public Task NotifyCustomerBookingPendingAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default) =>
-        EnqueueAsync(NotificationType.BookingPending, booking, booking.CustomerEmail, "BookingPending", TripFields(booking, route), cancellationToken);
+        EnqueueAsync(NotificationType.BookingPending, booking, booking.CustomerEmail, "BookingPending", booking.LanguageCode, TripFields(booking, route), cancellationToken);
 
     public Task NotifyDriverAssignedAsync(DomainBooking booking, DomainRoute route, DomainDriver driver, CancellationToken cancellationToken = default)
     {
@@ -59,23 +60,23 @@ public class NotificationService : INotificationService
         fields["CustomerPhone"] = booking.CustomerPhone;
         fields["Notes"] = string.IsNullOrWhiteSpace(booking.Notes) ? "(none)" : booking.Notes;
 
-        return EnqueueAsync(NotificationType.DriverAssignment, booking, driver.User.Email, "DriverBookingAssigned", fields, cancellationToken);
+        return EnqueueAsync(NotificationType.DriverAssignment, booking, driver.User.Email, "DriverBookingAssigned", driver.User.LanguageCode, fields, cancellationToken);
     }
 
     public Task NotifyCustomerAssignedAsync(DomainBooking booking, DomainRoute route, DomainDriver driver, CancellationToken cancellationToken = default) =>
-        EnqueueAsync(NotificationType.CustomerAssigned, booking, booking.CustomerEmail, "DriverAssigned", TripFields(booking, route), cancellationToken);
+        EnqueueAsync(NotificationType.CustomerAssigned, booking, booking.CustomerEmail, "DriverAssigned", booking.LanguageCode, TripFields(booking, route), cancellationToken);
 
     public async Task NotifyReassignedAsync(DomainBooking booking, DomainRoute route, DomainDriver previousDriver, DomainDriver newDriver, CancellationToken cancellationToken = default)
     {
         if (previousDriver.User is not null)
         {
-            await EnqueueAsync(NotificationType.DriverReassignedAway, booking, previousDriver.User.Email, "DriverReassignedAway",
+            await EnqueueAsync(NotificationType.DriverReassignedAway, booking, previousDriver.User.Email, "DriverReassignedAway", previousDriver.User.LanguageCode,
                 new Dictionary<string, string> { ["BookingReference"] = booking.BookingReference }, cancellationToken);
         }
 
         await NotifyDriverAssignedAsync(booking, route, newDriver, cancellationToken);
 
-        await EnqueueAsync(NotificationType.BookingReassigned, booking, booking.CustomerEmail, "BookingReassigned", TripFields(booking, route), cancellationToken);
+        await EnqueueAsync(NotificationType.BookingReassigned, booking, booking.CustomerEmail, "BookingReassigned", booking.LanguageCode, TripFields(booking, route), cancellationToken);
     }
 
     public Task NotifyCustomerCancelledAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default)
@@ -84,11 +85,11 @@ public class NotificationService : INotificationService
         // Only a customer-appropriate reason is ever shown — never internal admin notes.
         fields["CancellationReason"] = string.IsNullOrWhiteSpace(booking.CancellationReason) ? "(no reason provided)" : booking.CancellationReason;
 
-        return EnqueueAsync(NotificationType.BookingCancellation, booking, booking.CustomerEmail, "BookingCancelled", fields, cancellationToken);
+        return EnqueueAsync(NotificationType.BookingCancellation, booking, booking.CustomerEmail, "BookingCancelled", booking.LanguageCode, fields, cancellationToken);
     }
 
     public Task NotifyCustomerCompletedAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default) =>
-        EnqueueAsync(NotificationType.RideCompleted, booking, booking.CustomerEmail, "BookingCompleted", TripFields(booking, route), cancellationToken);
+        EnqueueAsync(NotificationType.RideCompleted, booking, booking.CustomerEmail, "BookingCompleted", booking.LanguageCode, TripFields(booking, route), cancellationToken);
 
     public Task NotifyAdminManualAssignmentRequiredAsync(DomainBooking booking, DomainRoute route, string reason, CancellationToken cancellationToken = default)
     {
@@ -101,11 +102,13 @@ public class NotificationService : INotificationService
         var fields = TripFields(booking, route);
         fields["Reason"] = reason;
 
-        return EnqueueAsync(NotificationType.ManualAssignmentRequired, booking, _settings.AdminEmail, "AdminManualAssignmentRequired", fields, cancellationToken);
+        // Not tied to any one User account (it's a raw config email address), so
+        // there is no per-recipient language preference to resolve — English only.
+        return EnqueueAsync(NotificationType.ManualAssignmentRequired, booking, _settings.AdminEmail, "AdminManualAssignmentRequired", null, fields, cancellationToken);
     }
 
     public Task ResendConfirmationAsync(DomainBooking booking, DomainRoute route, CancellationToken cancellationToken = default) =>
-        EnqueueAsync(NotificationType.BookingConfirmation, booking, booking.CustomerEmail, "BookingConfirmed", TripFields(booking, route), cancellationToken);
+        EnqueueAsync(NotificationType.BookingConfirmation, booking, booking.CustomerEmail, "BookingConfirmed", booking.LanguageCode, TripFields(booking, route), cancellationToken);
 
     public Task NotifyPaymentSucceededAsync(DomainBooking booking, DomainRoute route, DomainPayment payment, CancellationToken cancellationToken = default)
     {
@@ -115,11 +118,11 @@ public class NotificationService : INotificationService
         fields["DriverName"] = booking.Driver?.User is null ? "To be assigned" : $"{booking.Driver.User.FirstName} {booking.Driver.User.LastName}";
         fields["VehicleDescription"] = booking.Vehicle is null ? "To be assigned" : $"{booking.Vehicle.Make} {booking.Vehicle.Model} - {booking.Vehicle.RegistrationNumber}";
 
-        return EnqueueAsync(NotificationType.PaymentSucceeded, booking, booking.CustomerEmail, "PaymentSucceeded", fields, cancellationToken);
+        return EnqueueAsync(NotificationType.PaymentSucceeded, booking, booking.CustomerEmail, "PaymentSucceeded", booking.LanguageCode, fields, cancellationToken);
     }
 
     private async Task EnqueueAsync(
-        NotificationType notificationType, DomainBooking booking, string recipientEmail, string templateName,
+        NotificationType notificationType, DomainBooking booking, string recipientEmail, string templateName, string? languageCode,
         Dictionary<string, string> fields, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -132,7 +135,7 @@ public class NotificationService : INotificationService
 
         try
         {
-            var rendered = _renderer.Render(templateName, fields);
+            var rendered = _renderer.Render(templateName, Domain.Common.SupportedLanguages.Normalize(languageCode), fields);
 
             var payload = JsonSerializer.Serialize(new NotificationPayload
             {
@@ -168,6 +171,6 @@ public class NotificationService : INotificationService
         ["PassengerCount"] = booking.PassengerCount.ToString(CultureInfo.InvariantCulture),
         ["Price"] = booking.Price.ToString("0.00", CultureInfo.InvariantCulture),
         ["Currency"] = booking.Currency,
-        ["Status"] = booking.Status.ToString()
+        ["Status"] = StatusTranslations.Translate(booking.Status, booking.LanguageCode)
     };
 }

@@ -1,5 +1,6 @@
 using LimousineBooking.Application.Common;
 using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Domain.Common;
 
 namespace LimousineBooking.Application.Reports;
 
@@ -223,12 +224,12 @@ public class ReportService : IReportService
 
     private const int MaxExportRows = 10_000;
 
-    public async Task<string> ExportBookingsCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default)
+    public async Task<string> ExportBookingsCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default)
     {
         var rows = await _reportRepository.GetBookingReportRowsAsync(range.FromLocal, range.ToLocal, MaxExportRows, cancellationToken);
 
         return CsvWriter.Write(
-            new[] { "Booking Reference", "Date", "Time", "Route", "Customer", "Driver", "Vehicle", "Passengers", "Price", "Currency", "Status", "Ride Status" },
+            ReportCsvLabels.Bookings(SupportedLanguages.Normalize(languageCode)),
             rows.Select(r => new[]
             {
                 r.BookingReference,
@@ -246,12 +247,12 @@ public class ReportService : IReportService
             }));
     }
 
-    public async Task<string> ExportRoutesCsvAsync(ResolvedReportDateRange range, int? top, CancellationToken cancellationToken = default)
+    public async Task<string> ExportRoutesCsvAsync(ResolvedReportDateRange range, int? top, string languageCode, CancellationToken cancellationToken = default)
     {
         var routes = await GetPopularRoutesAsync(range, top, cancellationToken);
 
         return CsvWriter.Write(
-            new[] { "Departure", "Destination", "Booking Count", "Revenue", "Percentage Of Total Bookings" },
+            ReportCsvLabels.Routes(SupportedLanguages.Normalize(languageCode)),
             routes.Select(r => new[]
             {
                 r.DepartureLocation,
@@ -262,12 +263,12 @@ public class ReportService : IReportService
             }));
     }
 
-    public async Task<string> ExportDriversCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default)
+    public async Task<string> ExportDriversCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default)
     {
         var drivers = await GetDriverActivityAsync(range, cancellationToken);
 
         return CsvWriter.Write(
-            new[] { "Driver", "Assigned", "Completed", "Cancelled", "Upcoming", "Manual Assignments", "Completion Rate" },
+            ReportCsvLabels.Drivers(SupportedLanguages.Normalize(languageCode)),
             drivers.Select(d => new[]
             {
                 d.DriverName,
@@ -280,12 +281,12 @@ public class ReportService : IReportService
             }));
     }
 
-    public async Task<string> ExportVehiclesCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default)
+    public async Task<string> ExportVehiclesCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default)
     {
         var vehicles = await GetVehicleUsageAsync(range, cancellationToken);
 
         return CsvWriter.Write(
-            new[] { "Vehicle", "Assigned", "Completed", "Upcoming", "Total Passengers", "Utilization (Booking Count)" },
+            ReportCsvLabels.Vehicles(SupportedLanguages.Normalize(languageCode)),
             vehicles.Select(v => new[]
             {
                 v.VehicleDescription,

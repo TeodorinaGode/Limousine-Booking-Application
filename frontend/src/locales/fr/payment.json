@@ -1,0 +1,20 @@
+{
+  "statusTitle": "Statut du paiement",
+  "noPaymentYet": "Aucun paiement n'a encore été lancé pour cette réservation.",
+  "payNow": "Payer maintenant",
+  "retryPayment": "Réessayer le paiement",
+  "redirecting": "Redirection vers le paiement...",
+  "amount": "Montant",
+  "paidAt": "Payé le",
+  "status": "Statut",
+  "successTitle": "Paiement réussi",
+  "successMessage": "Votre paiement de {{amount}} a été confirmé.",
+  "confirming": "Confirmation du paiement",
+  "pleaseWait": "Veuillez patienter pendant que nous confirmons votre paiement...",
+  "stillWaiting": "Nous attendons toujours la confirmation du prestataire de paiement. Cela peut prendre un instant — veuillez revenir sous peu ou consulter le statut actuel ci-dessous.",
+  "checkStatus": "Vérifier le statut du paiement",
+  "cancelledTitle": "Paiement annulé",
+  "cancelledMessage": "Votre paiement n'a pas été finalisé. Votre réservation n'a pas été facturée.",
+  "missingLink": "Ce lien de paiement ne contient pas les informations requises.",
+  "returnHome": "Retour à l'accueil"
+}

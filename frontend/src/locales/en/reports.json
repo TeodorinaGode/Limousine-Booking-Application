@@ -1,0 +1,17 @@
+{
+  "summary": "Summary",
+  "revenue": "Revenue",
+  "operations": "Operations",
+  "bookingsTrend": "Bookings Trend",
+  "revenueTrend": "Revenue Trend",
+  "popularRoutes": "Popular Routes",
+  "driverActivity": "Driver Activity",
+  "vehicleUsage": "Vehicle Usage",
+  "passengers": "Passengers",
+  "statusDistribution": "Status Distribution",
+  "cancellations": "Cancellations",
+  "payments": "Payments",
+  "exportCsv": "Export CSV",
+  "dateFrom": "From",
+  "dateTo": "To"
+}

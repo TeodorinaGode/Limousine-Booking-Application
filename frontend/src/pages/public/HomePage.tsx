@@ -1,34 +1,41 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { APP_BRAND_NAME } from "../../config/brand";
+import LanguageSelector from "../../components/LanguageSelector";
 
 function HomePage() {
+  const { t } = useTranslation(["common", "booking"]);
+
   return (
     <div>
       <div className="container">
         <nav className="site-nav">
           <span className="site-nav__brand">{APP_BRAND_NAME}</span>
-          <Link to="/booking">
-            <span className="btn-secondary" style={{ display: "inline-block", padding: "0.5em 1.2em", borderRadius: "var(--radius-sm)", fontSize: "0.8rem", fontWeight: 600 }}>
-              Book Now
-            </span>
-          </Link>
+          <div className="row" style={{ alignItems: "center" }}>
+            <LanguageSelector />
+            <Link to="/booking">
+              <span className="btn-secondary" style={{ display: "inline-block", padding: "0.5em 1.2em", borderRadius: "var(--radius-sm)", fontSize: "0.8rem", fontWeight: 600 }}>
+                {t("nav.bookARide")}
+              </span>
+            </Link>
+          </div>
         </nav>
       </div>
 
       <section className="hero fade-in">
         <div className="container container--medium">
-          <p className="hero__eyebrow">Private Chauffeur Service</p>
+          <p className="hero__eyebrow">{t("booking:hero.eyebrow")}</p>
           <h1 className="hero__title">
-            Your journey.
+            {t("booking:hero.title1")}
             <br />
-            Our priority.
+            {t("booking:hero.title2")}
           </h1>
           <p className="hero__subtitle" style={{ marginLeft: "auto", marginRight: "auto" }}>
-            Premium chauffeur transportation across Switzerland — discreet, reliable, and reserved exclusively for you.
+            {t("booking:hero.subtitle")}
           </p>
           <Link to="/booking">
             <button type="button" style={{ fontSize: "0.9rem", padding: "0.9em 2.2em" }}>
-              Book Your Ride
+              {t("booking:title")}
             </button>
           </Link>
         </div>
@@ -36,7 +43,7 @@ function HomePage() {
 
       <section className="container container--medium" style={{ paddingBottom: "var(--space-16)", textAlign: "center" }}>
         <p className="text-muted" style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Executive Transportation &middot; Airport Transfers &middot; Private Events
+          {t("booking:hero.strip")}
         </p>
       </section>
     </div>

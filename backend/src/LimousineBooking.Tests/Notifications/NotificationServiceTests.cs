@@ -24,7 +24,7 @@ public class NotificationServiceTests
     public NotificationServiceTests()
     {
         _renderer
-            .Setup(r => r.Render(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+            .Setup(r => r.Render(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .Returns(new RenderedEmail("Test Subject", "<p>Body</p>", "Body"));
         _notificationRepository.Setup(r => r.AddAsync(It.IsAny<DomainNotification>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _dateTimeProvider.Setup(d => d.UtcNow).Returns(FixedUtcNow);
@@ -63,6 +63,41 @@ public class NotificationServiceTests
         _notificationRepository.Verify(r => r.AddAsync(
             It.Is<DomainNotification>(n => n.NotificationType == NotificationType.BookingConfirmation && n.Recipient == "jane.doe@example.com" && n.BookingId == booking.Id),
             It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task NotifyCustomerBookingConfirmedAsync_RendersUsingTheBookingsLanguage()
+    {
+        var route = new DomainRoute("Basel", "Zurich", 60, 180.00m, "CHF");
+        var booking = new DomainBooking("LM-20261225-000123", "Jane", "Doe", "jane.doe@example.com", "+41791234567",
+            route.Id, new DateOnly(2026, 12, 25), new TimeOnly(14, 0), "Bahnhofplatz 1, Basel", 2, 180.00m, "CHF", languageCode: "de");
+
+        await CreateService().NotifyCustomerBookingConfirmedAsync(booking, route);
+
+        _renderer.Verify(r => r.Render("BookingConfirmed", "de", It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task NotifyDriverAssignedAsync_RendersUsingTheDriversSavedLanguage_NotTheBookingsLanguage()
+    {
+        var (booking, route) = MakeBooking();
+        var driver = MakeDriver();
+        driver.User!.SetLanguage("fr");
+
+        await CreateService().NotifyDriverAssignedAsync(booking, route, driver);
+
+        _renderer.Verify(r => r.Render("DriverBookingAssigned", "fr", It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task NotifyAdminManualAssignmentRequiredAsync_AlwaysRendersInEnglish()
+    {
+        var (booking, route) = MakeBooking();
+
+        await CreateService(new NotificationSettings { AdminEmail = "ops@example.com" })
+            .NotifyAdminManualAssignmentRequiredAsync(booking, route, "No driver available.");
+
+        _renderer.Verify(r => r.Render("AdminManualAssignmentRequired", "en", It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
     }
 
     [Fact]
@@ -143,7 +178,7 @@ public class NotificationServiceTests
 
         await CreateService().NotifyCustomerCancelledAsync(booking, route);
 
-        _renderer.Verify(r => r.Render("BookingCancelled",
+        _renderer.Verify(r => r.Render("BookingCancelled", It.IsAny<string>(),
             It.Is<IReadOnlyDictionary<string, string>>(f => f["CancellationReason"] == "Customer requested cancellation")), Times.Once);
     }
 
@@ -212,7 +247,7 @@ public class NotificationServiceTests
     public async Task EnqueueAsync_RendererThrows_IsCaughtAndDoesNotPropagate()
     {
         var (booking, route) = MakeBooking();
-        _renderer.Setup(r => r.Render(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>())).Throws(new FileNotFoundException("template missing"));
+        _renderer.Setup(r => r.Render(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>())).Throws(new FileNotFoundException("template missing"));
 
         var exception = await Record.ExceptionAsync(() => CreateService().NotifyCustomerBookingConfirmedAsync(booking, route));
 

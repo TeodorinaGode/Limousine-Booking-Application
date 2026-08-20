@@ -1,0 +1,58 @@
+{
+  "hero": {
+    "eyebrow": "Service de chauffeur privé",
+    "title1": "Votre voyage.",
+    "title2": "Notre priorité.",
+    "subtitle": "Transport en chauffeur premium à travers la Suisse — discret, fiable et réservé exclusivement pour vous.",
+    "strip": "Transport d'affaires · Transferts aéroport · Événements privés"
+  },
+  "title": "Réservez votre trajet",
+  "steps": {
+    "trip": "Trajet",
+    "pickupDetails": "Détails de prise en charge",
+    "yourInformation": "Vos informations",
+    "reviewConfirm": "Vérifier et confirmer"
+  },
+  "selectRoute": "Trajet",
+  "departure": "Départ",
+  "destination": "Destination",
+  "date": "Date de réservation",
+  "time": "Heure de prise en charge",
+  "approxMinutes": "Env. {{count}} min",
+  "pickupAddress": "Adresse de prise en charge",
+  "pickupAddressPlaceholder": "Saisissez l'adresse de prise en charge",
+  "passengers": "Nombre de passagers",
+  "notes": "Remarques (facultatif)",
+  "notesPlaceholder": "Remarques facultatives",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "email": "E-mail",
+  "phone": "Téléphone",
+  "review": "Vérifier et confirmer",
+  "estimatedPrice": "Prix estimé",
+  "confirmBooking": "Confirmer la réservation",
+  "submitting": "Envoi en cours...",
+  "success": {
+    "confirmedTitle": "Réservation confirmée",
+    "pendingTitle": "Demande reçue",
+    "confirmedMessage": "Votre réservation a été confirmée.",
+    "pendingMessage": "Votre demande de réservation a été reçue et est en attente de confirmation.",
+    "trip": "Trajet",
+    "dateTime": "Date et heure",
+    "pickupAddress": "Adresse de prise en charge",
+    "passengers": "Passagers",
+    "price": "Prix",
+    "confirmedFooter": "Nous avons hâte de vous conduire.",
+    "pendingFooter": "Un membre de notre équipe vous contactera pour confirmer les détails de votre trajet.",
+    "emailSent": "Une confirmation a été envoyée à votre adresse e-mail.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "payment": {
+    "title": "Paiement",
+    "amountDue": "Montant dû : {{amount}}",
+    "payNow": "Payer maintenant",
+    "redirecting": "Redirection vers le paiement...",
+    "payLaterNotice": "Vous pouvez également payer plus tard via ce lien",
+    "here": "ici"
+  }
+}

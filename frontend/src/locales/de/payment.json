@@ -1,0 +1,20 @@
+{
+  "statusTitle": "Zahlungsstatus",
+  "noPaymentYet": "Für diese Buchung wurde noch keine Zahlung gestartet.",
+  "payNow": "Jetzt bezahlen",
+  "retryPayment": "Zahlung wiederholen",
+  "redirecting": "Weiterleitung zur Zahlung...",
+  "amount": "Betrag",
+  "paidAt": "Bezahlt am",
+  "status": "Status",
+  "successTitle": "Zahlung erfolgreich",
+  "successMessage": "Ihre Zahlung von {{amount}} wurde bestätigt.",
+  "confirming": "Zahlung wird bestätigt",
+  "pleaseWait": "Bitte warten Sie, während wir Ihre Zahlung bestätigen...",
+  "stillWaiting": "Wir warten noch auf die Bestätigung des Zahlungsanbieters. Dies kann einen Moment dauern — bitte schauen Sie in Kürze erneut vorbei oder sehen Sie sich den aktuellen Status unten an.",
+  "checkStatus": "Zahlungsstatus prüfen",
+  "cancelledTitle": "Zahlung abgebrochen",
+  "cancelledMessage": "Ihre Zahlung wurde nicht abgeschlossen. Ihre Buchung wurde nicht belastet.",
+  "missingLink": "Diesem Zahlungslink fehlen erforderliche Informationen.",
+  "returnHome": "Zurück zur Startseite"
+}

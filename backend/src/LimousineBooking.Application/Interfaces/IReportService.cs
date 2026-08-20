@@ -32,12 +32,12 @@ public interface IReportService
 
     Task<CancellationReportResponse> GetCancellationReportAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
 
-    /// <summary>CSV text for GET /api/admin/reports/bookings/export — capped server-side (never the browser dumping an already-loaded page, section 32).</summary>
-    Task<string> ExportBookingsCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
+    /// <summary>CSV text for GET /api/admin/reports/bookings/export — capped server-side (never the browser dumping an already-loaded page, section 32). Column headers are localized per <paramref name="languageCode"/> (section 44); the data values themselves are never translated.</summary>
+    Task<string> ExportBookingsCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default);
 
-    Task<string> ExportRoutesCsvAsync(ResolvedReportDateRange range, int? top, CancellationToken cancellationToken = default);
+    Task<string> ExportRoutesCsvAsync(ResolvedReportDateRange range, int? top, string languageCode, CancellationToken cancellationToken = default);
 
-    Task<string> ExportDriversCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
+    Task<string> ExportDriversCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default);
 
-    Task<string> ExportVehiclesCsvAsync(ResolvedReportDateRange range, CancellationToken cancellationToken = default);
+    Task<string> ExportVehiclesCsvAsync(ResolvedReportDateRange range, string languageCode, CancellationToken cancellationToken = default);
 }

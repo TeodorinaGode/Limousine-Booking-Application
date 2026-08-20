@@ -1,0 +1,20 @@
+{
+  "statusTitle": "Stato del pagamento",
+  "noPaymentYet": "Non è ancora stato avviato alcun pagamento per questa prenotazione.",
+  "payNow": "Paga ora",
+  "retryPayment": "Riprova pagamento",
+  "redirecting": "Reindirizzamento al pagamento...",
+  "amount": "Importo",
+  "paidAt": "Pagato il",
+  "status": "Stato",
+  "successTitle": "Pagamento riuscito",
+  "successMessage": "Il tuo pagamento di {{amount}} è stato confermato.",
+  "confirming": "Conferma del pagamento",
+  "pleaseWait": "Attendi mentre confermiamo il tuo pagamento...",
+  "stillWaiting": "Siamo ancora in attesa della conferma dal fornitore del pagamento. Potrebbe richiedere un momento — controlla di nuovo a breve oppure visualizza lo stato attuale qui sotto.",
+  "checkStatus": "Controlla lo stato del pagamento",
+  "cancelledTitle": "Pagamento annullato",
+  "cancelledMessage": "Il pagamento non è stato completato. La tua prenotazione non è stata addebitata.",
+  "missingLink": "A questo link di pagamento mancano informazioni obbligatorie.",
+  "returnHome": "Torna alla home"
+}

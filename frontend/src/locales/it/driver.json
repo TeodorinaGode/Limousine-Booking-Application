@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "mySchedule": "Il mio programma",
+    "availability": "Disponibilità",
+    "profile": "Profilo"
+  },
+  "brand": {
+    "suffix": "Autista"
+  },
+  "status": {
+    "available": "Disponibile",
+    "unavailable": "Non disponibile"
+  },
+  "trip": {
+    "startRide": "Avvia corsa",
+    "passengerPickedUp": "Passeggero prelevato",
+    "completeRide": "Completa corsa"
+  }
+}

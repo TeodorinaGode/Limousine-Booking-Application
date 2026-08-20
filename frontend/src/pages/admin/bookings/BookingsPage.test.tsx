@@ -63,7 +63,7 @@ function renderPage() {
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
-    user: { id: "u1", email: "admin@example.com", firstName: "Admin", lastName: "User", role: "Administrator" },
+    user: { id: "u1", email: "admin@example.com", firstName: "Admin", lastName: "User", role: "Administrator", languageCode: null },
     accessToken: "test-token",
     expiresAt: null,
     isAuthenticated: true,
@@ -182,7 +182,8 @@ describe("BookingsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("NotStarted")).toBeInTheDocument();
+    // StatusBadge translates the raw status value (Prompt 16) — "NotStarted" reads as "Not started".
+    expect(await screen.findByText("Not started")).toBeInTheDocument();
   });
 
   it("links to the booking detail page", async () => {

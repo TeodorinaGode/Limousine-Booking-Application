@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import i18n, { SUPPORTED_LANGUAGES } from "../i18n/i18n";
 import { login as loginRequest } from "../services/authService";
 import type { AuthenticatedUser } from "../types/auth";
 
@@ -50,6 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     const response = await loginRequest({ email, password });
     setState({ user: response.user, accessToken: response.accessToken, expiresAt: response.expiresAt });
+
+    // A user's saved preference always wins over whatever language the browser/
+    // localStorage had selected before they signed in (section 20/39).
+    const savedLanguage = response.user.languageCode;
+    if (savedLanguage && (SUPPORTED_LANGUAGES as readonly string[]).includes(savedLanguage)) {
+      i18n.changeLanguage(savedLanguage);
+    }
+
     return response.user;
   };
 

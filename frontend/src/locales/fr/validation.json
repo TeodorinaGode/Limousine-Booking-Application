@@ -1,0 +1,16 @@
+{
+  "required": "Ce champ est obligatoire.",
+  "selectRoute": "Veuillez sélectionner un trajet.",
+  "bookingDateRequired": "La date de réservation est requise.",
+  "bookingDateFuture": "La date de réservation doit être aujourd'hui ou ultérieure.",
+  "pickupTimeRequired": "L'heure de prise en charge est requise.",
+  "pickupAddressRequired": "L'adresse de prise en charge est requise.",
+  "passengersRequired": "Au moins un passager est requis.",
+  "firstNameRequired": "Le prénom est requis.",
+  "lastNameRequired": "Le nom est requis.",
+  "emailRequired": "L'e-mail est requis.",
+  "emailInvalid": "Saisissez une adresse e-mail valide.",
+  "phoneRequired": "Le numéro de téléphone est requis.",
+  "phoneInvalid": "Saisissez un numéro de téléphone valide.",
+  "paymentFailed": "Le paiement a échoué. Veuillez réessayer."
+}

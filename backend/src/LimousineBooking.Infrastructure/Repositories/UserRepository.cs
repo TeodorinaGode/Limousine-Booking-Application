@@ -35,4 +35,7 @@ public class UserRepository : IUserRepository
         _dbContext.Users.Add(user);
         return Task.CompletedTask;
     }
+
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+        _dbContext.SaveChangesAsync(cancellationToken);
 }

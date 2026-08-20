@@ -18,6 +18,16 @@ public class Booking : AuditableEntity
     /// </summary>
     public string PublicAccessToken { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// The language the customer was using when they created this booking (en/de/fr/it,
+    /// normalized via <see cref="Common.SupportedLanguages.Normalize"/> — never an
+    /// unsupported/arbitrary code). Captured once, at creation, rather than resolved from
+    /// the customer's current browser language at send time — the customer may have booked
+    /// in German and be reading their confirmation email later on a different device/browser,
+    /// so this is the only reliable source for which language their emails should use.
+    /// </summary>
+    public string LanguageCode { get; private set; } = Common.SupportedLanguages.Default;
+
     public string CustomerFirstName { get; private set; } = string.Empty;
     public string CustomerLastName { get; private set; } = string.Empty;
     public string CustomerEmail { get; private set; } = string.Empty;
@@ -87,7 +97,8 @@ public class Booking : AuditableEntity
         int passengerCount,
         decimal price,
         string currency,
-        string? notes = null)
+        string? notes = null,
+        string? languageCode = null)
     {
         if (string.IsNullOrWhiteSpace(bookingReference))
             throw new ArgumentException("Booking reference is required.", nameof(bookingReference));
@@ -96,6 +107,7 @@ public class Booking : AuditableEntity
 
         BookingReference = bookingReference;
         PublicAccessToken = GeneratePublicAccessToken();
+        LanguageCode = Common.SupportedLanguages.Normalize(languageCode);
         CustomerFirstName = customerFirstName;
         CustomerLastName = customerLastName;
         CustomerEmail = customerEmail;

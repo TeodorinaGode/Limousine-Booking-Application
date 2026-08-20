@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "bookings": "Réservations",
+    "drivers": "Chauffeurs",
+    "vehicles": "Véhicules",
+    "routes": "Trajets",
+    "reports": "Rapports"
+  },
+  "brand": {
+    "suffix": "Administration"
+  },
+  "dashboard": {
+    "title": "Tableau de bord"
+  },
+  "bookings": {
+    "title": "Réservations",
+    "description": "Gérez les réservations clients et les trajets à venir.",
+    "payment": "Paiement",
+    "refundPayment": "Rembourser le paiement"
+  },
+  "reports": {
+    "title": "Rapports",
+    "description": "Aperçu de l'activité et des opérations.",
+    "payments": "Paiements"
+  }
+}

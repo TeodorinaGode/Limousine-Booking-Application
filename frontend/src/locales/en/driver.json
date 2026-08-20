@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "mySchedule": "My Schedule",
+    "availability": "Availability",
+    "profile": "Profile"
+  },
+  "brand": {
+    "suffix": "Driver"
+  },
+  "status": {
+    "available": "Available",
+    "unavailable": "Unavailable"
+  },
+  "trip": {
+    "startRide": "Start Ride",
+    "passengerPickedUp": "Passenger Picked Up",
+    "completeRide": "Complete Ride"
+  }
+}

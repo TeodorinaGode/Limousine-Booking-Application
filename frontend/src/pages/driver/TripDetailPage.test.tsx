@@ -51,7 +51,7 @@ function renderPage() {
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
-    user: { id: "u1", email: "driver@example.com", firstName: "John", lastName: "Driver", role: "Driver" },
+    user: { id: "u1", email: "driver@example.com", firstName: "John", lastName: "Driver", role: "Driver", languageCode: null },
     accessToken: "test-token",
     expiresAt: null,
     isAuthenticated: true,

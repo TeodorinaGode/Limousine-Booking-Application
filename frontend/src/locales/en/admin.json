@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "bookings": "Bookings",
+    "drivers": "Drivers",
+    "vehicles": "Vehicles",
+    "routes": "Routes",
+    "reports": "Reports"
+  },
+  "brand": {
+    "suffix": "Administration"
+  },
+  "dashboard": {
+    "title": "Dashboard"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "description": "Manage customer reservations and upcoming trips.",
+    "payment": "Payment",
+    "refundPayment": "Refund Payment"
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Business and operational overview.",
+    "payments": "Payments"
+  }
+}

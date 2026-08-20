@@ -99,6 +99,33 @@ public class BookingTests
         Assert.NotEqual(first.PublicAccessToken, second.PublicAccessToken);
     }
 
+    [Theory]
+    [InlineData("de", "de")]
+    [InlineData("FR", "fr")]
+    [InlineData(" it ", "it")]
+    public void Booking_SupportedLanguageCode_IsNormalizedAndStored(string input, string expected)
+    {
+        var booking = new Booking("LM-0001", "Jane", "Doe", "jane@example.com", "+41791234567",
+            Guid.NewGuid(), new DateOnly(2026, 9, 10), new TimeOnly(8, 0),
+            "Bahnhofplatz 1, Basel", 2, 180.00m, "CHF", languageCode: input);
+
+        Assert.Equal(expected, booking.LanguageCode);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("es")]
+    [InlineData("de-CH")]
+    public void Booking_UnsupportedOrMissingLanguageCode_FallsBackToEnglish(string? input)
+    {
+        var booking = new Booking("LM-0001", "Jane", "Doe", "jane@example.com", "+41791234567",
+            Guid.NewGuid(), new DateOnly(2026, 9, 10), new TimeOnly(8, 0),
+            "Bahnhofplatz 1, Basel", 2, 180.00m, "CHF", languageCode: input);
+
+        Assert.Equal("en", booking.LanguageCode);
+    }
+
     [Fact]
     public void Booking_CanExistWithoutDriver()
     {

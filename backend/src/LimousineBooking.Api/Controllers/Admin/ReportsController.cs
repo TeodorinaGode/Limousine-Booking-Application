@@ -143,40 +143,41 @@ public class ReportsController : ControllerBase
         return Ok(await _reportService.GetCancellationReportAsync(range, cancellationToken));
     }
 
+    /// <summary>Column headers are localized per <paramref name="lang"/> (en/de/fr/it, default English) — the exported data itself is never translated (section 44).</summary>
     [HttpGet("bookings/export")]
-    public async Task<IActionResult> ExportBookings([FromQuery] ReportDateRangeQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportBookings([FromQuery] ReportDateRangeQuery query, [FromQuery] string? lang, CancellationToken cancellationToken)
     {
         if (!TryResolveRange(query, out var range, out var problem))
             return problem;
 
-        return CsvFile(await _reportService.ExportBookingsCsvAsync(range, cancellationToken), "bookings-report.csv");
+        return CsvFile(await _reportService.ExportBookingsCsvAsync(range, lang ?? "en", cancellationToken), "bookings-report.csv");
     }
 
     [HttpGet("routes/export")]
-    public async Task<IActionResult> ExportRoutes([FromQuery] RouteReportQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportRoutes([FromQuery] RouteReportQuery query, [FromQuery] string? lang, CancellationToken cancellationToken)
     {
         if (!TryResolveRange(query, out var range, out var problem))
             return problem;
 
-        return CsvFile(await _reportService.ExportRoutesCsvAsync(range, query.Top, cancellationToken), "routes-report.csv");
+        return CsvFile(await _reportService.ExportRoutesCsvAsync(range, query.Top, lang ?? "en", cancellationToken), "routes-report.csv");
     }
 
     [HttpGet("drivers/export")]
-    public async Task<IActionResult> ExportDrivers([FromQuery] ReportDateRangeQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportDrivers([FromQuery] ReportDateRangeQuery query, [FromQuery] string? lang, CancellationToken cancellationToken)
     {
         if (!TryResolveRange(query, out var range, out var problem))
             return problem;
 
-        return CsvFile(await _reportService.ExportDriversCsvAsync(range, cancellationToken), "drivers-report.csv");
+        return CsvFile(await _reportService.ExportDriversCsvAsync(range, lang ?? "en", cancellationToken), "drivers-report.csv");
     }
 
     [HttpGet("vehicles/export")]
-    public async Task<IActionResult> ExportVehicles([FromQuery] ReportDateRangeQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportVehicles([FromQuery] ReportDateRangeQuery query, [FromQuery] string? lang, CancellationToken cancellationToken)
     {
         if (!TryResolveRange(query, out var range, out var problem))
             return problem;
 
-        return CsvFile(await _reportService.ExportVehiclesCsvAsync(range, cancellationToken), "vehicles-report.csv");
+        return CsvFile(await _reportService.ExportVehiclesCsvAsync(range, lang ?? "en", cancellationToken), "vehicles-report.csv");
     }
 
     private FileContentResult CsvFile(string csv, string fileName) =>

@@ -47,7 +47,7 @@ function schedule(items: AvailabilityDto[], isCurrentlyAvailable = false): Drive
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
-    user: { id: "u1", email: "driver@example.com", firstName: "John", lastName: "Smith", role: "Driver" },
+    user: { id: "u1", email: "driver@example.com", firstName: "John", lastName: "Smith", role: "Driver", languageCode: null },
     accessToken: "test-token",
     expiresAt: null,
     isAuthenticated: true,

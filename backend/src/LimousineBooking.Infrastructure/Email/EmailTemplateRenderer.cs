@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Text.RegularExpressions;
 using LimousineBooking.Application.Interfaces;
+using LimousineBooking.Domain.Common;
 using Microsoft.Extensions.Options;
 
 namespace LimousineBooking.Infrastructure.Email;
@@ -31,9 +32,10 @@ public class EmailTemplateRenderer : IEmailTemplateRenderer
         _templatesDirectory = Path.Combine(AppContext.BaseDirectory, "Email", "Templates");
     }
 
-    public RenderedEmail Render(string templateName, IReadOnlyDictionary<string, string> fields)
+    public RenderedEmail Render(string templateName, string languageCode, IReadOnlyDictionary<string, string> fields)
     {
-        var raw = LoadFile($"{templateName}.html");
+        var language = SupportedLanguages.Normalize(languageCode);
+        var raw = LoadFile(language, $"{templateName}.html");
 
         var subjectMatch = SubjectLinePattern.Match(raw);
         if (!subjectMatch.Success)
@@ -50,7 +52,7 @@ public class EmailTemplateRenderer : IEmailTemplateRenderer
         var subject = Substitute(subjectTemplate, allFields);
         var renderedContent = Substitute(content, allFields);
 
-        var layout = LoadFile("_Layout.html");
+        var layout = LoadFile(language, "_Layout.html");
         var htmlBody = Substitute(layout.Replace("{{Content}}", renderedContent), allFields);
 
         var plainTextBody = ToPlainText(renderedContent);
@@ -58,13 +60,25 @@ public class EmailTemplateRenderer : IEmailTemplateRenderer
         return new RenderedEmail(subject, htmlBody, plainTextBody);
     }
 
-    private string LoadFile(string fileName) =>
-        _fileCache.GetOrAdd(fileName, name =>
+    /// <summary>
+    /// Looks in <paramref name="language"/>'s own folder first, then falls back to
+    /// "en" if that specific file doesn't exist there (section 25 — a missing
+    /// translation must never leave an email unsent). Only throws if the file is
+    /// missing from the English folder too, since English is the one language every
+    /// template is guaranteed to have.
+    /// </summary>
+    private string LoadFile(string language, string fileName) =>
+        _fileCache.GetOrAdd($"{language}/{fileName}", _ =>
         {
-            var path = Path.Combine(_templatesDirectory, name);
-            if (!File.Exists(path))
-                throw new FileNotFoundException($"Email template file not found: {path}", path);
-            return File.ReadAllText(path);
+            var languagePath = Path.Combine(_templatesDirectory, language, fileName);
+            if (File.Exists(languagePath))
+                return File.ReadAllText(languagePath);
+
+            var fallbackPath = Path.Combine(_templatesDirectory, SupportedLanguages.Default, fileName);
+            if (!File.Exists(fallbackPath))
+                throw new FileNotFoundException($"Email template file not found in '{language}' or the English fallback: {fallbackPath}", fallbackPath);
+
+            return File.ReadAllText(fallbackPath);
         });
 
     private static string Substitute(string template, IReadOnlyDictionary<string, string> fields)

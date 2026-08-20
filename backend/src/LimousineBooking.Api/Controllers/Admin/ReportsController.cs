@@ -143,7 +143,7 @@ public class ReportsController : ControllerBase
         return Ok(await _reportService.GetCancellationReportAsync(range, cancellationToken));
     }
 
-    /// <summary>Column headers are localized per <paramref name="lang"/> (en/de/fr/it, default English) — the exported data itself is never translated (section 44).</summary>
+    /// <summary>Column headers are localized per <paramref name="lang"/> (en/de/fr, default English) — the exported data itself is never translated (section 44).</summary>
     [HttpGet("bookings/export")]
     public async Task<IActionResult> ExportBookings([FromQuery] ReportDateRangeQuery query, [FromQuery] string? lang, CancellationToken cancellationToken)
     {

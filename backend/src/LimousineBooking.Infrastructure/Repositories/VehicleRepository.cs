@@ -61,6 +61,13 @@ public class VehicleRepository : IVehicleRepository
         return (items, totalCount);
     }
 
+    public async Task<IReadOnlyList<DomainVehicle>> GetActiveAsync(CancellationToken cancellationToken = default) =>
+        await _dbContext.Vehicles
+            .Where(v => v.IsActive)
+            .OrderBy(v => v.Make)
+            .ThenBy(v => v.Model)
+            .ToListAsync(cancellationToken);
+
     public async Task<bool> HasDuplicateRegistrationAsync(string registrationNumber, Guid? excludeVehicleId, CancellationToken cancellationToken = default)
     {
         var query = _dbContext.Vehicles.Where(v => EF.Functions.ILike(v.RegistrationNumber, registrationNumber));

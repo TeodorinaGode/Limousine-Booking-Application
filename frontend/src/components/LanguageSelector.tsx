@@ -4,7 +4,7 @@ import { updatePreferences } from "../services/accountService";
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "../i18n/i18n";
 
 /**
- * Shared EN | DE | FR | IT selector used in the public nav, admin header, and
+ * Shared EN | DE | FR selector used in the public nav, admin header, and
  * driver header (sections 46-48). Switching language only ever calls
  * i18next's changeLanguage — it never touches booking/form state, so nothing
  * the customer has already entered is lost (section 40). For an authenticated

@@ -14,8 +14,7 @@
     "label": "Select language",
     "en": "EN",
     "de": "DE",
-    "fr": "FR",
-    "it": "IT"
+    "fr": "FR"
   },
   "buttons": {
     "save": "Save",

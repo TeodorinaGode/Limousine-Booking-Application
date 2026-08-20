@@ -28,6 +28,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddHostedService<NotificationOutboxWorker>();
+    builder.Services.AddHostedService<ContactMessageOutboxWorker>();
 }
 
 builder.Services

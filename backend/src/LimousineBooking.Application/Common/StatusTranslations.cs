@@ -4,7 +4,7 @@ namespace LimousineBooking.Application.Common;
 
 /// <summary>
 /// Localizes the technical enum values (BookingStatus/RideStatus/PaymentStatus)
-/// into short, natural display text for the four supported languages — used only
+/// into short, natural display text for the three supported languages — used only
 /// at presentation edges (rendered emails today; the frontend does its own
 /// equivalent translation via i18next). The API itself and the domain model never
 /// see or store these strings (section 57/58/59) — <c>BookingResponse.Status</c>
@@ -36,37 +36,37 @@ public static class StatusTranslations
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> BookingStatusLabels =
         new Dictionary<string, IReadOnlyDictionary<string, string>>
         {
-            ["Pending"] = Labels("Pending", "Ausstehend", "En attente", "In attesa"),
-            ["Confirmed"] = Labels("Confirmed", "Bestätigt", "Confirmée", "Confermata"),
-            ["PendingManualAssignment"] = Labels("Pending (manual assignment)", "Ausstehend (manuelle Zuweisung)", "En attente (attribution manuelle)", "In attesa (assegnazione manuale)"),
-            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée", "Annullata"),
-            ["Assigned"] = Labels("Assigned", "Zugewiesen", "Attribuée", "Assegnata"),
-            ["OnTheWay"] = Labels("On the way", "Unterwegs", "En route", "In arrivo"),
-            ["PassengerPickedUp"] = Labels("Passenger picked up", "Fahrgast abgeholt", "Passager pris en charge", "Passeggero prelevato"),
-            ["Completed"] = Labels("Completed", "Abgeschlossen", "Terminée", "Completata")
+            ["Pending"] = Labels("Pending", "Ausstehend", "En attente"),
+            ["Confirmed"] = Labels("Confirmed", "Bestätigt", "Confirmée"),
+            ["PendingManualAssignment"] = Labels("Pending (manual assignment)", "Ausstehend (manuelle Zuweisung)", "En attente (attribution manuelle)"),
+            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée"),
+            ["Assigned"] = Labels("Assigned", "Zugewiesen", "Attribuée"),
+            ["OnTheWay"] = Labels("On the way", "Unterwegs", "En route"),
+            ["PassengerPickedUp"] = Labels("Passenger picked up", "Fahrgast abgeholt", "Passager pris en charge"),
+            ["Completed"] = Labels("Completed", "Abgeschlossen", "Terminée")
         };
 
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> RideStatusLabels =
         new Dictionary<string, IReadOnlyDictionary<string, string>>
         {
-            ["Upcoming"] = Labels("Upcoming", "Bevorstehend", "À venir", "In programma"),
-            ["OnTheWay"] = Labels("On the way", "Unterwegs", "En route", "In arrivo"),
-            ["PassengerPickedUp"] = Labels("Passenger picked up", "Fahrgast abgeholt", "Passager pris en charge", "Passeggero prelevato"),
-            ["Completed"] = Labels("Completed", "Abgeschlossen", "Terminée", "Completata"),
-            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée", "Annullata")
+            ["Upcoming"] = Labels("Upcoming", "Bevorstehend", "À venir"),
+            ["OnTheWay"] = Labels("On the way", "Unterwegs", "En route"),
+            ["PassengerPickedUp"] = Labels("Passenger picked up", "Fahrgast abgeholt", "Passager pris en charge"),
+            ["Completed"] = Labels("Completed", "Abgeschlossen", "Terminée"),
+            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée")
         };
 
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> PaymentStatusLabels =
         new Dictionary<string, IReadOnlyDictionary<string, string>>
         {
-            ["Pending"] = Labels("Pending", "Ausstehend", "En attente", "In attesa"),
-            ["Processing"] = Labels("Processing", "In Bearbeitung", "En cours de traitement", "In elaborazione"),
-            ["Paid"] = Labels("Paid", "Bezahlt", "Payée", "Pagato"),
-            ["Failed"] = Labels("Failed", "Fehlgeschlagen", "Échouée", "Non riuscito"),
-            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée", "Annullato"),
-            ["Refunded"] = Labels("Refunded", "Erstattet", "Remboursée", "Rimborsato")
+            ["Pending"] = Labels("Pending", "Ausstehend", "En attente"),
+            ["Processing"] = Labels("Processing", "In Bearbeitung", "En cours de traitement"),
+            ["Paid"] = Labels("Paid", "Bezahlt", "Payée"),
+            ["Failed"] = Labels("Failed", "Fehlgeschlagen", "Échouée"),
+            ["Cancelled"] = Labels("Cancelled", "Storniert", "Annulée"),
+            ["Refunded"] = Labels("Refunded", "Erstattet", "Remboursée")
         };
 
-    private static IReadOnlyDictionary<string, string> Labels(string en, string de, string fr, string it) =>
-        new Dictionary<string, string> { ["en"] = en, ["de"] = de, ["fr"] = fr, ["it"] = it };
+    private static IReadOnlyDictionary<string, string> Labels(string en, string de, string fr) =>
+        new Dictionary<string, string> { ["en"] = en, ["de"] = de, ["fr"] = fr };
 }

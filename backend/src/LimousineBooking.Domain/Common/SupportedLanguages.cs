@@ -1,7 +1,7 @@
 namespace LimousineBooking.Domain.Common;
 
 /// <summary>
-/// The four languages this application supports (Prompt 16) — en/de/fr/it, always
+/// The three languages this application supports (Prompt 16) — en/de/fr, always
 /// short lowercase codes, never a display name ("German") or region-qualified tag
 /// ("de-CH"). <see cref="Normalize"/> is the single place that decides what happens
 /// to an unsupported/missing code: it silently falls back to English rather than
@@ -12,7 +12,7 @@ public static class SupportedLanguages
 {
     public const string Default = "en";
 
-    public static readonly IReadOnlyCollection<string> Codes = new[] { "en", "de", "fr", "it" };
+    public static readonly IReadOnlyCollection<string> Codes = new[] { "en", "de", "fr" };
 
     public static bool IsSupported(string? code) =>
         !string.IsNullOrWhiteSpace(code) && Codes.Contains(code.Trim().ToLowerInvariant());

@@ -1,13 +1,20 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { createBooking, getActiveRoutes } from "../../services/bookingService";
 import { createPayment } from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
-import { APP_BRAND_NAME } from "../../config/brand";
-import LanguageSelector from "../../components/LanguageSelector";
+import Header from "../../components/Header";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
+
+/** Carried in via router state from the hero widget (section 27) or a Routes-page "Book This Route" CTA (section 26) — every field is optional since either flow may only supply some of them. */
+interface BookingPrefillState {
+  routeId?: string;
+  bookingDate?: string;
+  pickupTime?: string;
+  passengerCount?: number;
+}
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const PHONE_PATTERN = /^[0-9+\-\s()]{7,25}$/;
@@ -89,13 +96,21 @@ function validateStep3(values: FormValues, t: TFunction): Record<string, string>
 
 function BookingPage() {
   const { t, i18n } = useTranslation(["booking", "common", "validation"]);
+  const location = useLocation();
+  const prefill = location.state as BookingPrefillState | null;
 
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const [step, setStep] = useState<Step>(1);
-  const [values, setValues] = useState<FormValues>(initialValues);
+  const [values, setValues] = useState<FormValues>(() => ({
+    ...initialValues,
+    routeId: prefill?.routeId ?? initialValues.routeId,
+    bookingDate: prefill?.bookingDate ?? initialValues.bookingDate,
+    pickupTime: prefill?.pickupTime ?? initialValues.pickupTime,
+    passengerCount: prefill?.passengerCount ?? initialValues.passengerCount,
+  }));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -183,6 +198,8 @@ function BookingPage() {
     const statusMessage = isConfirmed ? t("booking:success.confirmedMessage") : t("booking:success.pendingMessage");
 
     return (
+      <>
+      <Header />
       <div className="container container--narrow fade-in" style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)", textAlign: "center" }}>
         <div className="card">
           {isConfirmed && (
@@ -243,19 +260,16 @@ function BookingPage() {
           <Link to="/">{t("booking:success.returnHome")}</Link>
         </p>
       </div>
+      </>
     );
   }
 
   const titles = stepTitles(t);
 
   return (
+    <>
+    <Header />
     <div className="container container--medium" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-16)" }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
-        <p className="site-nav__brand" style={{ margin: 0 }}>
-          <Link to="/">{APP_BRAND_NAME}</Link>
-        </p>
-        <LanguageSelector />
-      </div>
       <h1>{t("booking:title")}</h1>
 
       <div className="progress-steps" role="list" aria-label="Booking progress">
@@ -496,6 +510,7 @@ function BookingPage() {
         </form>
       )}
     </div>
+    </>
   );
 }
 

@@ -1,0 +1,236 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "services": "Services",
+    "routes": "Trajets",
+    "fleet": "Flotte",
+    "about": "À propos",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "bookARide": "Réserver un trajet"
+  },
+  "hero": {
+    "eyebrow": "Service de chauffeur premium",
+    "title1": "Voyagez confortablement.",
+    "title2": "Arrivez en toute confiance.",
+    "subtitle": "Transferts privés en limousine à travers la Suisse.",
+    "ctaPrimary": "Réserver un trajet",
+    "ctaSecondary": "Découvrir nos services"
+  },
+  "widget": {
+    "from": "Départ",
+    "to": "Destination",
+    "date": "Date",
+    "time": "Heure",
+    "passengers": "Passagers",
+    "checkAvailability": "Vérifier la disponibilité",
+    "selectRoute": "Sélectionner un trajet"
+  },
+  "trust": {
+    "chauffeur": {
+      "title": "Chauffeur privé",
+      "desc": "Service professionnel"
+    },
+    "onTime": {
+      "title": "Service ponctuel",
+      "desc": "Trajets fiables"
+    },
+    "vehicles": {
+      "title": "Véhicules premium",
+      "desc": "Confort et élégance"
+    },
+    "available": {
+      "title": "Prêts quand vous l'êtes",
+      "desc": "Réservez à votre convenance"
+    }
+  },
+  "services": {
+    "title": "Nos services",
+    "subtitle": "Un transport professionnel pour chaque occasion.",
+    "bookTransfer": "Réserver votre transfert",
+    "airport": {
+      "title": "Transferts aéroport",
+      "desc": "Voyagez confortablement entre aéroports, hôtels et destinations avec un chauffeur privé professionnel."
+    },
+    "business": {
+      "title": "Transferts d'affaires",
+      "desc": "Transport ponctuel et discret pour réunions, conférences et voyages d'affaires."
+    },
+    "cityToCity": {
+      "title": "Transferts inter-villes",
+      "desc": "Trajets longue distance confortables entre villes suisses, porte à porte."
+    },
+    "corporate": {
+      "title": "Voyages d'entreprise",
+      "desc": "Solutions de transport fiables pour les entreprises et leurs équipes."
+    },
+    "events": {
+      "title": "Événements & occasions spéciales",
+      "desc": "Transport élégant pour mariages, célébrations et événements spéciaux."
+    },
+    "privateChauffeur": {
+      "title": "Service de chauffeur privé",
+      "desc": "Un chauffeur dédié à votre disposition pour l'ensemble de votre trajet."
+    }
+  },
+  "airportHighlight": {
+    "title": "Transferts aéroport",
+    "subtitle": "De l'aéroport à votre destination, sans stress.",
+    "pickup": "Prise en charge à l'aéroport",
+    "chauffeur": "Chauffeur professionnel",
+    "vehicles": "Véhicules confortables",
+    "cta": "Réserver un transfert aéroport"
+  },
+  "routesTeaser": {
+    "title": "Destinations populaires",
+    "viewAll": "Voir tous les trajets",
+    "bookThisRoute": "Réserver ce trajet",
+    "duration": "Durée estimée",
+    "from": "À partir de"
+  },
+  "routesPage": {
+    "title": "Trajets & destinations",
+    "subtitle": "Découvrez nos trajets disponibles à travers la Suisse.",
+    "noRoutes": "Aucun trajet n'est disponible actuellement."
+  },
+  "fleetTeaser": {
+    "title": "Notre flotte",
+    "bookYourJourney": "Réserver votre trajet"
+  },
+  "fleetPage": {
+    "title": "Notre flotte",
+    "subtitle": "Une sélection premium de véhicules pour chaque trajet.",
+    "passengers": "Passagers",
+    "noVehicles": "Aucun véhicule n'est disponible actuellement."
+  },
+  "whyUs": {
+    "title": "Pourquoi nous choisir",
+    "professional": {
+      "title": "Chauffeurs professionnels",
+      "desc": "Des chauffeurs expérimentés, attentifs à votre confort et à votre sécurité."
+    },
+    "premium": {
+      "title": "Véhicules premium",
+      "desc": "Une flotte bien entretenue pour un trajet confortable."
+    },
+    "reliable": {
+      "title": "Transferts fiables",
+      "desc": "Un service ponctuel sur lequel vous pouvez compter."
+    },
+    "comfortable": {
+      "title": "Trajets confortables",
+      "desc": "Voyagez détendu, à chaque fois."
+    },
+    "personalized": {
+      "title": "Service personnalisé",
+      "desc": "Votre trajet, organisé selon vos besoins."
+    },
+    "simple": {
+      "title": "Réservation simple",
+      "desc": "Réservez votre trajet en quelques étapes, sans compte."
+    }
+  },
+  "howItWorks": {
+    "title": "Comment ça marche",
+    "step1": {
+      "title": "Choisissez votre trajet",
+      "desc": "Sélectionnez votre destination."
+    },
+    "step2": {
+      "title": "Planifiez votre voyage",
+      "desc": "Choisissez la date et l'heure."
+    },
+    "step3": {
+      "title": "Confirmez et payez",
+      "desc": "Saisissez vos informations et finalisez le paiement sécurisé."
+    },
+    "step4": {
+      "title": "Profitez de votre trajet",
+      "desc": "Votre chauffeur professionnel s'occupe du trajet."
+    }
+  },
+  "about": {
+    "title": "À propos de notre service",
+    "subtitle": "Un transport professionnel conçu autour de votre voyage.",
+    "body1": "Nous proposons un transport privé avec chauffeur axé sur le confort, la ponctualité et la discrétion.",
+    "body2": "Chaque trajet est organisé avec le plus grand soin, de la réservation jusqu'à votre arrivée."
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "q1": {
+      "question": "Comment réserver une limousine ?",
+      "answer": "Sélectionnez un trajet ou utilisez le formulaire de réservation, choisissez la date, l'heure et les détails, puis confirmez et payez en ligne."
+    },
+    "q2": {
+      "question": "Ai-je besoin d'un compte ?",
+      "answer": "Non. Vous pouvez réserver, payer et recevoir votre confirmation entièrement en tant qu'invité."
+    },
+    "q3": {
+      "question": "Puis-je réserver un transfert aéroport ?",
+      "answer": "Oui, les transferts aéroport font partie de nos services principaux — réservez-les comme n'importe quel autre trajet."
+    },
+    "q4": {
+      "question": "Combien de temps à l'avance puis-je réserver ?",
+      "answer": "Les réservations nécessitent un délai minimum, indiqué automatiquement lors du processus de réservation."
+    },
+    "q5": {
+      "question": "Puis-je annuler ma réservation ?",
+      "answer": "Les annulations sont traitées par notre équipe — veuillez nous contacter via les coordonnées ci-dessous."
+    },
+    "q6": {
+      "question": "Quels moyens de paiement sont acceptés ?",
+      "answer": "Les paiements sont traités en toute sécurité en ligne via notre prestataire de paiement."
+    },
+    "q7": {
+      "question": "Vais-je recevoir une confirmation ?",
+      "answer": "Oui, une confirmation vous est envoyée par e-mail dès que votre réservation est traitée."
+    },
+    "q8": {
+      "question": "Puis-je modifier mon adresse de prise en charge ?",
+      "answer": "Veuillez nous contacter dès que possible via les coordonnées ci-dessous, nous serons heureux de vous aider."
+    }
+  },
+  "contact": {
+    "title": "Besoin d'aide ?",
+    "subtitle": "Notre équipe est à votre disposition pour vous aider dans votre voyage.",
+    "callUs": "Appelez-nous",
+    "emailUs": "Écrivez-nous",
+    "form": {
+      "title": "Envoyez-nous un message",
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone (facultatif)",
+      "subject": "Sujet",
+      "message": "Message",
+      "send": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Merci — votre message a bien été reçu."
+    }
+  },
+  "finalCta": {
+    "title": "Votre voyage commence ici",
+    "subtitle": "Des transferts aéroport aux trajets privés inter-villes, voyagez avec confort, discrétion et confiance.",
+    "cta": "Réserver un trajet"
+  },
+  "footer": {
+    "description": "Transport privé avec chauffeur à travers la Suisse.",
+    "navigation": "Navigation",
+    "services": "Services",
+    "contact": "Contact",
+    "rights": "Tous droits réservés.",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsConditions": "Conditions générales",
+    "cookiePolicy": "Politique de cookies"
+  },
+  "legal": {
+    "privacyTitle": "Politique de confidentialité",
+    "termsTitle": "Conditions générales",
+    "cookieTitle": "Politique de cookies",
+    "placeholder": "Cette page est un espace réservé. Le texte juridique réel de l'entreprise n'a pas encore été fourni et sera publié ici dès qu'il sera disponible."
+  },
+  "mobileMenu": {
+    "open": "Ouvrir le menu",
+    "close": "Fermer le menu"
+  },
+  "backToTop": "Retour en haut"
+}

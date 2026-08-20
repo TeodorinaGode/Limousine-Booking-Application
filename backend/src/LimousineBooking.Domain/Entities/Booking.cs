@@ -19,7 +19,7 @@ public class Booking : AuditableEntity
     public string PublicAccessToken { get; private set; } = string.Empty;
 
     /// <summary>
-    /// The language the customer was using when they created this booking (en/de/fr/it,
+    /// The language the customer was using when they created this booking (en/de/fr,
     /// normalized via <see cref="Common.SupportedLanguages.Normalize"/> — never an
     /// unsupported/arbitrary code). Captured once, at creation, rather than resolved from
     /// the customer's current browser language at send time — the customer may have booked

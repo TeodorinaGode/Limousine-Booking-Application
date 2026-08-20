@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<RideStatusHistory> RideStatusHistories => Set<RideStatusHistory>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<PaymentWebhookEvent> PaymentWebhookEvents => Set<PaymentWebhookEvent>();
+    public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

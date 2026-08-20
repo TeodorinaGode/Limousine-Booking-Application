@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IPaymentWebhookEventRepository, PaymentWebhookEventRepository>();
+        services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
 
         // Real SMTP delivery only when explicitly enabled — otherwise the
         // dev-mode logger stands in, so the whole notification pipeline is

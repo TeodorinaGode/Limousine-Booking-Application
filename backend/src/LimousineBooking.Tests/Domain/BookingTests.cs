@@ -102,7 +102,7 @@ public class BookingTests
     [Theory]
     [InlineData("de", "de")]
     [InlineData("FR", "fr")]
-    [InlineData(" it ", "it")]
+    [InlineData(" fr ", "fr")]
     public void Booking_SupportedLanguageCode_IsNormalizedAndStored(string input, string expected)
     {
         var booking = new Booking("LM-0001", "Jane", "Doe", "jane@example.com", "+41791234567",

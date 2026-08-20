@@ -13,7 +13,7 @@ public class User : AuditableEntity
     public bool IsActive { get; private set; } = true;
 
     /// <summary>
-    /// The user's saved language preference (en/de/fr/it) — null means "no preference
+    /// The user's saved language preference (en/de/fr) — null means "no preference
     /// saved yet, use the browser's language" (section 20: language selection is never
     /// required at account creation). Once set, this drives both the UI on login and
     /// which language this user's emails are rendered in.

@@ -1,5 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/public/HomePage";
+import ServicesPage from "../pages/public/ServicesPage";
+import PublicRoutesPage from "../pages/public/RoutesPage";
+import FleetPage from "../pages/public/FleetPage";
+import AboutPage from "../pages/public/AboutPage";
+import FAQPage from "../pages/public/FAQPage";
+import ContactPage from "../pages/public/ContactPage";
+import LegalPage from "../pages/public/LegalPage";
 import BookingPage from "../pages/public/BookingPage";
 import PaymentStatusPage from "../pages/public/PaymentStatusPage";
 import PaymentSuccessPage from "../pages/public/PaymentSuccessPage";
@@ -26,6 +33,15 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/services" element={<ServicesPage />} />
+      <Route path="/routes" element={<PublicRoutesPage />} />
+      <Route path="/fleet" element={<FleetPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/privacy-policy" element={<LegalPage titleKey="privacyTitle" />} />
+      <Route path="/terms-and-conditions" element={<LegalPage titleKey="termsTitle" />} />
+      <Route path="/cookie-policy" element={<LegalPage titleKey="cookieTitle" />} />
       <Route path="/booking" element={<BookingPage />} />
       <Route path="/booking/payment/success" element={<PaymentSuccessPage />} />
       <Route path="/booking/payment/cancelled" element={<PaymentCancelledPage />} />

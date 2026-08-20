@@ -2,6 +2,8 @@ using LimousineBooking.Application.Account;
 using LimousineBooking.Application.Authentication;
 using LimousineBooking.Application.Availability;
 using LimousineBooking.Application.Bookings;
+using LimousineBooking.Application.Company;
+using LimousineBooking.Application.Contact;
 using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Notifications;
@@ -21,6 +23,7 @@ public static class DependencyInjection
         services.Configure<BookingSettings>(configuration.GetSection(BookingSettings.SectionName));
         services.Configure<NotificationSettings>(configuration.GetSection(NotificationSettings.SectionName));
         services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
+        services.Configure<CompanySettings>(configuration.GetSection(CompanySettings.SectionName));
 
         services.AddScoped<IAuthService, LoginHandler>();
         services.AddScoped<IAccountService, AccountService>();
@@ -40,6 +43,10 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAdminNotificationService, AdminNotificationService>();
         services.AddScoped<INotificationOutboxProcessor, NotificationOutboxProcessor>();
+        services.AddScoped<IPublicVehicleService, PublicVehicleService>();
+        services.AddScoped<IPublicCompanyService, PublicCompanyService>();
+        services.AddScoped<IPublicContactService, PublicContactService>();
+        services.AddScoped<IContactMessageOutboxProcessor, ContactMessageOutboxProcessor>();
 
         // Further use cases, validators, and mapping profiles will be
         // registered here as they are introduced in subsequent steps.

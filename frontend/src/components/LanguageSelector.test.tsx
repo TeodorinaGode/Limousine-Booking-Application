@@ -25,7 +25,7 @@ describe("LanguageSelector", () => {
     expect(screen.getByRole("button", { name: "EN" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "DE" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "FR" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "IT" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "IT" })).not.toBeInTheDocument();
   });
 
   it("marks the currently active language", () => {

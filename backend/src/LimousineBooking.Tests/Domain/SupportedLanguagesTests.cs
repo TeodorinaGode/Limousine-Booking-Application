@@ -9,7 +9,6 @@ public class SupportedLanguagesTests
     [InlineData("en")]
     [InlineData("de")]
     [InlineData("fr")]
-    [InlineData("it")]
     [InlineData("DE")]
     [InlineData(" fr ")]
     public void Normalize_SupportedCode_ReturnsItLowercasedAndTrimmed(string code)
@@ -24,6 +23,7 @@ public class SupportedLanguagesTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("es")]
+    [InlineData("it")]
     [InlineData("de-CH")]
     [InlineData("German")]
     public void Normalize_UnsupportedOrMissingCode_FallsBackToEnglish(string? code)
@@ -35,8 +35,9 @@ public class SupportedLanguagesTests
     [InlineData("en", true)]
     [InlineData("fr", true)]
     [InlineData("es", false)]
+    [InlineData("it", false)]
     [InlineData(null, false)]
-    public void IsSupported_ReflectsTheFourLanguageAllowList(string? code, bool expected)
+    public void IsSupported_ReflectsTheThreeLanguageAllowList(string? code, bool expected)
     {
         Assert.Equal(expected, SupportedLanguages.IsSupported(code));
     }

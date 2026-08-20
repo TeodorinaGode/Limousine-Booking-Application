@@ -20,7 +20,7 @@ public class UserTests
     [Theory]
     [InlineData("de", "de")]
     [InlineData("FR", "fr")]
-    [InlineData(" it ", "it")]
+    [InlineData(" fr ", "fr")]
     public void SetLanguage_SupportedCode_IsNormalizedAndStored(string input, string expected)
     {
         var user = CreateUser();

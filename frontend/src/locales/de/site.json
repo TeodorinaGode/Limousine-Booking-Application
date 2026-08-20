@@ -1,0 +1,236 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "services": "Leistungen",
+    "routes": "Strecken",
+    "fleet": "Fuhrpark",
+    "about": "Über uns",
+    "faq": "FAQ",
+    "contact": "Kontakt",
+    "bookARide": "Fahrt buchen"
+  },
+  "hero": {
+    "eyebrow": "Premium-Chauffeurservice",
+    "title1": "Reisen Sie komfortabel.",
+    "title2": "Kommen Sie souverän an.",
+    "subtitle": "Private Limousinentransfers in der ganzen Schweiz.",
+    "ctaPrimary": "Fahrt buchen",
+    "ctaSecondary": "Unsere Leistungen entdecken"
+  },
+  "widget": {
+    "from": "Von",
+    "to": "Nach",
+    "date": "Datum",
+    "time": "Uhrzeit",
+    "passengers": "Passagiere",
+    "checkAvailability": "Verfügbarkeit prüfen",
+    "selectRoute": "Strecke wählen"
+  },
+  "trust": {
+    "chauffeur": {
+      "title": "Privater Chauffeur",
+      "desc": "Professioneller Service"
+    },
+    "onTime": {
+      "title": "Pünktlicher Service",
+      "desc": "Zuverlässige Fahrten"
+    },
+    "vehicles": {
+      "title": "Premium-Fahrzeuge",
+      "desc": "Komfort und Eleganz"
+    },
+    "available": {
+      "title": "Bereit, wenn Sie es sind",
+      "desc": "Buchen Sie nach Belieben"
+    }
+  },
+  "services": {
+    "title": "Unsere Leistungen",
+    "subtitle": "Professioneller Transport für jeden Anlass.",
+    "bookTransfer": "Transfer buchen",
+    "airport": {
+      "title": "Flughafentransfers",
+      "desc": "Reisen Sie komfortabel zwischen Flughäfen, Hotels und Zielen mit einem professionellen privaten Chauffeur."
+    },
+    "business": {
+      "title": "Geschäftstransfers",
+      "desc": "Pünktlicher, diskreter Transport für Meetings, Konferenzen und Geschäftsreisen."
+    },
+    "cityToCity": {
+      "title": "Stadt-zu-Stadt-Transfers",
+      "desc": "Komfortable Fernfahrten zwischen Schweizer Städten, von Tür zu Tür."
+    },
+    "corporate": {
+      "title": "Geschäftsreisen",
+      "desc": "Zuverlässige Transportlösungen für Unternehmen und ihre Teams."
+    },
+    "events": {
+      "title": "Veranstaltungen & besondere Anlässe",
+      "desc": "Elegante Transportlösungen für Hochzeiten, Feiern und besondere Ereignisse."
+    },
+    "privateChauffeur": {
+      "title": "Privater Chauffeurservice",
+      "desc": "Ein Chauffeur steht Ihnen für die gesamte Dauer Ihrer Reise zur Verfügung."
+    }
+  },
+  "airportHighlight": {
+    "title": "Flughafentransfers",
+    "subtitle": "Vom Flughafen zu Ihrem Ziel, ganz ohne Stress.",
+    "pickup": "Abholung am Flughafen",
+    "chauffeur": "Professioneller Chauffeur",
+    "vehicles": "Komfortable Fahrzeuge",
+    "cta": "Flughafentransfer buchen"
+  },
+  "routesTeaser": {
+    "title": "Beliebte Ziele",
+    "viewAll": "Alle Strecken ansehen",
+    "bookThisRoute": "Diese Strecke buchen",
+    "duration": "Voraussichtliche Dauer",
+    "from": "Ab"
+  },
+  "routesPage": {
+    "title": "Strecken & Ziele",
+    "subtitle": "Entdecken Sie unsere verfügbaren Strecken in der Schweiz.",
+    "noRoutes": "Derzeit sind keine Strecken verfügbar."
+  },
+  "fleetTeaser": {
+    "title": "Unser Fuhrpark",
+    "bookYourJourney": "Ihre Fahrt buchen"
+  },
+  "fleetPage": {
+    "title": "Unser Fuhrpark",
+    "subtitle": "Eine erlesene Fahrzeugauswahl für jede Fahrt.",
+    "passengers": "Passagiere",
+    "noVehicles": "Derzeit sind keine Fahrzeuge verfügbar."
+  },
+  "whyUs": {
+    "title": "Warum wir",
+    "professional": {
+      "title": "Professionelle Chauffeure",
+      "desc": "Erfahrene Fahrer mit Fokus auf Ihren Komfort und Ihre Sicherheit."
+    },
+    "premium": {
+      "title": "Premium-Fahrzeuge",
+      "desc": "Ein gepflegter Fuhrpark für eine komfortable Fahrt."
+    },
+    "reliable": {
+      "title": "Zuverlässige Transfers",
+      "desc": "Pünktlicher Service, auf den Sie sich verlassen können."
+    },
+    "comfortable": {
+      "title": "Komfortable Fahrten",
+      "desc": "Reisen Sie jedes Mal entspannt."
+    },
+    "personalized": {
+      "title": "Persönlicher Service",
+      "desc": "Ihre Reise, ganz nach Ihren Bedürfnissen organisiert."
+    },
+    "simple": {
+      "title": "Einfache Buchung",
+      "desc": "Buchen Sie Ihre Fahrt in wenigen Schritten, ganz ohne Konto."
+    }
+  },
+  "howItWorks": {
+    "title": "So funktioniert's",
+    "step1": {
+      "title": "Strecke wählen",
+      "desc": "Wählen Sie Ihr Ziel."
+    },
+    "step2": {
+      "title": "Reise planen",
+      "desc": "Wählen Sie Datum und Uhrzeit."
+    },
+    "step3": {
+      "title": "Bestätigen & bezahlen",
+      "desc": "Geben Sie Ihre Daten ein und schliessen Sie die sichere Zahlung ab."
+    },
+    "step4": {
+      "title": "Fahrt geniessen",
+      "desc": "Ihr professioneller Chauffeur kümmert sich um die Fahrt."
+    }
+  },
+  "about": {
+    "title": "Über unseren Service",
+    "subtitle": "Professioneller Transport, ganz auf Ihre Reise abgestimmt.",
+    "body1": "Wir bieten privaten Chauffeurtransport mit Fokus auf Komfort, Pünktlichkeit und Diskretion.",
+    "body2": "Jede Fahrt wird mit Liebe zum Detail organisiert, vom Moment der Buchung bis zur Ankunft."
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "q1": {
+      "question": "Wie buche ich eine Limousine?",
+      "answer": "Wählen Sie eine Strecke oder nutzen Sie das Buchungsformular, wählen Sie Datum, Uhrzeit und Details und schliessen Sie die Buchung mit der Online-Zahlung ab."
+    },
+    "q2": {
+      "question": "Benötige ich ein Konto?",
+      "answer": "Nein. Sie können vollständig als Gast buchen, bezahlen und Ihre Bestätigung erhalten."
+    },
+    "q3": {
+      "question": "Kann ich einen Flughafentransfer buchen?",
+      "answer": "Ja, Flughafentransfers gehören zu unseren Kernleistungen — buchen Sie sie wie jede andere Strecke."
+    },
+    "q4": {
+      "question": "Wie weit im Voraus kann ich buchen?",
+      "answer": "Für Buchungen gilt eine Mindestvorlaufzeit, die während des Buchungsvorgangs automatisch angezeigt wird."
+    },
+    "q5": {
+      "question": "Kann ich meine Buchung stornieren?",
+      "answer": "Stornierungen werden von unserem Team bearbeitet — bitte kontaktieren Sie uns über die untenstehenden Angaben."
+    },
+    "q6": {
+      "question": "Welche Zahlungsmethoden werden akzeptiert?",
+      "answer": "Zahlungen werden sicher online über unseren Zahlungsanbieter abgewickelt."
+    },
+    "q7": {
+      "question": "Erhalte ich eine Bestätigung?",
+      "answer": "Ja, sobald Ihre Buchung bearbeitet wurde, erhalten Sie eine Bestätigung per E-Mail."
+    },
+    "q8": {
+      "question": "Kann ich meine Abholadresse ändern?",
+      "answer": "Bitte kontaktieren Sie uns so schnell wie möglich über die untenstehenden Angaben — wir helfen Ihnen gerne weiter."
+    }
+  },
+  "contact": {
+    "title": "Brauchen Sie Hilfe?",
+    "subtitle": "Unser Team unterstützt Sie gerne bei Ihrer Reise.",
+    "callUs": "Anrufen",
+    "emailUs": "E-Mail senden",
+    "form": {
+      "title": "Senden Sie uns eine Nachricht",
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon (optional)",
+      "subject": "Betreff",
+      "message": "Nachricht",
+      "send": "Nachricht senden",
+      "sending": "Wird gesendet...",
+      "success": "Vielen Dank — Ihre Nachricht wurde empfangen."
+    }
+  },
+  "finalCta": {
+    "title": "Ihre Reise beginnt hier",
+    "subtitle": "Von Flughafentransfers bis zu privaten Stadt-zu-Stadt-Fahrten — reisen Sie komfortabel, diskret und sicher.",
+    "cta": "Fahrt buchen"
+  },
+  "footer": {
+    "description": "Privater Chauffeurtransport in der ganzen Schweiz.",
+    "navigation": "Navigation",
+    "services": "Leistungen",
+    "contact": "Kontakt",
+    "rights": "Alle Rechte vorbehalten.",
+    "privacyPolicy": "Datenschutz",
+    "termsConditions": "AGB",
+    "cookiePolicy": "Cookie-Richtlinie"
+  },
+  "legal": {
+    "privacyTitle": "Datenschutz",
+    "termsTitle": "Allgemeine Geschäftsbedingungen",
+    "cookieTitle": "Cookie-Richtlinie",
+    "placeholder": "Diese Seite ist ein Platzhalter. Der tatsächliche rechtliche Text des Unternehmens liegt noch nicht vor und wird hier veröffentlicht, sobald er verfügbar ist."
+  },
+  "mobileMenu": {
+    "open": "Menü öffnen",
+    "close": "Menü schliessen"
+  },
+  "backToTop": "Nach oben"
+}

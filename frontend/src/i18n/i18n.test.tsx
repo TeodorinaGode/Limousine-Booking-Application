@@ -9,8 +9,8 @@ describe("i18n", () => {
     await i18n.changeLanguage(DEFAULT_LANGUAGE);
   });
 
-  it("declares exactly the four supported languages, English default", () => {
-    expect(SUPPORTED_LANGUAGES).toEqual(["en", "de", "fr", "it"]);
+  it("declares exactly the three supported languages, English default", () => {
+    expect(SUPPORTED_LANGUAGES).toEqual(["en", "de", "fr"]);
     expect(DEFAULT_LANGUAGE).toBe("en");
   });
 
@@ -18,7 +18,6 @@ describe("i18n", () => {
     ["en", "Book a Ride"],
     ["de", "Fahrt buchen"],
     ["fr", "Réserver un trajet"],
-    ["it", "Prenota una corsa"],
   ])("loads the %s common namespace correctly", (language, expected) => {
     expect(i18n.getFixedT(language, "common")("nav.bookARide")).toBe(expected);
   });

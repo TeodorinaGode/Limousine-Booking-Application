@@ -1,0 +1,236 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "routes": "Routes",
+    "fleet": "Fleet",
+    "about": "About",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "bookARide": "Book a Ride"
+  },
+  "hero": {
+    "eyebrow": "Premium Chauffeur Service",
+    "title1": "Travel in comfort.",
+    "title2": "Arrive with confidence.",
+    "subtitle": "Private limousine transfers across Switzerland.",
+    "ctaPrimary": "Book a Ride",
+    "ctaSecondary": "Explore Our Services"
+  },
+  "widget": {
+    "from": "From",
+    "to": "To",
+    "date": "Date",
+    "time": "Time",
+    "passengers": "Passengers",
+    "checkAvailability": "Check Availability",
+    "selectRoute": "Select a route"
+  },
+  "trust": {
+    "chauffeur": {
+      "title": "Private Chauffeur",
+      "desc": "Professional service"
+    },
+    "onTime": {
+      "title": "On-Time Service",
+      "desc": "Reliable journeys"
+    },
+    "vehicles": {
+      "title": "Premium Vehicles",
+      "desc": "Comfort and elegance"
+    },
+    "available": {
+      "title": "Ready When You Are",
+      "desc": "Book at your convenience"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Professional transportation for every occasion.",
+    "bookTransfer": "Book Your Transfer",
+    "airport": {
+      "title": "Airport Transfers",
+      "desc": "Travel comfortably between airports, hotels and destinations with a professional private chauffeur."
+    },
+    "business": {
+      "title": "Business Transfers",
+      "desc": "Punctual, discreet transportation for meetings, conferences and business travel."
+    },
+    "cityToCity": {
+      "title": "City-to-City Transfers",
+      "desc": "Comfortable long-distance journeys between Swiss cities, door to door."
+    },
+    "corporate": {
+      "title": "Corporate Travel",
+      "desc": "Reliable transportation arrangements for companies and their teams."
+    },
+    "events": {
+      "title": "Events & Special Occasions",
+      "desc": "Elegant transportation for weddings, celebrations and special events."
+    },
+    "privateChauffeur": {
+      "title": "Private Chauffeur Service",
+      "desc": "A dedicated chauffeur at your disposal for the entirety of your journey."
+    }
+  },
+  "airportHighlight": {
+    "title": "Airport Transfers",
+    "subtitle": "From the airport to your destination, without the stress.",
+    "pickup": "Airport pickup",
+    "chauffeur": "Professional chauffeur",
+    "vehicles": "Comfortable vehicles",
+    "cta": "Book Airport Transfer"
+  },
+  "routesTeaser": {
+    "title": "Popular Destinations",
+    "viewAll": "View All Routes",
+    "bookThisRoute": "Book This Route",
+    "duration": "Estimated duration",
+    "from": "From"
+  },
+  "routesPage": {
+    "title": "Routes & Destinations",
+    "subtitle": "Explore our available routes across Switzerland.",
+    "noRoutes": "No routes are currently available."
+  },
+  "fleetTeaser": {
+    "title": "Our Fleet",
+    "bookYourJourney": "Book Your Journey"
+  },
+  "fleetPage": {
+    "title": "Our Fleet",
+    "subtitle": "A premium selection of vehicles for every journey.",
+    "passengers": "Passengers",
+    "noVehicles": "No vehicles are currently available."
+  },
+  "whyUs": {
+    "title": "Why Choose Us",
+    "professional": {
+      "title": "Professional Chauffeurs",
+      "desc": "Experienced drivers focused on your comfort and safety."
+    },
+    "premium": {
+      "title": "Premium Vehicles",
+      "desc": "A well-maintained fleet for a comfortable journey."
+    },
+    "reliable": {
+      "title": "Reliable Transfers",
+      "desc": "Punctual service you can depend on."
+    },
+    "comfortable": {
+      "title": "Comfortable Journeys",
+      "desc": "Travel relaxed, every time."
+    },
+    "personalized": {
+      "title": "Personalized Service",
+      "desc": "Your journey, arranged around your needs."
+    },
+    "simple": {
+      "title": "Simple Booking",
+      "desc": "Reserve your ride in a few steps, no account required."
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1": {
+      "title": "Choose Your Route",
+      "desc": "Select your destination."
+    },
+    "step2": {
+      "title": "Plan Your Journey",
+      "desc": "Choose your date and time."
+    },
+    "step3": {
+      "title": "Confirm & Pay",
+      "desc": "Enter your details and complete secure payment."
+    },
+    "step4": {
+      "title": "Enjoy Your Ride",
+      "desc": "Your professional chauffeur takes care of the journey."
+    }
+  },
+  "about": {
+    "title": "About Our Service",
+    "subtitle": "Professional transportation designed around your journey.",
+    "body1": "We provide private chauffeur transportation focused on comfort, punctuality and discretion.",
+    "body2": "Every journey is arranged with attention to detail, from the moment you book to the moment you arrive."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": {
+      "question": "How do I book a limousine?",
+      "answer": "Select a route or use the booking form, choose your date, time and details, then confirm and pay online."
+    },
+    "q2": {
+      "question": "Do I need an account?",
+      "answer": "No. You can book, pay and receive your confirmation entirely as a guest."
+    },
+    "q3": {
+      "question": "Can I book an airport transfer?",
+      "answer": "Yes, airport transfers are one of our core services — book them the same way as any other route."
+    },
+    "q4": {
+      "question": "How far in advance can I book?",
+      "answer": "Bookings require a minimum lead time, shown automatically during the booking process."
+    },
+    "q5": {
+      "question": "Can I cancel my booking?",
+      "answer": "Cancellations are handled by our team — please contact us using the details below."
+    },
+    "q6": {
+      "question": "What payment methods are accepted?",
+      "answer": "Payments are processed securely online through our payment provider."
+    },
+    "q7": {
+      "question": "Will I receive a confirmation?",
+      "answer": "Yes, a confirmation is sent to your email as soon as your booking is processed."
+    },
+    "q8": {
+      "question": "Can I change my pickup address?",
+      "answer": "Please contact us as soon as possible using the details below and we will assist you."
+    }
+  },
+  "contact": {
+    "title": "Need Assistance?",
+    "subtitle": "Our team is available to help with your journey.",
+    "callUs": "Call Us",
+    "emailUs": "Email Us",
+    "form": {
+      "title": "Send Us a Message",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "success": "Thank you — your message has been received."
+    }
+  },
+  "finalCta": {
+    "title": "Your Journey Starts Here",
+    "subtitle": "From airport transfers to private city-to-city journeys, travel with comfort, privacy and confidence.",
+    "cta": "Book a Ride"
+  },
+  "footer": {
+    "description": "Private chauffeur transportation across Switzerland.",
+    "navigation": "Navigation",
+    "services": "Services",
+    "contact": "Contact",
+    "rights": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsConditions": "Terms & Conditions",
+    "cookiePolicy": "Cookie Policy"
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms & Conditions",
+    "cookieTitle": "Cookie Policy",
+    "placeholder": "This page is a placeholder. The company's actual legal text has not yet been provided and will be published here once available."
+  },
+  "mobileMenu": {
+    "open": "Open menu",
+    "close": "Close menu"
+  },
+  "backToTop": "Back to top"
+}

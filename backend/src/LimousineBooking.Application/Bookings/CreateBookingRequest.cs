@@ -36,7 +36,7 @@ public class CreateBookingRequest
     public string? Notes { get; set; }
 
     /// <summary>
-    /// The language the customer was using in the booking form (en/de/fr/it) — captured
+    /// The language the customer was using in the booking form (en/de/fr) — captured
     /// so their confirmation email uses the same language later, regardless of what their
     /// browser is set to by then. Optional; an unsupported/missing value silently falls
     /// back to English (see Booking's constructor / SupportedLanguages.Normalize) rather

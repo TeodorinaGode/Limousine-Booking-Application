@@ -103,7 +103,6 @@ public class EmailTemplateRendererTests
     [Theory]
     [InlineData("de", "Buchung bestätigt")]
     [InlineData("fr", "Réservation confirmée")]
-    [InlineData("it", "Prenotazione confermata")]
     public void Render_SupportedNonEnglishLanguage_RendersLocalizedContent(string languageCode, string expectedHeading)
     {
         var result = CreateRenderer().Render("BookingConfirmed", languageCode, BookingConfirmedFields());

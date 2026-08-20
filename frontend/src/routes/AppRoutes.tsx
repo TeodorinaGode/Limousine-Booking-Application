@@ -3,6 +3,7 @@ import HomePage from "../pages/public/HomePage";
 import BookingPage from "../pages/public/BookingPage";
 import LoginPage from "../pages/auth/LoginPage";
 import UnauthorizedPage from "../pages/public/UnauthorizedPage";
+import NotFoundPage from "../pages/public/NotFoundPage";
 import DriverHomePage from "../pages/driver/DriverHomePage";
 import AvailabilityPage from "../pages/driver/AvailabilityPage";
 import SchedulePage from "../pages/driver/SchedulePage";
@@ -129,6 +130,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

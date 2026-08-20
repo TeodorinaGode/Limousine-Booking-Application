@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VehiclesPage from "./VehiclesPage";
 import * as vehicleService from "../../../services/vehicleService";
@@ -36,6 +37,14 @@ function pagedResult(items: VehicleDto[]): PagedResult<VehicleDto> {
   return { items, page: 1, pageSize: 20, totalCount: items.length, totalPages: 1 };
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <VehiclesPage />
+    </MemoryRouter>
+  );
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
@@ -54,7 +63,7 @@ describe("VehiclesPage", () => {
       pagedResult([makeVehicle(), makeVehicle({ id: "2", registrationNumber: "BS 789012", model: "S-Class" })])
     );
 
-    render(<VehiclesPage />);
+    renderPage();
 
     expect(await screen.findByText("V-Class")).toBeInTheDocument();
     expect(screen.getByText("S-Class")).toBeInTheDocument();
@@ -63,7 +72,7 @@ describe("VehiclesPage", () => {
   it("shows an error message when loading fails", async () => {
     mockedVehicleService.getVehicles.mockRejectedValue(new Error("Network error"));
 
-    render(<VehiclesPage />);
+    renderPage();
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Network error");
   });
@@ -72,7 +81,7 @@ describe("VehiclesPage", () => {
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([makeVehicle()]));
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.type(screen.getByLabelText("Search vehicles"), "Mercedes");
@@ -92,7 +101,7 @@ describe("VehiclesPage", () => {
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([makeVehicle()]));
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.selectOptions(screen.getByLabelText("Status:"), "active");
@@ -109,7 +118,7 @@ describe("VehiclesPage", () => {
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([makeVehicle()]));
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.selectOptions(screen.getByLabelText("Capacity:"), "5+");
@@ -126,10 +135,10 @@ describe("VehiclesPage", () => {
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([]));
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
-    await screen.findByText("No vehicles found.");
+    renderPage();
+    await screen.findByText("No Vehicles Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Vehicle" }));
+    await user.click(screen.getByRole("button", { name: "+ New Vehicle" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Registration number is required.")).toBeInTheDocument();
@@ -143,10 +152,10 @@ describe("VehiclesPage", () => {
     );
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
-    await screen.findByText("No vehicles found.");
+    renderPage();
+    await screen.findByText("No Vehicles Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Vehicle" }));
+    await user.click(screen.getByRole("button", { name: "+ New Vehicle" }));
     await user.type(screen.getByLabelText("Registration number"), "BS 123456");
     await user.type(screen.getByLabelText("Make"), "Mercedes-Benz");
     await user.type(screen.getByLabelText("Model"), "V-Class");
@@ -165,7 +174,7 @@ describe("VehiclesPage", () => {
     mockedVehicleService.updateVehicle.mockResolvedValue({ ...vehicle, model: "S-Class" });
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -190,7 +199,7 @@ describe("VehiclesPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
@@ -206,7 +215,7 @@ describe("VehiclesPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
-    render(<VehiclesPage />);
+    renderPage();
     await screen.findByText("V-Class");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));

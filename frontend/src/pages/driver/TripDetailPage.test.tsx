@@ -67,7 +67,7 @@ describe("TripDetailPage", () => {
     renderPage();
 
     expect(await screen.findByRole("button", { name: "Start Ride" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Mark Passenger Picked Up" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Passenger Picked Up" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Complete Ride" })).not.toBeInTheDocument();
   });
 
@@ -85,7 +85,7 @@ describe("TripDetailPage", () => {
         "test-token"
       );
     });
-    expect(await screen.findByRole("button", { name: "Mark Passenger Picked Up" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Passenger Picked Up" })).toBeInTheDocument();
     expect(await screen.findByRole("status")).toHaveTextContent("Ride started.");
   });
 
@@ -96,7 +96,7 @@ describe("TripDetailPage", () => {
 
     await screen.findByText("Trip LM-20261225-123456");
     expect(screen.queryByRole("button", { name: "Start Ride" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Mark Passenger Picked Up" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Passenger Picked Up" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Complete Ride" })).not.toBeInTheDocument();
   });
 
@@ -106,7 +106,7 @@ describe("TripDetailPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await user.click(await screen.findByRole("button", { name: "Mark Passenger Picked Up" }));
+    await user.click(await screen.findByRole("button", { name: "Passenger Picked Up" }));
 
     expect(await screen.findByText("The passenger has already been picked up.")).toBeInTheDocument();
   });

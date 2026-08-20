@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getMyProfile } from "../../services/driverBookingService";
+import DriverNav from "../../components/DriverNav";
+import PageHeader from "../../components/PageHeader";
 import type { DriverDto } from "../../types/driver";
 
 function ProfilePage() {
@@ -27,18 +28,17 @@ function ProfilePage() {
   }, [accessToken]);
 
   return (
-    <div>
-      <p>
-        <Link to="/driver">&larr; Back to Dashboard</Link>
-      </p>
-      <h1>My Profile</h1>
+    <div className="app-shell">
+      <DriverNav />
+      <main className="app-main app-main--narrow">
+      <PageHeader title="My Profile" />
 
       {error && <p role="alert">{error}</p>}
-      {isLoading && <p>Loading profile...</p>}
+      {isLoading && <div className="skeleton skeleton-line" style={{ height: 40, maxWidth: 300 }} />}
 
       {profile && (
         <>
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section className="card" style={{ marginBottom: "1.5rem" }}>
             <h2>Contact</h2>
             <p>
               {profile.firstName} {profile.lastName}
@@ -49,13 +49,13 @@ function ProfilePage() {
             </p>
           </section>
 
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section className="card" style={{ marginBottom: "1.5rem" }}>
             <h2>Status</h2>
             <p>Account: {profile.isActive ? "Active" : "Inactive"}</p>
             <p>Availability: {profile.isAvailable ? "Available" : "Unavailable"}</p>
           </section>
 
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section className="card">
             <h2>Vehicle</h2>
             {profile.vehicle ? (
               <p>
@@ -67,6 +67,7 @@ function ProfilePage() {
           </section>
         </>
       )}
+      </main>
     </div>
   );
 }

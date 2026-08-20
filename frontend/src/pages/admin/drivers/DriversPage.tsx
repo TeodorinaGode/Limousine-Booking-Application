@@ -10,6 +10,9 @@ import {
   updateDriver,
 } from "../../../services/driverService";
 import { getVehicles } from "../../../services/vehicleService";
+import AdminNav from "../../../components/AdminNav";
+import PageHeader from "../../../components/PageHeader";
+import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, AvailabilityFilter, DriverDto, VehicleFilter } from "../../../types/driver";
 import type { VehicleDto } from "../../../types/vehicle";
 import DriverFormModal, { type DriverFormValues } from "./DriverFormModal";
@@ -182,10 +185,20 @@ function DriversPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <div>
-      <h1>Driver Management</h1>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+      <PageHeader
+        title="Drivers"
+        description="Manage driver accounts, availability, and vehicle assignment."
+        actions={
+          <button type="button" onClick={() => setModalState({})}>
+            + New Driver
+          </button>
+        }
+      />
 
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <input
           type="search"
           placeholder="Search drivers..."
@@ -238,21 +251,24 @@ function DriversPage() {
             <option value="unassigned">Not Assigned</option>
           </select>
         </label>
-
-        <button type="button" onClick={() => setModalState({})}>
-          Add Driver
-        </button>
       </div>
 
       {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading drivers...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+        </div>
       ) : drivers.length === 0 ? (
-        <p>No drivers found.</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No Drivers Found</p>
+          <p>Try adjusting your filters.</p>
+        </div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto" }}>
+        <table>
           <thead>
             <tr>
               <th>Driver</th>
@@ -272,36 +288,43 @@ function DriversPage() {
                 </td>
                 <td>{driver.email}</td>
                 <td>{driver.phone}</td>
-                <td>{driver.isAvailable ? "Available" : "Unavailable"}</td>
-                <td>{driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}` : "Not assigned"}</td>
-                <td>{driver.isActive ? "Active" : "Inactive"}</td>
                 <td>
-                  <Link to={`/admin/drivers/${driver.id}`}>View Details</Link>{" "}
-                  <button type="button" onClick={() => setModalState({ driver })}>
-                    Edit
-                  </button>{" "}
-                  <button type="button" onClick={() => handleToggleActive(driver)}>
-                    {driver.isActive ? "Deactivate" : "Activate"}
-                  </button>{" "}
-                  <button type="button" onClick={() => setPasswordResetDriver(driver)}>
-                    Reset Password
-                  </button>
+                  <StatusBadge status={driver.isAvailable ? "Available" : "Unavailable"} />
+                </td>
+                <td>{driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}` : "Not assigned"}</td>
+                <td>
+                  <StatusBadge status={driver.isActive ? "Active" : "Inactive"} />
+                </td>
+                <td>
+                  <div className="row" style={{ gap: "var(--space-2)" }}>
+                    <Link to={`/admin/drivers/${driver.id}`}>View Details</Link>
+                    <button type="button" className="btn-ghost" onClick={() => setModalState({ driver })}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn-ghost" onClick={() => handleToggleActive(driver)}>
+                      {driver.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                    <button type="button" className="btn-ghost" onClick={() => setPasswordResetDriver(driver)}>
+                      Reset Password
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {totalPages > 1 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
-          </button>{" "}
+          </button>
           <span>
             Page {page} of {totalPages}
-          </span>{" "}
-          <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          </span>
+          <button type="button" className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
@@ -323,6 +346,7 @@ function DriversPage() {
           onClose={() => setPasswordResetDriver(null)}
         />
       )}
+      </main>
     </div>
   );
 }

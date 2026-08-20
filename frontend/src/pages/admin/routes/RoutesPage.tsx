@@ -7,6 +7,9 @@ import {
   getRoutes,
   updateRoute,
 } from "../../../services/routeService";
+import AdminNav from "../../../components/AdminNav";
+import PageHeader from "../../../components/PageHeader";
+import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, RouteDto } from "../../../types/route";
 import RouteFormModal, { type RouteFormValues } from "./RouteFormModal";
 
@@ -110,10 +113,20 @@ function RoutesPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <div>
-      <h1>Route Management</h1>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+      <PageHeader
+        title="Routes"
+        description="Manage the predefined trips customers can book."
+        actions={
+          <button type="button" onClick={() => setModalState({})}>
+            + New Route
+          </button>
+        }
+      />
 
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <input
           type="search"
           placeholder="Search routes..."
@@ -136,21 +149,24 @@ function RoutesPage() {
             <option value="inactive">Inactive</option>
           </select>
         </label>
-
-        <button type="button" onClick={() => setModalState({})}>
-          Add Route
-        </button>
       </div>
 
       {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading routes...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+        </div>
       ) : routes.length === 0 ? (
-        <p>No routes found.</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No Routes Found</p>
+          <p>Try adjusting your filters.</p>
+        </div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto" }}>
+        <table>
           <thead>
             <tr>
               <th>Departure</th>
@@ -170,30 +186,35 @@ function RoutesPage() {
                 <td>{route.estimatedDurationMinutes} min</td>
                 <td>{route.price.toFixed(2)}</td>
                 <td>{route.currency}</td>
-                <td>{route.isActive ? "Active" : "Inactive"}</td>
                 <td>
-                  <button type="button" onClick={() => setModalState({ route })}>
-                    Edit
-                  </button>{" "}
-                  <button type="button" onClick={() => handleToggleActive(route)}>
-                    {route.isActive ? "Deactivate" : "Activate"}
-                  </button>
+                  <StatusBadge status={route.isActive ? "Active" : "Inactive"} />
+                </td>
+                <td>
+                  <div className="row" style={{ gap: "var(--space-2)" }}>
+                    <button type="button" className="btn-ghost" onClick={() => setModalState({ route })}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn-ghost" onClick={() => handleToggleActive(route)}>
+                      {route.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {totalPages > 1 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
-          </button>{" "}
+          </button>
           <span>
             Page {page} of {totalPages}
-          </span>{" "}
-          <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          </span>
+          <button type="button" className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
@@ -202,6 +223,7 @@ function RoutesPage() {
       {modalState && (
         <RouteFormModal route={modalState.route} onSave={handleSave} onClose={() => setModalState(null)} />
       )}
+      </main>
     </div>
   );
 }

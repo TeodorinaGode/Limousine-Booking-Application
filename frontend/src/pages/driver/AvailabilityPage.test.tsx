@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AvailabilityPage from "./AvailabilityPage";
 import * as availabilityService from "../../services/availabilityService";
@@ -7,6 +8,7 @@ import * as authContext from "../../context/AuthContext";
 import type { AvailabilityDto, DriverScheduleDto } from "../../types/availability";
 
 vi.mock("../../services/availabilityService");
+vi.mock("../../services/driverBookingService");
 vi.mock("../../context/AuthContext", async () => {
   const actual = await vi.importActual<typeof authContext>("../../context/AuthContext");
   return { ...actual, useAuth: vi.fn() };
@@ -14,6 +16,14 @@ vi.mock("../../context/AuthContext", async () => {
 
 const mockedAvailabilityService = vi.mocked(availabilityService);
 const mockedUseAuth = vi.mocked(authContext.useAuth);
+
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <AvailabilityPage />
+    </MemoryRouter>
+  );
+}
 
 function makeAvailability(overrides: Partial<AvailabilityDto> = {}): AvailabilityDto {
   return {
@@ -50,7 +60,7 @@ describe("AvailabilityPage", () => {
   it("loads and displays current availability and the schedule", async () => {
     mockedAvailabilityService.getMySchedule.mockResolvedValue(schedule([makeAvailability()], true));
 
-    render(<AvailabilityPage />);
+    renderPage();
 
     // "Available" appears both as the current-status text and in the
     // schedule table's Status column, so expect exactly those two matches.
@@ -65,8 +75,8 @@ describe("AvailabilityPage", () => {
     mockedAvailabilityService.setCurrentAvailability.mockResolvedValue({ isAvailable: true });
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
-    await screen.findByText("No availability periods yet.");
+    renderPage();
+    await screen.findByText("No Availability Periods Yet");
 
     await user.click(screen.getByRole("button", { name: "Set Available" }));
 
@@ -80,8 +90,8 @@ describe("AvailabilityPage", () => {
     mockedAvailabilityService.getMySchedule.mockResolvedValue(schedule([]));
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
-    await screen.findByText("No availability periods yet.");
+    renderPage();
+    await screen.findByText("No Availability Periods Yet");
 
     await user.click(screen.getByRole("button", { name: "Add Availability" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -95,8 +105,8 @@ describe("AvailabilityPage", () => {
     mockedAvailabilityService.createAvailability.mockResolvedValue(makeAvailability());
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
-    await screen.findByText("No availability periods yet.");
+    renderPage();
+    await screen.findByText("No Availability Periods Yet");
 
     await user.click(screen.getByRole("button", { name: "Add Availability" }));
     await user.type(screen.getByLabelText("Date"), "2026-09-15");
@@ -120,8 +130,8 @@ describe("AvailabilityPage", () => {
     );
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
-    await screen.findByText("No availability periods yet.");
+    renderPage();
+    await screen.findByText("No Availability Periods Yet");
 
     await user.click(screen.getByRole("button", { name: "Add Availability" }));
     await user.type(screen.getByLabelText("Date"), "2026-09-15");
@@ -140,7 +150,7 @@ describe("AvailabilityPage", () => {
     mockedAvailabilityService.updateAvailability.mockResolvedValue({ ...item, endTime: "18:00:00" });
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
+    renderPage();
     await screen.findByText("08:00");
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -165,7 +175,7 @@ describe("AvailabilityPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
+    renderPage();
     await screen.findByText("08:00");
 
     await user.click(screen.getByRole("button", { name: "Remove" }));
@@ -182,7 +192,7 @@ describe("AvailabilityPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
-    render(<AvailabilityPage />);
+    renderPage();
     await screen.findByText("08:00");
 
     await user.click(screen.getByRole("button", { name: "Remove" }));

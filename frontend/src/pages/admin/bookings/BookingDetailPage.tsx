@@ -4,6 +4,8 @@ import { useAuth } from "../../../context/AuthContext";
 import { assignDriver, autoAssign, cancelBooking, getBookingById, resendConfirmation, updateBooking } from "../../../services/adminBookingService";
 import { getDrivers } from "../../../services/driverService";
 import { getRoutes } from "../../../services/routeService";
+import AdminNav from "../../../components/AdminNav";
+import StatusBadge from "../../../components/StatusBadge";
 import type { AdminBookingDetailDto, AssignDriverRequest, UpdateBookingRequest } from "../../../types/adminBooking";
 import type { DriverDto } from "../../../types/driver";
 import type { RouteDto } from "../../../types/route";
@@ -135,14 +137,32 @@ function BookingDetailPage() {
     }
   };
 
-  if (error && !booking) return <p role="alert">{error}</p>;
-  if (isLoading || !booking) return <p>Loading booking...</p>;
+  if (error && !booking)
+    return (
+      <div className="app-shell">
+        <AdminNav />
+        <main className="app-main">
+          <p role="alert">{error}</p>
+        </main>
+      </div>
+    );
+  if (isLoading || !booking)
+    return (
+      <div className="app-shell">
+        <AdminNav />
+        <main className="app-main">
+          <div className="skeleton skeleton-line" style={{ height: 40, maxWidth: 300 }} />
+        </main>
+      </div>
+    );
 
   const canEdit = booking.status !== "Cancelled" && booking.status !== "Completed";
   const canCancel = booking.status !== "Cancelled" && booking.status !== "Completed";
 
   return (
-    <div>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
       <p>
         <Link to="/admin/bookings">&larr; Back to Bookings</Link>
       </p>
@@ -151,12 +171,13 @@ function BookingDetailPage() {
       {error && <p role="alert">{error}</p>}
 
       <section style={{ marginBottom: "1.5rem" }}>
-        <h1>Booking Information</h1>
-        <p>Booking reference: {booking.bookingReference}</p>
-        <p>Status: {booking.status}</p>
-        <p>Ride status: {booking.rideStatus}</p>
+        <h1>{booking.bookingReference}</h1>
+        <div className="row">
+          <StatusBadge status={booking.status} />
+          <StatusBadge status={booking.rideStatus} />
+        </div>
         {booking.requiresManualAssignment && (
-          <p role="alert">Requires manual assignment: {booking.manualAssignmentReason}</p>
+          <p role="alert" style={{ marginTop: "var(--space-4)" }}>Requires manual assignment: {booking.manualAssignmentReason}</p>
         )}
         {booking.status === "Cancelled" && (
           <p>
@@ -222,7 +243,7 @@ function BookingDetailPage() {
       {booking.assignmentHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Assignment History</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table>
             <thead>
               <tr>
                 <th>Driver</th>
@@ -250,7 +271,7 @@ function BookingDetailPage() {
       {booking.rideStatusHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Ride Status History</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table>
             <thead>
               <tr>
                 <th>From</th>
@@ -271,29 +292,29 @@ function BookingDetailPage() {
         </section>
       )}
 
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+      <div className="row">
         {canEdit && (
-          <button type="button" onClick={() => setIsEditOpen(true)} disabled={isBusy}>
+          <button type="button" className="btn-secondary" onClick={() => setIsEditOpen(true)} disabled={isBusy}>
             Edit
           </button>
         )}
         {canEdit && (
-          <button type="button" onClick={() => setIsAssignOpen(true)} disabled={isBusy}>
+          <button type="button" className="btn-secondary" onClick={() => setIsAssignOpen(true)} disabled={isBusy}>
             {booking.driverId ? "Reassign Driver" : "Assign Driver"}
           </button>
         )}
         {canEdit && (
-          <button type="button" onClick={handleAutoAssign} disabled={isBusy}>
+          <button type="button" className="btn-secondary" onClick={handleAutoAssign} disabled={isBusy}>
             Run Automatic Assignment
           </button>
         )}
         {booking.status === "Confirmed" && (
-          <button type="button" onClick={handleResendConfirmation} disabled={isBusy}>
+          <button type="button" className="btn-secondary" onClick={handleResendConfirmation} disabled={isBusy}>
             Resend Confirmation Email
           </button>
         )}
         {canCancel && (
-          <button type="button" onClick={handleCancel} disabled={isBusy}>
+          <button type="button" className="btn-danger" onClick={handleCancel} disabled={isBusy}>
             Cancel Booking
           </button>
         )}
@@ -303,6 +324,7 @@ function BookingDetailPage() {
       {isAssignOpen && (
         <AssignBookingModal booking={booking} drivers={drivers} onAssign={handleAssign} onClose={() => setIsAssignOpen(false)} />
       )}
+      </main>
     </div>
   );
 }

@@ -5,6 +5,9 @@ import { getBookings } from "../../../services/adminBookingService";
 import { getDrivers } from "../../../services/driverService";
 import { getVehicles } from "../../../services/vehicleService";
 import { getRoutes } from "../../../services/routeService";
+import AdminNav from "../../../components/AdminNav";
+import PageHeader from "../../../components/PageHeader";
+import StatusBadge from "../../../components/StatusBadge";
 import type { AdminBookingListItemDto } from "../../../types/adminBooking";
 import type { DriverDto } from "../../../types/driver";
 import type { VehicleDto } from "../../../types/vehicle";
@@ -135,10 +138,12 @@ function BookingsPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <div>
-      <h1>Booking Management</h1>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+      <PageHeader title="Bookings" description="Manage customer reservations and upcoming trips." />
 
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <input
           type="search"
           placeholder="Search reference, name, email, phone..."
@@ -235,7 +240,7 @@ function BookingsPage() {
         </label>
       </div>
 
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <label>
           From:{" "}
           <input
@@ -294,11 +299,19 @@ function BookingsPage() {
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading bookings...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+        </div>
       ) : bookings.length === 0 ? (
-        <p>No bookings found.</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No Bookings Found</p>
+          <p>Try adjusting your filters.</p>
+        </div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto" }}>
+        <table>
           <thead>
             <tr>
               <th>Booking</th>
@@ -332,8 +345,12 @@ function BookingsPage() {
                 <td>
                   {booking.price.toFixed(2)} {booking.currency}
                 </td>
-                <td>{booking.status}</td>
-                <td>{booking.rideStatus}</td>
+                <td>
+                  <StatusBadge status={booking.status} />
+                </td>
+                <td>
+                  <StatusBadge status={booking.rideStatus} />
+                </td>
                 <td>{booking.driverName ?? "—"}</td>
                 <td>{booking.vehicleDescription ?? "—"}</td>
                 <td>{booking.assignment}</td>
@@ -344,21 +361,23 @@ function BookingsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {totalPages > 1 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
-          </button>{" "}
+          </button>
           <span>
             Page {page} of {totalPages}
-          </span>{" "}
-          <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          </span>
+          <button type="button" className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
       )}
+      </main>
     </div>
   );
 }

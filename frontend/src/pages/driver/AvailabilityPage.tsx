@@ -7,6 +7,9 @@ import {
   setCurrentAvailability,
   updateAvailability,
 } from "../../services/availabilityService";
+import DriverNav from "../../components/DriverNav";
+import PageHeader from "../../components/PageHeader";
+import StatusBadge from "../../components/StatusBadge";
 import type { AvailabilityDto } from "../../types/availability";
 import AvailabilityFormModal, { type AvailabilityFormValues } from "./AvailabilityFormModal";
 
@@ -114,12 +117,16 @@ function AvailabilityPage() {
   };
 
   return (
-    <div>
-      <h1>My Availability</h1>
+    <div className="app-shell">
+      <DriverNav />
+      <main className="app-main app-main--narrow">
+      <PageHeader title="My Availability" />
 
-      <section style={{ marginBottom: "1.5rem" }}>
+      <section className="card" style={{ marginBottom: "1.5rem" }}>
         <h2>Current availability</h2>
-        <p>{isCurrentlyAvailable ? "Available" : "Unavailable"}</p>
+        <p>
+          <StatusBadge status={isCurrentlyAvailable ? "Available" : "Unavailable"} />
+        </p>
         <button type="button" onClick={handleToggleCurrentAvailability} disabled={isTogglingAvailability || isLoading}>
           {isTogglingAvailability ? "Updating..." : isCurrentlyAvailable ? "Set Unavailable" : "Set Available"}
         </button>
@@ -129,7 +136,7 @@ function AvailabilityPage() {
       {error && <p role="alert">{error}</p>}
 
       <section>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <div className="row row--between" style={{ marginBottom: "1rem" }}>
           <h2 style={{ margin: 0 }}>Schedule</h2>
           <button type="button" onClick={() => setModalState({})}>
             Add Availability
@@ -137,11 +144,15 @@ function AvailabilityPage() {
         </div>
 
         {isLoading ? (
-          <p>Loading schedule...</p>
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
         ) : schedule.length === 0 ? (
-          <p>No availability periods yet.</p>
+          <div className="empty-state">
+            <p className="empty-state__title">No Availability Periods Yet</p>
+            <p>Add a period to start managing your schedule.</p>
+          </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table>
             <thead>
               <tr>
                 <th>Date</th>
@@ -158,20 +169,25 @@ function AvailabilityPage() {
                   <td>{formatDate(item.date)}</td>
                   <td>{formatTime(item.startTime)}</td>
                   <td>{formatTime(item.endTime)}</td>
-                  <td>{item.isAvailable ? "Available" : "Unavailable"}</td>
+                  <td>
+                    <StatusBadge status={item.isAvailable ? "Available" : "Unavailable"} />
+                  </td>
                   <td>{item.notes}</td>
                   <td>
-                    <button type="button" onClick={() => setModalState({ availability: item })}>
-                      Edit
-                    </button>{" "}
-                    <button type="button" onClick={() => handleDelete(item)}>
-                      Remove
-                    </button>
+                    <div className="row" style={{ gap: "var(--space-2)" }}>
+                      <button type="button" className="btn-ghost" onClick={() => setModalState({ availability: item })}>
+                        Edit
+                      </button>
+                      <button type="button" className="btn-ghost" onClick={() => handleDelete(item)}>
+                        Remove
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
 
@@ -182,6 +198,7 @@ function AvailabilityPage() {
           onClose={() => setModalState(null)}
         />
       )}
+      </main>
     </div>
   );
 }

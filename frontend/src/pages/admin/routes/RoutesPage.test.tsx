@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import RoutesPage from "./RoutesPage";
 import * as routeService from "../../../services/routeService";
@@ -35,6 +36,14 @@ function pagedResult(items: RouteDto[]): PagedResult<RouteDto> {
   return { items, page: 1, pageSize: 20, totalCount: items.length, totalPages: 1 };
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <RoutesPage />
+    </MemoryRouter>
+  );
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockedUseAuth.mockReturnValue({
@@ -53,7 +62,7 @@ describe("RoutesPage", () => {
       pagedResult([makeRoute(), makeRoute({ id: "2", departureLocation: "Basel", destination: "Bern" })])
     );
 
-    render(<RoutesPage />);
+    renderPage();
 
     expect(await screen.findByText("Zurich")).toBeInTheDocument();
     expect(screen.getByText("Bern")).toBeInTheDocument();
@@ -62,7 +71,7 @@ describe("RoutesPage", () => {
   it("shows an error message when loading fails", async () => {
     mockedRouteService.getRoutes.mockRejectedValue(new Error("Network error"));
 
-    render(<RoutesPage />);
+    renderPage();
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Network error");
   });
@@ -71,7 +80,7 @@ describe("RoutesPage", () => {
     mockedRouteService.getRoutes.mockResolvedValue(pagedResult([makeRoute()]));
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
+    renderPage();
     await screen.findByText("Zurich");
 
     await user.type(screen.getByLabelText("Search routes"), "Basel");
@@ -91,7 +100,7 @@ describe("RoutesPage", () => {
     mockedRouteService.getRoutes.mockResolvedValue(pagedResult([makeRoute()]));
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
+    renderPage();
     await screen.findByText("Zurich");
 
     await user.selectOptions(screen.getByLabelText("Status:"), "active");
@@ -108,10 +117,10 @@ describe("RoutesPage", () => {
     mockedRouteService.getRoutes.mockResolvedValue(pagedResult([]));
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
-    await screen.findByText("No routes found.");
+    renderPage();
+    await screen.findByText("No Routes Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Route" }));
+    await user.click(screen.getByRole("button", { name: "+ New Route" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Departure location is required.")).toBeInTheDocument();
@@ -124,7 +133,7 @@ describe("RoutesPage", () => {
     mockedRouteService.updateRoute.mockResolvedValue({ ...route, destination: "Bern" });
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
+    renderPage();
     await screen.findByText("Zurich");
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -149,7 +158,7 @@ describe("RoutesPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
+    renderPage();
     await screen.findByText("Zurich");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
@@ -165,7 +174,7 @@ describe("RoutesPage", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
-    render(<RoutesPage />);
+    renderPage();
     await screen.findByText("Zurich");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));

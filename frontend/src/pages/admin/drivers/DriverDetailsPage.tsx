@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { getDriverById } from "../../../services/driverService";
 import { getDriverSchedule } from "../../../services/availabilityService";
+import AdminNav from "../../../components/AdminNav";
+import StatusBadge from "../../../components/StatusBadge";
 import type { DriverDto } from "../../../types/driver";
 import type { AvailabilityDto } from "../../../types/availability";
 
@@ -61,11 +63,29 @@ function DriverDetailsPage() {
     loadSchedule();
   }, [loadSchedule]);
 
-  if (error) return <p role="alert">{error}</p>;
-  if (!driver) return <p>Loading driver...</p>;
+  if (error)
+    return (
+      <div className="app-shell">
+        <AdminNav />
+        <main className="app-main">
+          <p role="alert">{error}</p>
+        </main>
+      </div>
+    );
+  if (!driver)
+    return (
+      <div className="app-shell">
+        <AdminNav />
+        <main className="app-main">
+          <div className="skeleton skeleton-line" style={{ height: 40, maxWidth: 300 }} />
+        </main>
+      </div>
+    );
 
   return (
-    <div>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
       <p>
         <Link to="/admin/drivers">&larr; Back to Drivers</Link>
       </p>
@@ -81,14 +101,16 @@ function DriverDetailsPage() {
 
       <section style={{ marginBottom: "1.5rem" }}>
         <h2>Work Information</h2>
-        <p>Status: {driver.isActive ? "Active" : "Inactive"}</p>
-        <p>Availability: {isCurrentlyAvailable ? "Available" : "Unavailable"}</p>
+        <div className="row" style={{ marginBottom: "var(--space-3)" }}>
+          <StatusBadge status={driver.isActive ? "Active" : "Inactive"} />
+          <StatusBadge status={isCurrentlyAvailable ? "Available" : "Unavailable"} />
+        </div>
         <p>Vehicle: {driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model} - ${driver.vehicle.registrationNumber}` : "Not assigned"}</p>
       </section>
 
       <section>
         <h2>Availability Schedule</h2>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+        <div className="row" style={{ marginBottom: "1rem" }}>
           <label>
             From:{" "}
             <input type="date" aria-label="From date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
@@ -100,11 +122,15 @@ function DriverDetailsPage() {
         </div>
 
         {isLoading ? (
-          <p>Loading schedule...</p>
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
         ) : schedule.length === 0 ? (
-          <p>No availability periods found.</p>
+          <div className="empty-state">
+            <p className="empty-state__title">No Availability Periods</p>
+            <p>Nothing scheduled for this range.</p>
+          </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table>
             <thead>
               <tr>
                 <th>Date</th>
@@ -120,14 +146,18 @@ function DriverDetailsPage() {
                   <td>{formatDate(item.date)}</td>
                   <td>{formatTime(item.startTime)}</td>
                   <td>{formatTime(item.endTime)}</td>
-                  <td>{item.isAvailable ? "Available" : "Unavailable"}</td>
+                  <td>
+                    <StatusBadge status={item.isAvailable ? "Available" : "Unavailable"} />
+                  </td>
                   <td>{item.notes}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
+      </main>
     </div>
   );
 }

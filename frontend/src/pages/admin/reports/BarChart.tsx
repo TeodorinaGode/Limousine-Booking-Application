@@ -55,11 +55,32 @@ function BarChart({ series, data, height = 220, formatValue }: BarChartProps) {
                 return (
                   <g key={seriesIndex}>
                     <title>{`${datum.label}: ${format(value)}`}</title>
-                    <rect x={x} y={y} width={barWidth - 2} height={barHeight} fill={series[seriesIndex]?.color ?? "#4a6fa5"} />
+                    <rect
+                      x={x}
+                      y={y}
+                      width={barWidth - 2}
+                      height={barHeight}
+                      fill={series[seriesIndex]?.color ?? "var(--color-accent)"}
+                      rx={1}
+                    />
                   </g>
                 );
               })}
-              <text x={groupX + barGroupWidth / 2 - 4} y={height - 6} fontSize="10" textAnchor="middle">
+              <line
+                x1={groupX}
+                y1={height - 24}
+                x2={groupX + barGroupWidth}
+                y2={height - 24}
+                stroke="var(--color-border)"
+                strokeWidth={1}
+              />
+              <text
+                x={groupX + barGroupWidth / 2 - 4}
+                y={height - 6}
+                fontSize="10"
+                textAnchor="middle"
+                fill="var(--color-text-muted)"
+              >
                 {datum.label}
               </text>
             </g>

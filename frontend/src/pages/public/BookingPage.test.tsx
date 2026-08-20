@@ -51,7 +51,7 @@ function renderPage() {
 const FUTURE_DATE = "2099-01-01";
 
 async function fillStep1(user: ReturnType<typeof userEvent.setup>) {
-  await user.selectOptions(screen.getByLabelText("Route"), "11111111-1111-1111-1111-111111111111");
+  await user.click(screen.getByRole("radio", { name: /Basel.*Zurich/s }));
   const dateInput = screen.getByLabelText("Booking date");
   await user.clear(dateInput);
   await user.type(dateInput, FUTURE_DATE);
@@ -84,7 +84,7 @@ describe("BookingPage", () => {
     renderPage();
 
     await waitFor(() => expect(mockedBookingService.getActiveRoutes).toHaveBeenCalled());
-    expect(await screen.findByText(/Basel.*Zurich/)).toBeInTheDocument();
+    expect(await screen.findByRole("radio", { name: /Basel.*Zurich/s })).toBeInTheDocument();
   });
 
   it("shows an error when routes fail to load", async () => {

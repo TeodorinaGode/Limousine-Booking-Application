@@ -7,6 +7,9 @@ import {
   getVehicles,
   updateVehicle,
 } from "../../../services/vehicleService";
+import AdminNav from "../../../components/AdminNav";
+import PageHeader from "../../../components/PageHeader";
+import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, VehicleDto } from "../../../types/vehicle";
 import VehicleFormModal, { type VehicleFormValues } from "./VehicleFormModal";
 
@@ -125,10 +128,20 @@ function VehiclesPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <div>
-      <h1>Vehicle Management</h1>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+      <PageHeader
+        title="Vehicles"
+        description="Manage the fleet's active vehicles and capacity."
+        actions={
+          <button type="button" onClick={() => setModalState({})}>
+            + New Vehicle
+          </button>
+        }
+      />
 
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <input
           type="search"
           placeholder="Search vehicles..."
@@ -168,21 +181,24 @@ function VehiclesPage() {
             ))}
           </select>
         </label>
-
-        <button type="button" onClick={() => setModalState({})}>
-          Add Vehicle
-        </button>
       </div>
 
       {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading vehicles...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+        </div>
       ) : vehicles.length === 0 ? (
-        <p>No vehicles found.</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No Vehicles Found</p>
+          <p>Try adjusting your filters.</p>
+        </div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto" }}>
+        <table>
           <thead>
             <tr>
               <th>Registration</th>
@@ -202,30 +218,35 @@ function VehiclesPage() {
                 <td>{vehicle.model}</td>
                 <td>{vehicle.vehicleType}</td>
                 <td>{vehicle.passengerCapacity}</td>
-                <td>{vehicle.isActive ? "Active" : "Inactive"}</td>
                 <td>
-                  <button type="button" onClick={() => setModalState({ vehicle })}>
-                    Edit
-                  </button>{" "}
-                  <button type="button" onClick={() => handleToggleActive(vehicle)}>
-                    {vehicle.isActive ? "Deactivate" : "Activate"}
-                  </button>
+                  <StatusBadge status={vehicle.isActive ? "Active" : "Inactive"} />
+                </td>
+                <td>
+                  <div className="row" style={{ gap: "var(--space-2)" }}>
+                    <button type="button" className="btn-ghost" onClick={() => setModalState({ vehicle })}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn-ghost" onClick={() => handleToggleActive(vehicle)}>
+                      {vehicle.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {totalPages > 1 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
-          </button>{" "}
+          </button>
           <span>
             Page {page} of {totalPages}
-          </span>{" "}
-          <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          </span>
+          <button type="button" className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
@@ -234,6 +255,7 @@ function VehiclesPage() {
       {modalState && (
         <VehicleFormModal vehicle={modalState.vehicle} onSave={handleSave} onClose={() => setModalState(null)} />
       )}
+      </main>
     </div>
   );
 }

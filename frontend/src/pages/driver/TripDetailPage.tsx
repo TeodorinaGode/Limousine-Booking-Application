@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { completeRide, getMyBookingById, markPassengerPickedUp, startRide } from "../../services/driverBookingService";
+import DriverNav from "../../components/DriverNav";
+import StatusBadge from "../../components/StatusBadge";
 import type { DriverBookingDetailDto } from "../../types/driverBooking";
 
 function formatDate(dateIso: string): string {
@@ -64,11 +66,29 @@ function TripDetailPage() {
     }
   };
 
-  if (error && !trip) return <p role="alert">{error}</p>;
-  if (isLoading || !trip) return <p>Loading trip...</p>;
+  if (error && !trip)
+    return (
+      <div className="app-shell">
+        <DriverNav />
+        <main className="app-main app-main--narrow">
+          <p role="alert">{error}</p>
+        </main>
+      </div>
+    );
+  if (isLoading || !trip)
+    return (
+      <div className="app-shell">
+        <DriverNav />
+        <main className="app-main app-main--narrow">
+          <div className="skeleton skeleton-line" style={{ height: 40, maxWidth: 300 }} />
+        </main>
+      </div>
+    );
 
   return (
-    <div>
+    <div className="app-shell">
+      <DriverNav />
+      <main className="app-main app-main--narrow">
       <p>
         <Link to="/driver/schedule">&larr; Back to Schedule</Link>
       </p>
@@ -78,8 +98,10 @@ function TripDetailPage() {
 
       <section style={{ marginBottom: "1.5rem" }}>
         <h1>Trip {trip.bookingReference}</h1>
-        <p>Status: {trip.status}</p>
-        <p>Ride status: {trip.rideStatus}</p>
+        <div className="row">
+          <StatusBadge status={trip.status} />
+          <StatusBadge status={trip.rideStatus} />
+        </div>
       </section>
 
       <section style={{ marginBottom: "1.5rem" }}>
@@ -110,19 +132,24 @@ function TripDetailPage() {
         </section>
       )}
 
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
+      <div className="stack" style={{ marginBottom: "1.5rem" }}>
         {trip.rideStatus === "Upcoming" && (
-          <button type="button" onClick={() => runAction(startRide, "Ride started.")} disabled={isBusy}>
+          <button type="button" className="btn-block" onClick={() => runAction(startRide, "Ride started.")} disabled={isBusy}>
             Start Ride
           </button>
         )}
         {trip.rideStatus === "OnTheWay" && (
-          <button type="button" onClick={() => runAction(markPassengerPickedUp, "Passenger marked as picked up.")} disabled={isBusy}>
-            Mark Passenger Picked Up
+          <button
+            type="button"
+            className="btn-block"
+            onClick={() => runAction(markPassengerPickedUp, "Passenger marked as picked up.")}
+            disabled={isBusy}
+          >
+            Passenger Picked Up
           </button>
         )}
         {trip.rideStatus === "PassengerPickedUp" && (
-          <button type="button" onClick={() => runAction(completeRide, "Ride completed.")} disabled={isBusy}>
+          <button type="button" className="btn-block" onClick={() => runAction(completeRide, "Ride completed.")} disabled={isBusy}>
             Complete Ride
           </button>
         )}
@@ -131,7 +158,8 @@ function TripDetailPage() {
       {trip.rideStatusHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Ride Status History</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table>
             <thead>
               <tr>
                 <th>From</th>
@@ -149,8 +177,10 @@ function TripDetailPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </section>
       )}
+      </main>
     </div>
   );
 }

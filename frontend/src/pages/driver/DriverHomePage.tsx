@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getMyDashboard } from "../../services/driverBookingService";
+import DriverNav from "../../components/DriverNav";
 import type { DriverDashboardDto } from "../../types/driverBooking";
 import TripCard from "./TripCard";
 
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 18) return "Good Afternoon";
+  return "Good Evening";
+}
+
 function DriverHomePage() {
-  const { user, accessToken, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, accessToken } = useAuth();
 
   const [dashboard, setDashboard] = useState<DriverDashboardDto | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,61 +29,61 @@ function DriverHomePage() {
     })();
   }, [accessToken]);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-    <div>
-      <h1>Driver Dashboard</h1>
-      {user && (
-        <p>
-          Logged in as {user.firstName} {user.lastName} ({user.email})
+    <div className="app-shell">
+      <DriverNav />
+      <main className="app-main app-main--narrow">
+        <p className="hero__eyebrow" style={{ marginBottom: "var(--space-2)" }}>
+          {greeting()}
+          {user ? `, ${user.firstName.toUpperCase()}` : ""}
         </p>
-      )}
-      <nav>
-        <Link to="/driver/schedule">My Schedule</Link>
-        {" | "}
-        <Link to="/driver/availability">My Availability</Link>
-        {" | "}
-        <Link to="/driver/profile">My Profile</Link>
-      </nav>
-      <button type="button" onClick={handleLogout}>
-        Logout
-      </button>
+        <h1>Today&apos;s Operations</h1>
 
-      {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{error}</p>}
 
-      {dashboard && (
-        <>
-          <section style={{ marginTop: "1.5rem" }}>
-            <h2>Today</h2>
-            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-              <p>Currently: {dashboard.isAvailable ? "Available" : "Unavailable"}</p>
-              <p>Today&apos;s trips: {dashboard.todaysTripCount}</p>
-              <p>Completed today: {dashboard.completedTodayCount}</p>
-              <p>Upcoming trips: {dashboard.upcomingTripCount}</p>
-            </div>
-          </section>
-
-          {dashboard.nextTrip && (
-            <section style={{ marginTop: "1.5rem" }}>
-              <h2>Next Trip</h2>
-              <TripCard trip={dashboard.nextTrip} />
+        {dashboard && (
+          <>
+            <section style={{ marginTop: "var(--space-6)", marginBottom: "var(--space-8)" }}>
+              <div className="row">
+                <div className="metric-card">
+                  <div className="metric-card__label">Status</div>
+                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>
+                    Currently: {dashboard.isAvailable ? "Available" : "Unavailable"}
+                  </div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Today&apos;s trips: {dashboard.todaysTripCount}</div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Completed today: {dashboard.completedTodayCount}</div>
+                </div>
+                <div className="metric-card">
+                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Upcoming trips: {dashboard.upcomingTripCount}</div>
+                </div>
+              </div>
             </section>
-          )}
 
-          <section style={{ marginTop: "1.5rem" }}>
-            <h2>Today&apos;s Trips</h2>
-            {dashboard.todaysTrips.length === 0 ? (
-              <p>No trips scheduled for today.</p>
-            ) : (
-              dashboard.todaysTrips.map((trip) => <TripCard key={trip.id} trip={trip} />)
+            {dashboard.nextTrip && (
+              <section style={{ marginBottom: "var(--space-8)" }}>
+                <h2>Next Trip</h2>
+                <TripCard trip={dashboard.nextTrip} />
+              </section>
             )}
-          </section>
-        </>
-      )}
+
+            <section>
+              <h2>Today&apos;s Trips</h2>
+              {dashboard.todaysTrips.length === 0 ? (
+                <div className="empty-state">
+                  <p className="empty-state__title">No Upcoming Trips</p>
+                  <p>Your schedule is currently clear.</p>
+                </div>
+              ) : (
+                dashboard.todaysTrips.map((trip) => <TripCard key={trip.id} trip={trip} />)
+              )}
+            </section>
+          </>
+        )}
+      </main>
     </div>
   );
 }

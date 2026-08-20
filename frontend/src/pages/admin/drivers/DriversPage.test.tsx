@@ -174,9 +174,9 @@ describe("DriversPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await screen.findByText("No drivers found.");
+    await screen.findByText("No Drivers Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Driver" }));
+    await user.click(screen.getByRole("button", { name: "+ New Driver" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("First name is required.")).toBeInTheDocument();
@@ -191,9 +191,9 @@ describe("DriversPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await screen.findByText("No drivers found.");
+    await screen.findByText("No Drivers Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Driver" }));
+    await user.click(screen.getByRole("button", { name: "+ New Driver" }));
     await user.type(screen.getByLabelText("First name"), "John");
     await user.type(screen.getByLabelText("Last name"), "Smith");
     await user.type(screen.getByLabelText("Email"), "john.smith@example.com");
@@ -217,9 +217,9 @@ describe("DriversPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await screen.findByText("No drivers found.");
+    await screen.findByText("No Drivers Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Driver" }));
+    await user.click(screen.getByRole("button", { name: "+ New Driver" }));
     await user.type(screen.getByLabelText("First name"), "John");
     await user.type(screen.getByLabelText("Last name"), "Smith");
     await user.type(screen.getByLabelText("Email"), "john.smith@example.com");
@@ -236,9 +236,9 @@ describe("DriversPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await screen.findByText("No drivers found.");
+    await screen.findByText("No Drivers Found");
 
-    await user.click(screen.getByRole("button", { name: "Add Driver" }));
+    await user.click(screen.getByRole("button", { name: "+ New Driver" }));
     await user.type(screen.getByLabelText("First name"), "John");
     await user.type(screen.getByLabelText("Last name"), "Smith");
     await user.type(screen.getByLabelText("Email"), "john.smith@example.com");

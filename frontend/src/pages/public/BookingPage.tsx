@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { createBooking, getActiveRoutes } from "../../services/bookingService";
 import { ApiError } from "../../services/apiClient";
+import { APP_BRAND_NAME } from "../../config/brand";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -157,121 +158,160 @@ function BookingPage() {
       : "Your booking request has been received and is awaiting confirmation.";
 
     return (
-      <div>
-        <h1>{isConfirmed ? "Booking Confirmed" : "Booking Received"}</h1>
-        <p role="status">{statusMessage}</p>
-        <dl>
-          <dt>Booking reference</dt>
-          <dd>{confirmedBooking.bookingReference}</dd>
+      <div className="container container--narrow fade-in" style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)", textAlign: "center" }}>
+        <div className="card">
+          {isConfirmed && (
+            <div aria-hidden="true" style={{ fontSize: "1.5rem", marginBottom: "var(--space-3)" }}>
+              ✓
+            </div>
+          )}
+          <p className="hero__eyebrow" style={{ marginBottom: "var(--space-4)" }}>
+            {isConfirmed ? "Booking Confirmed" : "Booking Received"}
+          </p>
+          <h1 style={{ fontSize: "1.5rem", textTransform: "uppercase" }}>{confirmedBooking.bookingReference}</h1>
+          <p role="status" style={{ display: "inline-block" }}>{statusMessage}</p>
 
-          <dt>Status</dt>
-          <dd>{confirmedBooking.status}</dd>
+          <dl style={{ textAlign: "left", marginTop: "var(--space-8)" }}>
+            <dt>Trip</dt>
+            <dd>
+              {confirmedBooking.route.departureLocation} &rarr; {confirmedBooking.route.destination}
+            </dd>
 
-          <dt>Trip</dt>
-          <dd>
-            {confirmedBooking.route.departureLocation} &rarr; {confirmedBooking.route.destination}
-          </dd>
+            <dt>Date &amp; time</dt>
+            <dd>
+              {confirmedBooking.bookingDate} at {confirmedBooking.pickupTime.slice(0, 5)}
+            </dd>
 
-          <dt>Date &amp; time</dt>
-          <dd>
-            {confirmedBooking.bookingDate} at {confirmedBooking.pickupTime.slice(0, 5)}
-          </dd>
+            <dt>Pickup address</dt>
+            <dd>{confirmedBooking.pickupAddress}</dd>
 
-          <dt>Pickup address</dt>
-          <dd>{confirmedBooking.pickupAddress}</dd>
+            <dt>Passengers</dt>
+            <dd>{confirmedBooking.passengerCount}</dd>
 
-          <dt>Passengers</dt>
-          <dd>{confirmedBooking.passengerCount}</dd>
+            <dt>Price</dt>
+            <dd>
+              {confirmedBooking.price.toFixed(2)} {confirmedBooking.currency}
+            </dd>
+          </dl>
 
-          <dt>Price</dt>
-          <dd>
-            {confirmedBooking.price.toFixed(2)} {confirmedBooking.currency}
-          </dd>
-        </dl>
-        <p>
-          {isConfirmed
-            ? "We look forward to driving you."
-            : "A member of our team will contact you to confirm the details of your ride."}
+          <p style={{ marginTop: "var(--space-8)" }}>
+            {isConfirmed
+              ? "We look forward to driving you."
+              : "A member of our team will contact you to confirm the details of your ride."}
+          </p>
+          <p className="text-muted" style={{ fontSize: "0.8rem" }}>A confirmation has been sent to your email.</p>
+        </div>
+        <p style={{ marginTop: "var(--space-6)" }}>
+          <Link to="/">Return to home</Link>
         </p>
-        <Link to="/">Return to home</Link>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1>Book a Ride</h1>
-      <p>
-        Step {step} of 4: {STEP_TITLES[step]}
+    <div className="container container--medium" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-16)" }}>
+      <p className="site-nav__brand" style={{ marginBottom: "var(--space-6)" }}>
+        <Link to="/">{APP_BRAND_NAME}</Link>
       </p>
+      <h1>Book Your Ride</h1>
+
+      <div className="progress-steps" role="list" aria-label="Booking progress">
+        {([1, 2, 3, 4] as const).map((s) => (
+          <div key={s} className="progress-step" role="listitem">
+            <span className={`progress-step__label${s === step ? " progress-step--active" : ""}${s < step ? " progress-step--done" : ""}`}>
+              0{s} {STEP_TITLES[s]}
+            </span>
+            {s < 4 && <span className={`progress-step__line${s < step ? " progress-step--done" : ""}`} />}
+          </div>
+        ))}
+      </div>
 
       {loadError && <p role="alert">{loadError}</p>}
 
       {isLoadingRoutes ? (
-        <p>Loading available routes...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 90 }} />
+          <div className="skeleton skeleton-line" style={{ height: 90 }} />
+        </div>
       ) : (
         <form onSubmit={step < 4 ? goToNextStep : (e) => e.preventDefault()} noValidate>
           {step === 1 && (
             <>
-              <div>
-                <label htmlFor="routeId">Route</label>
-                <br />
-                <select
-                  id="routeId"
-                  value={values.routeId}
-                  onChange={(e) => setValues({ ...values, routeId: e.target.value })}
-                >
-                  <option value="">Select a route...</option>
-                  {routes.map((route) => (
-                    <option key={route.id} value={route.id}>
-                      {route.departureLocation} &rarr; {route.destination} ({route.price.toFixed(2)} {route.currency})
-                    </option>
-                  ))}
-                </select>
-                {errors.routeId && <p role="alert">{errors.routeId}</p>}
+              <div className="form-group">
+                <label>Route</label>
+                {errors.routeId && <p className="form-error">{errors.routeId}</p>}
+                <div className="stack" role="radiogroup" aria-label="Route">
+                  {routes.map((route) => {
+                    const isSelected = values.routeId === route.id;
+                    return (
+                      <button
+                        type="button"
+                        key={route.id}
+                        role="radio"
+                        aria-checked={isSelected}
+                        className={`trip-card${isSelected ? " trip-card--selected" : ""}`}
+                        style={{ textAlign: "left", background: isSelected ? "var(--color-surface-elevated)" : undefined, width: "100%" }}
+                        onClick={() => setValues({ ...values, routeId: route.id })}
+                      >
+                        <div className="trip-card__route">
+                          <span>{route.departureLocation}</span>
+                          <span className="trip-card__arrow">&rarr;</span>
+                          <span>{route.destination}</span>
+                        </div>
+                        <p className="trip-card__meta">Approx. {route.estimatedDurationMinutes} min</p>
+                        <p className="trip-card__price">
+                          {route.price.toFixed(2)} {route.currency}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="bookingDate">Booking date</label>
-                <br />
-                <input
-                  id="bookingDate"
-                  type="date"
-                  value={values.bookingDate}
-                  onChange={(e) => setValues({ ...values, bookingDate: e.target.value })}
-                />
-                {errors.bookingDate && <p role="alert">{errors.bookingDate}</p>}
-              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label htmlFor="bookingDate">Booking date</label>
+                  <br />
+                  <input
+                    id="bookingDate"
+                    type="date"
+                    value={values.bookingDate}
+                    onChange={(e) => setValues({ ...values, bookingDate: e.target.value })}
+                  />
+                  {errors.bookingDate && <p className="form-error">{errors.bookingDate}</p>}
+                </div>
 
-              <div>
-                <label htmlFor="pickupTime">Pickup time</label>
-                <br />
-                <input
-                  id="pickupTime"
-                  type="time"
-                  value={values.pickupTime}
-                  onChange={(e) => setValues({ ...values, pickupTime: e.target.value })}
-                />
-                {errors.pickupTime && <p role="alert">{errors.pickupTime}</p>}
+                <div className="form-group">
+                  <label htmlFor="pickupTime">Pickup time</label>
+                  <br />
+                  <input
+                    id="pickupTime"
+                    type="time"
+                    value={values.pickupTime}
+                    onChange={(e) => setValues({ ...values, pickupTime: e.target.value })}
+                  />
+                  {errors.pickupTime && <p className="form-error">{errors.pickupTime}</p>}
+                </div>
               </div>
             </>
           )}
 
           {step === 2 && (
             <>
-              <div>
+              <div className="form-group">
                 <label htmlFor="pickupAddress">Pickup address</label>
                 <br />
                 <input
                   id="pickupAddress"
                   type="text"
+                  placeholder="Enter pickup address"
                   value={values.pickupAddress}
                   onChange={(e) => setValues({ ...values, pickupAddress: e.target.value })}
                 />
-                {errors.pickupAddress && <p role="alert">{errors.pickupAddress}</p>}
+                {errors.pickupAddress && <p className="form-error">{errors.pickupAddress}</p>}
               </div>
 
-              <div>
+              <div className="form-group">
                 <label htmlFor="passengerCount">Number of passengers</label>
                 <br />
                 <input
@@ -281,14 +321,15 @@ function BookingPage() {
                   value={values.passengerCount}
                   onChange={(e) => setValues({ ...values, passengerCount: Number(e.target.value) })}
                 />
-                {errors.passengerCount && <p role="alert">{errors.passengerCount}</p>}
+                {errors.passengerCount && <p className="form-error">{errors.passengerCount}</p>}
               </div>
 
-              <div>
+              <div className="form-group">
                 <label htmlFor="notes">Notes (optional)</label>
                 <br />
                 <textarea
                   id="notes"
+                  placeholder="Optional notes"
                   value={values.notes}
                   onChange={(e) => setValues({ ...values, notes: e.target.value })}
                 />
@@ -298,31 +339,33 @@ function BookingPage() {
 
           {step === 3 && (
             <>
-              <div>
-                <label htmlFor="customerFirstName">First name</label>
-                <br />
-                <input
-                  id="customerFirstName"
-                  type="text"
-                  value={values.customerFirstName}
-                  onChange={(e) => setValues({ ...values, customerFirstName: e.target.value })}
-                />
-                {errors.customerFirstName && <p role="alert">{errors.customerFirstName}</p>}
+              <div className="row">
+                <div className="form-group">
+                  <label htmlFor="customerFirstName">First name</label>
+                  <br />
+                  <input
+                    id="customerFirstName"
+                    type="text"
+                    value={values.customerFirstName}
+                    onChange={(e) => setValues({ ...values, customerFirstName: e.target.value })}
+                  />
+                  {errors.customerFirstName && <p className="form-error">{errors.customerFirstName}</p>}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="customerLastName">Last name</label>
+                  <br />
+                  <input
+                    id="customerLastName"
+                    type="text"
+                    value={values.customerLastName}
+                    onChange={(e) => setValues({ ...values, customerLastName: e.target.value })}
+                  />
+                  {errors.customerLastName && <p className="form-error">{errors.customerLastName}</p>}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="customerLastName">Last name</label>
-                <br />
-                <input
-                  id="customerLastName"
-                  type="text"
-                  value={values.customerLastName}
-                  onChange={(e) => setValues({ ...values, customerLastName: e.target.value })}
-                />
-                {errors.customerLastName && <p role="alert">{errors.customerLastName}</p>}
-              </div>
-
-              <div>
+              <div className="form-group">
                 <label htmlFor="customerEmail">Email</label>
                 <br />
                 <input
@@ -331,10 +374,10 @@ function BookingPage() {
                   value={values.customerEmail}
                   onChange={(e) => setValues({ ...values, customerEmail: e.target.value })}
                 />
-                {errors.customerEmail && <p role="alert">{errors.customerEmail}</p>}
+                {errors.customerEmail && <p className="form-error">{errors.customerEmail}</p>}
               </div>
 
-              <div>
+              <div className="form-group">
                 <label htmlFor="customerPhone">Phone</label>
                 <br />
                 <input
@@ -343,13 +386,13 @@ function BookingPage() {
                   value={values.customerPhone}
                   onChange={(e) => setValues({ ...values, customerPhone: e.target.value })}
                 />
-                {errors.customerPhone && <p role="alert">{errors.customerPhone}</p>}
+                {errors.customerPhone && <p className="form-error">{errors.customerPhone}</p>}
               </div>
             </>
           )}
 
           {step === 4 && selectedRoute && (
-            <dl>
+            <dl className="card">
               <dt>Trip</dt>
               <dd>
                 {selectedRoute.departureLocation} &rarr; {selectedRoute.destination}
@@ -393,12 +436,12 @@ function BookingPage() {
 
           {submitError && <p role="alert">{submitError}</p>}
 
-          <div style={{ marginTop: "1rem" }}>
+          <div className="row" style={{ marginTop: "var(--space-6)" }}>
             {step > 1 && (
-              <button type="button" onClick={goToPreviousStep} disabled={isSubmitting}>
+              <button type="button" className="btn-secondary" onClick={goToPreviousStep} disabled={isSubmitting}>
                 Back
               </button>
-            )}{" "}
+            )}
             {step < 4 ? (
               <button type="submit">Next</button>
             ) : (

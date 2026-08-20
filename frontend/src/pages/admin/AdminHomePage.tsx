@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboard } from "../../services/adminBookingService";
 import { getSummary } from "../../services/reportService";
+import AdminNav from "../../components/AdminNav";
+import PageHeader from "../../components/PageHeader";
+import StatusBadge from "../../components/StatusBadge";
 import type { AdminDashboardDto } from "../../types/adminBooking";
 import type { ReportSummaryDto } from "../../types/reports";
 
@@ -23,9 +26,17 @@ function formatTime(time: string): string {
   return time.slice(0, 5);
 }
 
+function MetricCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="metric-card">
+      <div className="metric-card__label">{label}</div>
+      <div className="metric-card__value">{value}</div>
+    </div>
+  );
+}
+
 function AdminHomePage() {
-  const { user, accessToken, logout } = useAuth();
-  const navigate = useNavigate();
+  const { accessToken } = useAuth();
 
   const [dashboard, setDashboard] = useState<AdminDashboardDto | null>(null);
   const [monthSummary, setMonthSummary] = useState<ReportSummaryDto | null>(null);
@@ -47,108 +58,101 @@ function AdminHomePage() {
     })();
   }, [accessToken]);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-    <div>
-      <h1>Administrator Application</h1>
-      {user && (
-        <p>
-          Logged in as {user.firstName} {user.lastName} ({user.email})
-        </p>
-      )}
-      <nav>
-        <Link to="/admin/bookings">Manage Bookings</Link>
-        {" | "}
-        <Link to="/admin/routes">Manage Routes</Link>
-        {" | "}
-        <Link to="/admin/vehicles">Manage Vehicles</Link>
-        {" | "}
-        <Link to="/admin/drivers">Manage Drivers</Link>
-        {" | "}
-        <Link to="/admin/reports">Reports</Link>
-      </nav>
-      <button type="button" onClick={handleLogout}>
-        Logout
-      </button>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+        <PageHeader title="Dashboard" description="Operational overview of bookings, revenue, and today's activity." />
 
-      {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{error}</p>}
 
-      {dashboard && (
-        <>
-          <section style={{ marginTop: "1.5rem" }}>
-            <h2>Overview</h2>
-            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-              <p>Total bookings: {dashboard.totalBookings}</p>
-              <p>Today&apos;s bookings: {dashboard.todaysBookings}</p>
-              <p>Pending: {dashboard.pendingBookings}</p>
-              <p>Requires manual assignment: {dashboard.requiresManualAssignmentCount}</p>
-              <p>Confirmed: {dashboard.confirmedBookings}</p>
-              <p>Cancelled: {dashboard.cancelledBookings}</p>
-              <p>Upcoming trips: {dashboard.upcomingTripsCount}</p>
-              {monthSummary && <p>Completed: {monthSummary.completedBookings}</p>}
-              {monthSummary && (
-                <p>
-                  Revenue this month: {monthSummary.currency} {monthSummary.grossRevenue.toFixed(2)}
-                </p>
+        {dashboard && (
+          <>
+            <section style={{ marginBottom: "var(--space-8)" }}>
+              <div className="row">
+                <MetricCard label="Total Bookings" value={dashboard.totalBookings} />
+                <MetricCard label="Today" value={dashboard.todaysBookings} />
+                <MetricCard label="Pending" value={dashboard.pendingBookings} />
+                <MetricCard label="Manual Assignment Required" value={dashboard.requiresManualAssignmentCount} />
+                <MetricCard label="Confirmed" value={dashboard.confirmedBookings} />
+                <MetricCard label="Cancelled" value={dashboard.cancelledBookings} />
+                <MetricCard label="Upcoming Trips" value={dashboard.upcomingTripsCount} />
+                {monthSummary && (
+                  <div className="metric-card">
+                    <div className="metric-card__value" style={{ fontSize: "1rem", fontWeight: 600 }}>
+                      Completed: {monthSummary.completedBookings}
+                    </div>
+                  </div>
+                )}
+                {monthSummary && (
+                  <div className="metric-card">
+                    <div className="metric-card__value" style={{ fontSize: "1rem", fontWeight: 600 }}>
+                      Revenue this month: {monthSummary.currency} {monthSummary.grossRevenue.toFixed(2)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section style={{ marginBottom: "var(--space-8)" }}>
+              <h2>Notifications</h2>
+              <div className="row" style={{ marginTop: "var(--space-4)" }}>
+                <p>Pending: {dashboard.notifications.pending}</p>
+                <p>Retrying: {dashboard.notifications.retrying}</p>
+                <p>Failed: {dashboard.notifications.failed}</p>
+                <p>Sent today: {dashboard.notifications.sentToday}</p>
+              </div>
+            </section>
+
+            <section>
+              <h2>Upcoming Bookings</h2>
+              {dashboard.upcomingBookings.length === 0 ? (
+                <div className="empty-state">
+                  <p className="empty-state__title">No Upcoming Trips</p>
+                  <p>The schedule is currently clear.</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Time</th>
+                        <th>Route</th>
+                        <th>Customer</th>
+                        <th>Driver</th>
+                        <th>Vehicle</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboard.upcomingBookings.map((item) => (
+                        <tr key={item.id}>
+                          <td>
+                            <Link to={`/admin/bookings/${item.id}`}>
+                              {formatDate(item.bookingDate)} {formatTime(item.pickupTime)}
+                            </Link>
+                          </td>
+                          <td>
+                            {item.route.departureLocation} &rarr; {item.route.destination}
+                          </td>
+                          <td>
+                            {item.customerFirstName} {item.customerLastName}
+                          </td>
+                          <td>{item.driverName ?? "—"}</td>
+                          <td>{item.vehicleDescription ?? "—"}</td>
+                          <td>
+                            <StatusBadge status={item.status} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-            </div>
-          </section>
-
-          <section style={{ marginTop: "1.5rem" }}>
-            <h2>Notifications</h2>
-            <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-              <p>Pending: {dashboard.notifications.pending}</p>
-              <p>Retrying: {dashboard.notifications.retrying}</p>
-              <p>Failed: {dashboard.notifications.failed}</p>
-              <p>Sent today: {dashboard.notifications.sentToday}</p>
-            </div>
-          </section>
-
-          <section style={{ marginTop: "1.5rem" }}>
-            <h2>Upcoming Bookings</h2>
-            {dashboard.upcomingBookings.length === 0 ? (
-              <p>No upcoming bookings.</p>
-            ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th>Time</th>
-                    <th>Route</th>
-                    <th>Customer</th>
-                    <th>Driver</th>
-                    <th>Vehicle</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dashboard.upcomingBookings.map((item) => (
-                    <tr key={item.id}>
-                      <td>
-                        <Link to={`/admin/bookings/${item.id}`}>
-                          {formatDate(item.bookingDate)} {formatTime(item.pickupTime)}
-                        </Link>
-                      </td>
-                      <td>
-                        {item.route.departureLocation} &rarr; {item.route.destination}
-                      </td>
-                      <td>
-                        {item.customerFirstName} {item.customerLastName}
-                      </td>
-                      <td>{item.driverName ?? "—"}</td>
-                      <td>{item.vehicleDescription ?? "—"}</td>
-                      <td>{item.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
-        </>
-      )}
+            </section>
+          </>
+        )}
+      </main>
     </div>
   );
 }

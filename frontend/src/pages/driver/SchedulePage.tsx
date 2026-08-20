@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getMyBookings } from "../../services/driverBookingService";
+import DriverNav from "../../components/DriverNav";
+import PageHeader from "../../components/PageHeader";
 import type { DriverBookingListItemDto } from "../../types/driverBooking";
 import TripCard from "./TripCard";
 
@@ -74,13 +75,12 @@ function SchedulePage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <div>
-      <p>
-        <Link to="/driver">&larr; Back to Dashboard</Link>
-      </p>
-      <h1>My Schedule</h1>
+    <div className="app-shell">
+      <DriverNav />
+      <main className="app-main app-main--narrow">
+      <PageHeader title="My Schedule" description="Upcoming trips assigned to you." />
 
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="row" style={{ marginBottom: "1rem" }}>
         <label>
           From:{" "}
           <input
@@ -105,19 +105,19 @@ function SchedulePage() {
             }}
           />
         </label>
-        <button type="button" onClick={() => applyQuickDateFilter(todayIso(), todayIso())}>
+        <button type="button" className="btn-secondary" onClick={() => applyQuickDateFilter(todayIso(), todayIso())}>
           Today
         </button>
-        <button type="button" onClick={() => applyQuickDateFilter(addDaysIso(1), addDaysIso(1))}>
+        <button type="button" className="btn-secondary" onClick={() => applyQuickDateFilter(addDaysIso(1), addDaysIso(1))}>
           Tomorrow
         </button>
-        <button type="button" onClick={() => applyQuickDateFilter(startOfWeekIso(), endOfWeekIso())}>
+        <button type="button" className="btn-secondary" onClick={() => applyQuickDateFilter(startOfWeekIso(), endOfWeekIso())}>
           This week
         </button>
-        <button type="button" onClick={() => applyQuickDateFilter(todayIso(), addDaysIso(7))}>
+        <button type="button" className="btn-secondary" onClick={() => applyQuickDateFilter(todayIso(), addDaysIso(7))}>
           Next 7 days
         </button>
-        <button type="button" onClick={() => loadTrips()}>
+        <button type="button" className="btn-ghost" onClick={() => loadTrips()}>
           Refresh
         </button>
       </div>
@@ -125,26 +125,33 @@ function SchedulePage() {
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading schedule...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 90 }} />
+          <div className="skeleton skeleton-line" style={{ height: 90 }} />
+        </div>
       ) : trips.length === 0 ? (
-        <p>No trips in this date range.</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No Trips Found</p>
+          <p>Nothing scheduled for this date range.</p>
+        </div>
       ) : (
         trips.map((trip) => <TripCard key={trip.id} trip={trip} />)
       )}
 
       {totalPages > 1 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="row" style={{ marginTop: "1rem" }}>
+          <button type="button" className="btn-secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
-          </button>{" "}
+          </button>
           <span>
             Page {page} of {totalPages}
-          </span>{" "}
-          <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          </span>
+          <button type="button" className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
       )}
+      </main>
     </div>
   );
 }

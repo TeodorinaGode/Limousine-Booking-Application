@@ -20,6 +20,9 @@ import {
   getVehicleUsage,
 } from "../../../services/reportService";
 import { getBookings } from "../../../services/adminBookingService";
+import AdminNav from "../../../components/AdminNav";
+import PageHeader from "../../../components/PageHeader";
+import StatusBadge from "../../../components/StatusBadge";
 import type {
   AssignmentReportDto,
   BookingStatusDistributionDto,
@@ -196,18 +199,20 @@ function ReportsPage() {
   const totalBookingsReportPages = Math.max(1, Math.ceil(bookingReportTotal / PAGE_SIZE));
 
   return (
-    <div>
-      <p>
-        <Link to="/admin">&larr; Back to Dashboard</Link>
-      </p>
-      <h1>Reports</h1>
+    <div className="app-shell">
+      <AdminNav />
+      <main className="app-main">
+      <PageHeader title="Reports" description="Business and operational overview." />
 
       <DateRangeFilter dateFrom={dateFrom} dateTo={dateTo} onChange={handleDateChange} />
 
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
-        <p>Loading reports...</p>
+        <div className="stack">
+          <div className="skeleton skeleton-line" style={{ height: 40 }} />
+          <div className="skeleton skeleton-line" style={{ height: 90 }} />
+        </div>
       ) : (
         summary && (
           <>
@@ -245,10 +250,10 @@ function ReportsPage() {
             <ChartCard title="Bookings Trend" isLoading={false} error={null} isEmpty={bookingsByDay.length === 0}>
               <BarChart
                 series={[
-                  { name: "Completed", color: "#3d8b57" },
-                  { name: "Cancelled", color: "#b3423f" },
-                  { name: "Pending", color: "#c9a227" },
-                  { name: "Confirmed", color: "#4a6fa5" },
+                  { name: "Completed", color: "#f5f5f5" },
+                  { name: "Cancelled", color: "#4a4a4a" },
+                  { name: "Pending", color: "#8a8a8a" },
+                  { name: "Confirmed", color: "#c4c4c4" },
                 ]}
                 data={bookingsByDay.map((d) => ({
                   label: formatDate(d.date),
@@ -259,7 +264,7 @@ function ReportsPage() {
 
             <ChartCard title="Revenue Trend" isLoading={false} error={null} isEmpty={revenueByDay.length === 0}>
               <BarChart
-                series={[{ name: "Revenue", color: "#4a6fa5" }]}
+                series={[{ name: "Revenue", color: "#d8d8d8" }]}
                 data={revenueByDay.map((d) => ({ label: formatDate(d.date), values: [d.revenue] }))}
                 formatValue={(v) => `${summary.currency} ${v.toFixed(2)}`}
               />
@@ -525,8 +530,12 @@ function ReportsPage() {
                 </td>
                 <td>{b.driverName ?? "—"}</td>
                 <td>{b.vehicleDescription ?? "—"}</td>
-                <td>{b.status}</td>
-                <td>{b.rideStatus}</td>
+                <td>
+                  <StatusBadge status={b.status} />
+                </td>
+                <td>
+                  <StatusBadge status={b.rideStatus} />
+                </td>
                 <td>
                   <Link to={`/admin/bookings/${b.id}`}>View</Link>
                 </td>
@@ -577,7 +586,9 @@ function ReportsPage() {
                 <td>
                   {b.currency} {b.price.toFixed(2)}
                 </td>
-                <td>{b.status}</td>
+                <td>
+                  <StatusBadge status={b.status} />
+                </td>
                 <td>
                   <Link to={`/admin/bookings/${b.id}`}>View</Link>
                 </td>
@@ -603,6 +614,7 @@ function ReportsPage() {
           </button>
         </div>
       )}
+      </main>
     </div>
   );
 }

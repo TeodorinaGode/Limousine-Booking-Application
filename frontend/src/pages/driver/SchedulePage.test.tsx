@@ -73,7 +73,7 @@ describe("SchedulePage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("No trips in this date range.")).toBeInTheDocument();
+    expect(await screen.findByText("No Trips Found")).toBeInTheDocument();
   });
 
   it("reloads with the Today quick filter", async () => {
@@ -81,7 +81,7 @@ describe("SchedulePage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await screen.findByText("No trips in this date range.");
+    await screen.findByText("No Trips Found");
     mockedDriverBookingService.getMyBookings.mockClear();
 
     await user.click(screen.getByRole("button", { name: "Today" }));

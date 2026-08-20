@@ -85,7 +85,7 @@ describe("DriverHomePage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("No trips scheduled for today.")).toBeInTheDocument();
+    expect(await screen.findByText("No Upcoming Trips")).toBeInTheDocument();
     expect(screen.queryByText("Next Trip")).not.toBeInTheDocument();
   });
 

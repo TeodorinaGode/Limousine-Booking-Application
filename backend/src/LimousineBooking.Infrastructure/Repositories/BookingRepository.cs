@@ -1,4 +1,5 @@
 using LimousineBooking.Application.Bookings;
+using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Entities;
 using LimousineBooking.Domain.Enums;
@@ -95,6 +96,44 @@ public class BookingRepository : IBookingRepository
 
         return (items, totalCount);
     }
+
+    public Task<Booking?> GetByDriverAndIdAsync(Guid driverId, Guid bookingId, CancellationToken cancellationToken = default) =>
+        _dbContext.Bookings
+            .Include(b => b.Route)
+            .SingleOrDefaultAsync(b => b.Id == bookingId && b.DriverId == driverId, cancellationToken);
+
+    public async Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchByDriverAsync(Guid driverId, DriverBookingSearchQuery query, CancellationToken cancellationToken = default)
+    {
+        var bookings = _dbContext.Bookings
+            .Include(b => b.Route)
+            .Where(b => b.DriverId == driverId)
+            .AsQueryable();
+
+        if (query.DateFrom.HasValue)
+            bookings = bookings.Where(b => b.TravelDate >= query.DateFrom.Value);
+        if (query.DateTo.HasValue)
+            bookings = bookings.Where(b => b.TravelDate <= query.DateTo.Value);
+
+        var totalCount = await bookings.CountAsync(cancellationToken);
+
+        var items = await bookings
+            .OrderBy(b => b.TravelDate).ThenBy(b => b.PickupTime)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    public async Task<IReadOnlyList<Booking>> GetByDriverAndDateAsync(Guid driverId, DateOnly date, CancellationToken cancellationToken = default) =>
+        await _dbContext.Bookings
+            .Include(b => b.Route)
+            .Where(b => b.DriverId == driverId && b.TravelDate == date)
+            .OrderBy(b => b.PickupTime)
+            .ToListAsync(cancellationToken);
+
+    public Task<int> CountUpcomingByDriverAsync(Guid driverId, DateOnly afterDate, CancellationToken cancellationToken = default) =>
+        _dbContext.Bookings.CountAsync(b => b.DriverId == driverId && b.TravelDate > afterDate, cancellationToken);
 
     public async Task<AdminBookingCounts> GetDashboardCountsAsync(DateOnly today, CancellationToken cancellationToken = default)
     {

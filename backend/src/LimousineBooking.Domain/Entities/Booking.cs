@@ -47,10 +47,14 @@ public class Booking : AuditableEntity
     public DateTime? CancelledAt { get; private set; }
     public Guid? CancelledByUserId { get; private set; }
 
+    /// <summary>Trip progress — independent of <see cref="Status"/>. See RideStatus's own summary.</summary>
+    public RideStatus RideStatus { get; private set; } = RideStatus.Upcoming;
+
     public Route? Route { get; private set; }
     public Driver? Driver { get; private set; }
     public Vehicle? Vehicle { get; private set; }
     public ICollection<BookingStatusHistory> StatusHistory { get; private set; } = new List<BookingStatusHistory>();
+    public ICollection<RideStatusHistory> RideStatusHistory { get; private set; } = new List<RideStatusHistory>();
     public ICollection<Notification> Notifications { get; private set; } = new List<Notification>();
 
     private Booking()
@@ -260,6 +264,7 @@ public class Booking : AuditableEntity
     public void Cancel(string? reason, Guid? cancelledByUserId, DateTime cancelledAt)
     {
         Status = BookingStatus.Cancelled;
+        RideStatus = RideStatus.Cancelled;
         DriverId = null;
         VehicleId = null;
         AssignmentType = null;
@@ -268,5 +273,37 @@ public class Booking : AuditableEntity
         CancellationReason = string.IsNullOrWhiteSpace(reason) ? null : reason;
         CancelledByUserId = cancelledByUserId;
         CancelledAt = cancelledAt;
+    }
+
+    /// <summary>
+    /// Upcoming -&gt; OnTheWay. The precondition (not Cancelled/Completed,
+    /// driver ownership, driver active) is enforced by the caller
+    /// (DriverBookingService) so it can return a specific, user-facing 409
+    /// reason — this guard is defense-in-depth, not the primary validation path.
+    /// </summary>
+    public void StartRide()
+    {
+        if (RideStatus != RideStatus.Upcoming)
+            throw new InvalidOperationException("The ride has already started.");
+
+        RideStatus = RideStatus.OnTheWay;
+    }
+
+    public void MarkPassengerPickedUp()
+    {
+        if (RideStatus != RideStatus.OnTheWay)
+            throw new InvalidOperationException("Passenger can only be marked as picked up after the ride has started.");
+
+        RideStatus = RideStatus.PassengerPickedUp;
+    }
+
+    /// <summary>Also moves the booking lifecycle to Completed — this is the only path that ever sets that status.</summary>
+    public void CompleteRide()
+    {
+        if (RideStatus != RideStatus.PassengerPickedUp)
+            throw new InvalidOperationException("The ride can only be completed after the passenger has been picked up.");
+
+        RideStatus = RideStatus.Completed;
+        Status = BookingStatus.Completed;
     }
 }

@@ -227,7 +227,9 @@ public class DriverService : IDriverService
                 Id = vehicle.Id,
                 RegistrationNumber = vehicle.RegistrationNumber,
                 Make = vehicle.Make,
-                Model = vehicle.Model
+                Model = vehicle.Model,
+                VehicleType = vehicle.VehicleType,
+                PassengerCapacity = vehicle.PassengerCapacity
             },
         CreatedAt = driver.CreatedAt,
         UpdatedAt = driver.UpdatedAt

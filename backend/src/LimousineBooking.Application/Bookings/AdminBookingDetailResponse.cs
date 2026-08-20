@@ -28,6 +28,10 @@ public class AdminBookingDetailResponse
 
     public string Status { get; set; } = string.Empty;
 
+    /// <summary>Trip progress (Upcoming/OnTheWay/PassengerPickedUp/Completed/Cancelled) — view-only here; only the driver's own endpoints can change it.</summary>
+    public string RideStatus { get; set; } = string.Empty;
+    public IReadOnlyList<RideStatusHistoryEntry> RideStatusHistory { get; set; } = Array.Empty<RideStatusHistoryEntry>();
+
     public Guid? DriverId { get; set; }
     public string? DriverName { get; set; }
     public Guid? VehicleId { get; set; }
@@ -56,4 +60,11 @@ public class AssignmentHistoryItem
     public string AssignmentType { get; set; } = string.Empty;
     public string? AssignedByEmail { get; set; }
     public DateTime AssignedAt { get; set; }
+}
+
+public class RideStatusHistoryEntry
+{
+    public string PreviousStatus { get; set; } = string.Empty;
+    public string NewStatus { get; set; } = string.Empty;
+    public DateTime ChangedAt { get; set; }
 }

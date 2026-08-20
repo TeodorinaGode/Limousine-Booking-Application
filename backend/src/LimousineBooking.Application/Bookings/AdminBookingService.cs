@@ -27,6 +27,7 @@ public class AdminBookingService : IAdminBookingService
     private readonly IAvailabilityEvaluationService _availabilityEvaluationService;
     private readonly IAutomaticAssignmentService _automaticAssignmentService;
     private readonly IAssignmentHistoryRepository _assignmentHistoryRepository;
+    private readonly IRideStatusHistoryRepository _rideStatusHistoryRepository;
     private readonly INotificationService _notificationService;
     private readonly INotificationRepository _notificationRepository;
     private readonly ITransactionRunner _transactionRunner;
@@ -44,6 +45,7 @@ public class AdminBookingService : IAdminBookingService
         IAvailabilityEvaluationService availabilityEvaluationService,
         IAutomaticAssignmentService automaticAssignmentService,
         IAssignmentHistoryRepository assignmentHistoryRepository,
+        IRideStatusHistoryRepository rideStatusHistoryRepository,
         INotificationService notificationService,
         INotificationRepository notificationRepository,
         ITransactionRunner transactionRunner,
@@ -60,6 +62,7 @@ public class AdminBookingService : IAdminBookingService
         _availabilityEvaluationService = availabilityEvaluationService;
         _automaticAssignmentService = automaticAssignmentService;
         _assignmentHistoryRepository = assignmentHistoryRepository;
+        _rideStatusHistoryRepository = rideStatusHistoryRepository;
         _notificationService = notificationService;
         _notificationRepository = notificationRepository;
         _transactionRunner = transactionRunner;
@@ -384,6 +387,7 @@ public class AdminBookingService : IAdminBookingService
         Price = booking.Price,
         Currency = booking.Currency,
         Status = booking.Status.ToString(),
+        RideStatus = booking.RideStatus.ToString(),
         DriverName = booking.Driver is null ? null : FormatDriverName(booking.Driver),
         VehicleDescription = booking.Vehicle is null ? null : FormatVehicleDescription(booking.Vehicle),
         Assignment = booking.AssignmentType?.ToString() ?? "Unassigned"
@@ -415,6 +419,14 @@ public class AdminBookingService : IAdminBookingService
             var cancelledByUser = await _userRepository.GetByIdAsync(booking.CancelledByUserId.Value, cancellationToken);
             cancelledByEmail = cancelledByUser?.Email;
         }
+
+        var rideStatusEntries = await _rideStatusHistoryRepository.GetByBookingIdAsync(booking.Id, cancellationToken);
+        var rideStatusHistoryItems = rideStatusEntries.Select(r => new RideStatusHistoryEntry
+        {
+            PreviousStatus = r.PreviousStatus.ToString(),
+            NewStatus = r.NewStatus.ToString(),
+            ChangedAt = r.ChangedAt
+        }).ToList();
 
         var historyEntries = await _assignmentHistoryRepository.GetByBookingIdAsync(booking.Id, cancellationToken);
         var historyItems = new List<AssignmentHistoryItem>();
@@ -469,6 +481,8 @@ public class AdminBookingService : IAdminBookingService
             Price = booking.Price,
             Currency = booking.Currency,
             Status = booking.Status.ToString(),
+            RideStatus = booking.RideStatus.ToString(),
+            RideStatusHistory = rideStatusHistoryItems,
             DriverId = booking.DriverId,
             DriverName = booking.Driver is null ? null : FormatDriverName(booking.Driver),
             VehicleId = booking.VehicleId,

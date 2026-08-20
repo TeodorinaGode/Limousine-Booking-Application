@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IAutomaticAssignmentService, AutomaticAssignmentService>();
         services.AddScoped<IPublicBookingService, PublicBookingService>();
         services.AddScoped<IAdminBookingService, AdminBookingService>();
+        services.AddScoped<IDriverBookingService, DriverBookingService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAdminNotificationService, AdminNotificationService>();
         services.AddScoped<INotificationOutboxProcessor, NotificationOutboxProcessor>();

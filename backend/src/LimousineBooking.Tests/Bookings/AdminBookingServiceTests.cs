@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using DomainAssignmentHistory = LimousineBooking.Domain.Entities.AssignmentHistory;
+using DomainRideStatusHistory = LimousineBooking.Domain.Entities.RideStatusHistory;
 using DomainBooking = LimousineBooking.Domain.Entities.Booking;
 using DomainDriver = LimousineBooking.Domain.Entities.Driver;
 using DomainRoute = LimousineBooking.Domain.Entities.Route;
@@ -25,6 +26,7 @@ public class AdminBookingServiceTests
     private readonly Mock<IAvailabilityEvaluationService> _availabilityEvaluationService = new();
     private readonly Mock<IAutomaticAssignmentService> _automaticAssignmentService = new();
     private readonly Mock<IAssignmentHistoryRepository> _assignmentHistoryRepository = new();
+    private readonly Mock<IRideStatusHistoryRepository> _rideStatusHistoryRepository = new();
     private readonly Mock<INotificationService> _notificationService = new();
     private readonly Mock<INotificationRepository> _notificationRepository = new();
     private readonly Mock<ITransactionRunner> _transactionRunner = new();
@@ -43,6 +45,7 @@ public class AdminBookingServiceTests
         _bookingRepository.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _assignmentHistoryRepository.Setup(r => r.GetByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<DomainAssignmentHistory>());
         _assignmentHistoryRepository.Setup(r => r.AddAsync(It.IsAny<DomainAssignmentHistory>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _rideStatusHistoryRepository.Setup(r => r.GetByBookingIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<DomainRideStatusHistory>());
         _automaticAssignmentService.Setup(s => s.AssignBookingAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _notificationRepository.Setup(r => r.GetSummaryAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(new OutboxSummaryCounts());
         _currentUserService.Setup(c => c.UserId).Returns(AdminUserId);
@@ -58,6 +61,7 @@ public class AdminBookingServiceTests
         _availabilityEvaluationService.Object,
         _automaticAssignmentService.Object,
         _assignmentHistoryRepository.Object,
+        _rideStatusHistoryRepository.Object,
         _notificationService.Object,
         _notificationRepository.Object,
         _transactionRunner.Object,

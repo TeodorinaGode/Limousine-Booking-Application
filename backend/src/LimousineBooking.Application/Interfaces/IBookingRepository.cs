@@ -1,4 +1,5 @@
 using LimousineBooking.Application.Bookings;
+using LimousineBooking.Application.Drivers;
 using LimousineBooking.Domain.Entities;
 
 namespace LimousineBooking.Application.Interfaces;
@@ -11,6 +12,22 @@ public interface IBookingRepository
     Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchAsync(AdminBookingSearchQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// A single booking scoped to the given driver (includes Route) — returns null if
+    /// no such booking exists OR it belongs to a different driver, so callers can
+    /// return a uniform 404 either way without leaking existence to a non-owner.
+    /// </summary>
+    Task<Booking?> GetByDriverAndIdAsync(Guid driverId, Guid bookingId, CancellationToken cancellationToken = default);
+
+    /// <summary>The authenticated driver's own schedule — filtered to their bookings only, chronological order.</summary>
+    Task<(IReadOnlyList<Booking> Items, int TotalCount)> SearchByDriverAsync(Guid driverId, DriverBookingSearchQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>This driver's bookings on exactly one date (includes Route), ordered by pickup time — used for the driver dashboard's "today" list.</summary>
+    Task<IReadOnlyList<Booking>> GetByDriverAndDateAsync(Guid driverId, DateOnly date, CancellationToken cancellationToken = default);
+
+    /// <summary>Count of this driver's bookings strictly after <paramref name="afterDate"/> — a single COUNT query for the dashboard's forward-looking counter.</summary>
+    Task<int> CountUpcomingByDriverAsync(Guid driverId, DateOnly afterDate, CancellationToken cancellationToken = default);
 
     /// <summary>Counts for the admin dashboard — each a targeted COUNT query, never a full table load.</summary>
     Task<AdminBookingCounts> GetDashboardCountsAsync(DateOnly today, CancellationToken cancellationToken = default);

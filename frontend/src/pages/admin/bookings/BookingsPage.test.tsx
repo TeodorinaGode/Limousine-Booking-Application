@@ -39,6 +39,7 @@ function makeBooking(overrides: Partial<AdminBookingListItemDto> = {}): AdminBoo
     price: 180,
     currency: "CHF",
     status: "Confirmed",
+    rideStatus: "Upcoming",
     driverName: "Dev Driver",
     vehicleDescription: "Mercedes-Benz V-Class - BS 123456",
     assignment: "Automatic",

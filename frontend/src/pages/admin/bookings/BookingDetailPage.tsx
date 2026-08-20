@@ -154,6 +154,7 @@ function BookingDetailPage() {
         <h1>Booking Information</h1>
         <p>Booking reference: {booking.bookingReference}</p>
         <p>Status: {booking.status}</p>
+        <p>Ride status: {booking.rideStatus}</p>
         {booking.requiresManualAssignment && (
           <p role="alert">Requires manual assignment: {booking.manualAssignmentReason}</p>
         )}
@@ -239,6 +240,30 @@ function BookingDetailPage() {
                   <td>{entry.assignmentType}</td>
                   <td>{entry.assignedByEmail ?? "System (automatic)"}</td>
                   <td>{formatDateTime(entry.assignedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {booking.rideStatusHistory.length > 0 && (
+        <section style={{ marginBottom: "1.5rem" }}>
+          <h2>Ride Status History</h2>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Changed At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {booking.rideStatusHistory.map((entry, index) => (
+                <tr key={index}>
+                  <td>{entry.previousStatus}</td>
+                  <td>{entry.newStatus}</td>
+                  <td>{formatDateTime(entry.changedAt)}</td>
                 </tr>
               ))}
             </tbody>

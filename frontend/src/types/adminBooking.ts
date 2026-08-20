@@ -15,6 +15,8 @@ export interface AdminBookingListItemDto {
   price: number;
   currency: string;
   status: string;
+  /** Upcoming | OnTheWay | PassengerPickedUp | Completed | Cancelled — view-only; only the driver's own endpoints can change it. */
+  rideStatus: string;
   driverName: string | null;
   vehicleDescription: string | null;
   /** "Automatic" | "Manual" | "Unassigned" */
@@ -27,6 +29,12 @@ export interface AssignmentHistoryItemDto {
   assignmentType: string;
   assignedByEmail: string | null;
   assignedAt: string;
+}
+
+export interface RideStatusHistoryEntryDto {
+  previousStatus: string;
+  newStatus: string;
+  changedAt: string;
 }
 
 export interface AdminBookingDetailDto {
@@ -48,6 +56,9 @@ export interface AdminBookingDetailDto {
   price: number;
   currency: string;
   status: string;
+  /** Upcoming | OnTheWay | PassengerPickedUp | Completed | Cancelled — view-only; only the driver's own endpoints can change it. */
+  rideStatus: string;
+  rideStatusHistory: RideStatusHistoryEntryDto[];
   driverId: string | null;
   driverName: string | null;
   vehicleId: string | null;

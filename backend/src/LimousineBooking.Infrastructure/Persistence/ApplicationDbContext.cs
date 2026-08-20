@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<DriverAvailability> DriverAvailabilities => Set<DriverAvailability>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AssignmentHistory> AssignmentHistories => Set<AssignmentHistory>();
+    public DbSet<RideStatusHistory> RideStatusHistories => Set<RideStatusHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IDriverAvailabilityRepository, DriverAvailabilityRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IAssignmentHistoryRepository, AssignmentHistoryRepository>();
+        services.AddScoped<IRideStatusHistoryRepository, RideStatusHistoryRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<ITransactionRunner, TransactionRunner>();
         services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();

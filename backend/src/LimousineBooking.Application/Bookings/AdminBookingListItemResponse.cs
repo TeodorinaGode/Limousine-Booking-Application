@@ -14,6 +14,10 @@ public class AdminBookingListItemResponse
     public decimal Price { get; set; }
     public string Currency { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+
+    /// <summary>Trip progress (Upcoming/OnTheWay/PassengerPickedUp/Completed/Cancelled) — view-only here; only the driver's own endpoints can change it.</summary>
+    public string RideStatus { get; set; } = string.Empty;
+
     public string? DriverName { get; set; }
     public string? VehicleDescription { get; set; }
 

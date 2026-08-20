@@ -309,6 +309,7 @@ function BookingsPage() {
               <th>Passengers</th>
               <th>Price</th>
               <th>Status</th>
+              <th>Ride Status</th>
               <th>Driver</th>
               <th>Vehicle</th>
               <th>Assignment</th>
@@ -332,6 +333,7 @@ function BookingsPage() {
                   {booking.price.toFixed(2)} {booking.currency}
                 </td>
                 <td>{booking.status}</td>
+                <td>{booking.rideStatus}</td>
                 <td>{booking.driverName ?? "—"}</td>
                 <td>{booking.vehicleDescription ?? "—"}</td>
                 <td>{booking.assignment}</td>

@@ -84,6 +84,12 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.Property(b => b.CancelledAt)
             .HasColumnType("timestamptz");
 
+        builder.Property(b => b.RideStatus)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(Domain.Enums.RideStatus.Upcoming);
+
         builder.Property(b => b.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
@@ -94,6 +100,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
 
         builder.HasIndex(b => b.TravelDate);
         builder.HasIndex(b => b.Status);
+        builder.HasIndex(b => b.RideStatus);
         builder.HasIndex(b => b.DriverId);
         builder.HasIndex(b => b.RouteId);
         builder.HasIndex(b => b.CreatedAt);

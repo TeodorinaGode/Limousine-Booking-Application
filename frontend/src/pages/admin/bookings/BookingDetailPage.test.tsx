@@ -45,6 +45,8 @@ function makeBooking(overrides: Partial<AdminBookingDetailDto> = {}): AdminBooki
     price: 180,
     currency: "CHF",
     status: "Confirmed",
+    rideStatus: "Upcoming",
+    rideStatusHistory: [],
     driverId: "33333333-3333-3333-3333-333333333333",
     driverName: "John Driver",
     vehicleId: "44444444-4444-4444-4444-444444444444",

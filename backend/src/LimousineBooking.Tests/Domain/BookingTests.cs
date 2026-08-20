@@ -228,6 +228,106 @@ public class BookingTests
     }
 
     [Fact]
+    public void RideStatus_DefaultsToUpcoming()
+    {
+        var booking = CreateValidBooking();
+
+        Assert.Equal(RideStatus.Upcoming, booking.RideStatus);
+    }
+
+    [Fact]
+    public void StartRide_MovesUpcomingToOnTheWay()
+    {
+        var booking = CreateValidBooking();
+
+        booking.StartRide();
+
+        Assert.Equal(RideStatus.OnTheWay, booking.RideStatus);
+    }
+
+    [Fact]
+    public void StartRide_WhenAlreadyStarted_Throws()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+
+        Assert.Throws<InvalidOperationException>(() => booking.StartRide());
+    }
+
+    [Fact]
+    public void MarkPassengerPickedUp_MovesOnTheWayToPassengerPickedUp()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+
+        booking.MarkPassengerPickedUp();
+
+        Assert.Equal(RideStatus.PassengerPickedUp, booking.RideStatus);
+    }
+
+    [Fact]
+    public void MarkPassengerPickedUp_BeforeRideStarted_Throws()
+    {
+        var booking = CreateValidBooking();
+
+        Assert.Throws<InvalidOperationException>(() => booking.MarkPassengerPickedUp());
+    }
+
+    [Fact]
+    public void MarkPassengerPickedUp_WhenAlreadyPickedUp_Throws()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+        booking.MarkPassengerPickedUp();
+
+        Assert.Throws<InvalidOperationException>(() => booking.MarkPassengerPickedUp());
+    }
+
+    [Fact]
+    public void CompleteRide_MovesPassengerPickedUpToCompleted_AndAlsoCompletesBookingStatus()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+        booking.MarkPassengerPickedUp();
+
+        booking.CompleteRide();
+
+        Assert.Equal(RideStatus.Completed, booking.RideStatus);
+        Assert.Equal(BookingStatus.Completed, booking.Status);
+    }
+
+    [Fact]
+    public void CompleteRide_BeforePickup_Throws()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+
+        Assert.Throws<InvalidOperationException>(() => booking.CompleteRide());
+    }
+
+    [Fact]
+    public void CompleteRide_WhenAlreadyCompleted_Throws()
+    {
+        var booking = CreateValidBooking();
+        booking.StartRide();
+        booking.MarkPassengerPickedUp();
+        booking.CompleteRide();
+
+        Assert.Throws<InvalidOperationException>(() => booking.CompleteRide());
+    }
+
+    [Fact]
+    public void Cancel_AlsoSetsRideStatusToCancelled()
+    {
+        var booking = CreateValidBooking();
+        booking.ConfirmAutomaticAssignment(Guid.NewGuid(), Guid.NewGuid());
+
+        booking.Cancel("Customer requested cancellation", Guid.NewGuid(), DateTime.UtcNow);
+
+        Assert.Equal(RideStatus.Cancelled, booking.RideStatus);
+    }
+
+    [Fact]
     public void Booking_RoutePriceChange_DoesNotAffectExistingBookingPrice()
     {
         var route = new Route("Basel", "Zurich", 60, 180.00m, "CHF");

@@ -5,6 +5,9 @@ import LoginPage from "../pages/auth/LoginPage";
 import UnauthorizedPage from "../pages/public/UnauthorizedPage";
 import DriverHomePage from "../pages/driver/DriverHomePage";
 import AvailabilityPage from "../pages/driver/AvailabilityPage";
+import SchedulePage from "../pages/driver/SchedulePage";
+import TripDetailPage from "../pages/driver/TripDetailPage";
+import ProfilePage from "../pages/driver/ProfilePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import RoutesPage from "../pages/admin/routes/RoutesPage";
 import VehiclesPage from "../pages/admin/vehicles/VehiclesPage";
@@ -34,6 +37,30 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["Driver"]}>
             <AvailabilityPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/driver/schedule"
+        element={
+          <ProtectedRoute allowedRoles={["Driver"]}>
+            <SchedulePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/driver/bookings/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Driver"]}>
+            <TripDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/driver/profile"
+        element={
+          <ProtectedRoute allowedRoles={["Driver"]}>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />

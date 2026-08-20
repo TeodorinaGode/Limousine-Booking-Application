@@ -8,6 +8,7 @@ import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import HeroBookingWidget from "../../components/HeroBookingWidget";
 import { usePageMeta } from "../../hooks/usePageMeta";
+import { useCompanyInfo } from "../../hooks/useCompanyInfo";
 import { SERVICES } from "../../config/services";
 import type { PublicRouteDto } from "../../types/booking";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
@@ -19,11 +20,12 @@ const TRUST_ITEMS = [
   { key: "available", icon: "☎" },
 ] as const;
 
-const WHY_US_ITEMS = ["professional", "premium", "reliable", "comfortable", "personalized", "simple"] as const;
+const WHY_US_ITEMS = ["reliability", "luxury", "professionalChauffeurs"] as const;
 
 function HomePage() {
   const { t } = useTranslation(["site", "booking"]);
-  usePageMeta(`${t("hero.eyebrow")} | ${t("footer.description")}`, t("hero.subtitle"));
+  usePageMeta(t("seo.homeTitle"), t("seo.homeDescription"));
+  const company = useCompanyInfo();
 
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [vehicles, setVehicles] = useState<PublicVehicleDto[]>([]);
@@ -187,6 +189,22 @@ function HomePage() {
           ))}
         </div>
       </section>
+
+      {company && company.operatingCountryCodes.length > 0 && (
+        <section className="section section--elevated">
+          <div className="container section--center">
+            <p className="section__eyebrow">{t("operatingArea.title")}</p>
+            <h2 className="section__title">{t("operatingArea.subtitle")}</h2>
+          </div>
+          <div className="container">
+            <ul style={{ listStyle: "none", padding: 0, display: "flex", gap: "var(--space-6)", justifyContent: "center", flexWrap: "wrap" }}>
+              {company.operatingCountryCodes.map((code) => (
+                <li className="text-secondary" key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       <section className="final-cta">
         <div className="container container--medium">

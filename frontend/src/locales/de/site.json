@@ -11,9 +11,9 @@
   },
   "hero": {
     "eyebrow": "Premium-Chauffeurservice",
-    "title1": "Reisen Sie komfortabel.",
-    "title2": "Kommen Sie souverän an.",
-    "subtitle": "Private Limousinentransfers in der ganzen Schweiz.",
+    "title1": "Luxuriöses Reisen.",
+    "title2": "Mit Sorgfalt begleitet.",
+    "subtitle": "Premium-Chauffeurtransfers in der Schweiz und in ganz Europa.",
     "ctaPrimary": "Fahrt buchen",
     "ctaSecondary": "Unsere Leistungen entdecken"
   },
@@ -48,33 +48,29 @@
     "title": "Unsere Leistungen",
     "subtitle": "Professioneller Transport für jeden Anlass.",
     "bookTransfer": "Transfer buchen",
-    "airport": {
-      "title": "Flughafentransfers",
-      "desc": "Reisen Sie komfortabel zwischen Flughäfen, Hotels und Zielen mit einem professionellen privaten Chauffeur."
+    "airportTransfer": {
+      "title": "Flughafentransfer",
+      "desc": "Beginnen oder beenden Sie Ihre Reise komfortabel mit einem professionellen privaten Chauffeur, direkt zum oder vom Flughafen."
     },
-    "business": {
-      "title": "Geschäftstransfers",
-      "desc": "Pünktlicher, diskreter Transport für Meetings, Konferenzen und Geschäftsreisen."
+    "corporateEvents": {
+      "title": "Firmenveranstaltungen",
+      "desc": "Professioneller, diskreter Transport für Geschäftstreffen, Firmenveranstaltungen und Reisen von Führungskräften."
     },
-    "cityToCity": {
-      "title": "Stadt-zu-Stadt-Transfers",
-      "desc": "Komfortable Fernfahrten zwischen Schweizer Städten, von Tür zu Tür."
+    "cityTours": {
+      "title": "Stadtrundfahrten",
+      "desc": "Eine private und komfortable Art, Ihr Reiseziel mit einem professionellen Chauffeur an Ihrer Seite zu erkunden."
     },
-    "corporate": {
-      "title": "Geschäftsreisen",
-      "desc": "Zuverlässige Transportlösungen für Unternehmen und ihre Teams."
+    "pointToPoint": {
+      "title": "Punkt-zu-Punkt-Transfers",
+      "desc": "Direkter, effizienter und privater Transport zwischen zwei beliebigen Orten auf Ihrer Strecke."
     },
-    "events": {
-      "title": "Veranstaltungen & besondere Anlässe",
-      "desc": "Elegante Transportlösungen für Hochzeiten, Feiern und besondere Ereignisse."
-    },
-    "privateChauffeur": {
-      "title": "Privater Chauffeurservice",
-      "desc": "Ein Chauffeur steht Ihnen für die gesamte Dauer Ihrer Reise zur Verfügung."
+    "professionalChauffeursService": {
+      "title": "Professioneller Chauffeurservice",
+      "desc": "Ein engagierter, ausgebildeter und lizenzierter Chauffeur, der sich vom Abholort bis zur Ankunft um Ihre Sicherheit und Ihren Komfort kümmert."
     }
   },
   "airportHighlight": {
-    "title": "Flughafentransfers",
+    "title": "Flughafentransfer",
     "subtitle": "Vom Flughafen zu Ihrem Ziel, ganz ohne Stress.",
     "pickup": "Abholung am Flughafen",
     "chauffeur": "Professioneller Chauffeur",
@@ -105,29 +101,17 @@
   },
   "whyUs": {
     "title": "Warum wir",
-    "professional": {
+    "reliability": {
+      "title": "Zuverlässigkeit",
+      "desc": "Ihre Reise wird um Ihre Zeit herum geplant — wir bringen Sie jedes Mal pünktlich an Ihr Ziel."
+    },
+    "luxury": {
+      "title": "Luxus",
+      "desc": "Reisen Sie in einem Premium-Fahrzeug aus einem auf Komfort und Eleganz ausgelegten Fuhrpark."
+    },
+    "professionalChauffeurs": {
       "title": "Professionelle Chauffeure",
-      "desc": "Erfahrene Fahrer mit Fokus auf Ihren Komfort und Ihre Sicherheit."
-    },
-    "premium": {
-      "title": "Premium-Fahrzeuge",
-      "desc": "Ein gepflegter Fuhrpark für eine komfortable Fahrt."
-    },
-    "reliable": {
-      "title": "Zuverlässige Transfers",
-      "desc": "Pünktlicher Service, auf den Sie sich verlassen können."
-    },
-    "comfortable": {
-      "title": "Komfortable Fahrten",
-      "desc": "Reisen Sie jedes Mal entspannt."
-    },
-    "personalized": {
-      "title": "Persönlicher Service",
-      "desc": "Ihre Reise, ganz nach Ihren Bedürfnissen organisiert."
-    },
-    "simple": {
-      "title": "Einfache Buchung",
-      "desc": "Buchen Sie Ihre Fahrt in wenigen Schritten, ganz ohne Konto."
+      "desc": "Ausgebildete, lizenzierte und erfahrene Chauffeure, die Ihre Sicherheit und Ihren Komfort an erste Stelle setzen."
     }
   },
   "howItWorks": {
@@ -152,42 +136,42 @@
   "about": {
     "title": "Über unseren Service",
     "subtitle": "Professioneller Transport, ganz auf Ihre Reise abgestimmt.",
-    "body1": "Wir bieten privaten Chauffeurtransport mit Fokus auf Komfort, Pünktlichkeit und Diskretion.",
-    "body2": "Jede Fahrt wird mit Liebe zum Detail organisiert, vom Moment der Buchung bis zur Ankunft."
+    "body1": "ROI Limousinen bietet massgeschneiderten Premium-Chauffeurtransport in der Schweiz und den Nachbarländern — mit Fokus auf Komfort, Zuverlässigkeit und Diskretion.",
+    "body2": "Ob für einen besonderen Anlass, einen Firmentermin, einen Flughafentransfer oder eine private Reise — jede Fahrt wird mit derselben Sorgfalt organisiert, von der Buchung bis zur Ankunft."
   },
   "faq": {
     "title": "Häufig gestellte Fragen",
     "q1": {
-      "question": "Wie buche ich eine Limousine?",
-      "answer": "Wählen Sie eine Strecke oder nutzen Sie das Buchungsformular, wählen Sie Datum, Uhrzeit und Details und schliessen Sie die Buchung mit der Online-Zahlung ab."
+      "question": "Wie arbeiten Sie?",
+      "answer": "Wir bieten privaten Chauffeurtransport mit professionellen, lizenzierten Fahrern in der Schweiz und den Nachbarländern. Sie können online buchen, Strecke, Datum und Uhrzeit wählen und sicher bezahlen — ganz ohne Anruf."
     },
     "q2": {
-      "question": "Benötige ich ein Konto?",
-      "answer": "Nein. Sie können vollständig als Gast buchen, bezahlen und Ihre Bestätigung erhalten."
+      "question": "In welchen Ländern sind Sie tätig?",
+      "answer": "Wir sind in der Schweiz, Österreich, Italien, Deutschland, Frankreich, Belgien und Luxemburg tätig."
     },
     "q3": {
-      "question": "Kann ich einen Flughafentransfer buchen?",
-      "answer": "Ja, Flughafentransfers gehören zu unseren Kernleistungen — buchen Sie sie wie jede andere Strecke."
+      "question": "Welche Fahrzeuge bieten Sie an?",
+      "answer": "Unser aktueller Fuhrpark basiert auf der Mercedes S-Klasse; weitere Fahrzeuge werden hier angezeigt, sobald sie verfügbar sind."
     },
     "q4": {
-      "question": "Wie weit im Voraus kann ich buchen?",
-      "answer": "Für Buchungen gilt eine Mindestvorlaufzeit, die während des Buchungsvorgangs automatisch angezeigt wird."
+      "question": "Wie kann ich eine Reservierung vornehmen?",
+      "answer": "Wählen Sie eine Strecke oder nutzen Sie das Buchungsformular auf dieser Website, wählen Sie Datum, Uhrzeit und Details, und schliessen Sie die Buchung mit der Online-Zahlung ab."
     },
     "q5": {
-      "question": "Kann ich meine Buchung stornieren?",
-      "answer": "Stornierungen werden von unserem Team bearbeitet — bitte kontaktieren Sie uns über die untenstehenden Angaben."
+      "question": "Sind Ihre Chauffeure Profis?",
+      "answer": "Ja — jeder Chauffeur ist ausgebildet, erfahren und lizenziert und kümmert sich während der gesamten Fahrt um Ihre Sicherheit und Ihren Komfort."
     },
     "q6": {
-      "question": "Welche Zahlungsmethoden werden akzeptiert?",
-      "answer": "Zahlungen werden sicher online über unseren Zahlungsanbieter abgewickelt."
+      "question": "Benötige ich ein Konto für die Buchung?",
+      "answer": "Nein. Sie können vollständig als Gast buchen, bezahlen und Ihre Bestätigung erhalten — ganz ohne Konto."
     },
     "q7": {
-      "question": "Erhalte ich eine Bestätigung?",
-      "answer": "Ja, sobald Ihre Buchung bearbeitet wurde, erhalten Sie eine Bestätigung per E-Mail."
+      "question": "Wie bezahle ich?",
+      "answer": "Zahlungen werden am Ende des Buchungsvorgangs sicher online über unseren Zahlungsanbieter abgewickelt."
     },
     "q8": {
-      "question": "Kann ich meine Abholadresse ändern?",
-      "answer": "Bitte kontaktieren Sie uns so schnell wie möglich über die untenstehenden Angaben — wir helfen Ihnen gerne weiter."
+      "question": "Wie erhalte ich eine Bestätigung?",
+      "answer": "Sobald Ihre Buchung bearbeitet wurde, erhalten Sie eine Bestätigung per E-Mail."
     }
   },
   "contact": {
@@ -204,7 +188,11 @@
       "message": "Nachricht",
       "send": "Nachricht senden",
       "sending": "Wird gesendet...",
-      "success": "Vielen Dank — Ihre Nachricht wurde empfangen."
+      "success": "Vielen Dank — Ihre Nachricht wurde empfangen.",
+      "preferredContactMethod": "Bevorzugte Kontaktmethode",
+      "phoneOption": "Telefon",
+      "emailOption": "E-Mail",
+      "preferredDate": "Bevorzugtes Datum (optional)"
     }
   },
   "finalCta": {
@@ -213,14 +201,15 @@
     "cta": "Fahrt buchen"
   },
   "footer": {
-    "description": "Privater Chauffeurtransport in der ganzen Schweiz.",
+    "description": "Premium-Chauffeurservice in der Schweiz und in ganz Europa.",
     "navigation": "Navigation",
     "services": "Leistungen",
     "contact": "Kontakt",
     "rights": "Alle Rechte vorbehalten.",
     "privacyPolicy": "Datenschutz",
     "termsConditions": "AGB",
-    "cookiePolicy": "Cookie-Richtlinie"
+    "cookiePolicy": "Cookie-Richtlinie",
+    "followUs": "Folgen Sie uns"
   },
   "legal": {
     "privacyTitle": "Datenschutz",
@@ -232,5 +221,22 @@
     "open": "Menü öffnen",
     "close": "Menü schliessen"
   },
-  "backToTop": "Nach oben"
+  "backToTop": "Nach oben",
+  "operatingArea": {
+    "title": "Unser Einsatzgebiet",
+    "subtitle": "Wir betreuen Kunden in ganz Europa.",
+    "countries": {
+      "CH": "Schweiz",
+      "AT": "Österreich",
+      "IT": "Italien",
+      "DE": "Deutschland",
+      "FR": "Frankreich",
+      "BE": "Belgien",
+      "LU": "Luxemburg"
+    }
+  },
+  "seo": {
+    "homeTitle": "ROI Limousinen | Premium-Chauffeur- und Limousinenservice",
+    "homeDescription": "Premium-Limousinen- und Chauffeurservice aus der Schweiz für Flughafentransfers, Geschäftsreisen, Stadtrundfahrten und private Fahrten."
+  }
 }

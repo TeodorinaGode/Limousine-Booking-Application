@@ -31,6 +31,10 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 

@@ -5,7 +5,7 @@ import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
 
-const WHY_US_ITEMS = ["professional", "premium", "reliable", "comfortable", "personalized", "simple"] as const;
+const WHY_US_ITEMS = ["reliability", "luxury", "professionalChauffeurs"] as const;
 
 function AboutPage() {
   const { t } = useTranslation("site");

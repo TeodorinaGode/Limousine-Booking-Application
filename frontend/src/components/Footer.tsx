@@ -32,10 +32,11 @@ function Footer() {
         <div>
           <h3 className="site-footer__heading">{t("footer.services")}</h3>
           <ul className="site-footer__list">
-            <li><Link to="/services">{t("services.airport.title")}</Link></li>
-            <li><Link to="/services">{t("services.cityToCity.title")}</Link></li>
-            <li><Link to="/services">{t("services.corporate.title")}</Link></li>
-            <li><Link to="/services">{t("services.privateChauffeur.title")}</Link></li>
+            <li><Link to="/services">{t("services.airportTransfer.title")}</Link></li>
+            <li><Link to="/services">{t("services.corporateEvents.title")}</Link></li>
+            <li><Link to="/services">{t("services.cityTours.title")}</Link></li>
+            <li><Link to="/services">{t("services.pointToPoint.title")}</Link></li>
+            <li><Link to="/services">{t("services.professionalChauffeursService.title")}</Link></li>
           </ul>
         </div>
 
@@ -50,6 +51,22 @@ function Footer() {
               </>
             )}
           </ul>
+          {company && (company.facebookUrl || company.instagramUrl || company.whatsAppUrl) && (
+            <>
+              <h3 className="site-footer__heading" style={{ marginTop: "var(--space-4)" }}>{t("footer.followUs")}</h3>
+              <div className="site-footer__social">
+                {company.facebookUrl && (
+                  <a href={company.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">Facebook</a>
+                )}
+                {company.instagramUrl && (
+                  <a href={company.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">Instagram</a>
+                )}
+                {company.whatsAppUrl && (
+                  <a href={company.whatsAppUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">WhatsApp</a>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 

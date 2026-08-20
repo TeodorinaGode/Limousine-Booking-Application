@@ -61,7 +61,9 @@ public class ContactMessageOutboxProcessor : IContactMessageOutboxProcessor
                     ["Email"] = contactMessage.Email,
                     ["Phone"] = contactMessage.Phone ?? "(not provided)",
                     ["Subject"] = contactMessage.Subject,
-                    ["Message"] = contactMessage.Message
+                    ["Message"] = contactMessage.Message,
+                    ["PreferredContactMethod"] = contactMessage.PreferredContactMethod ?? "(no preference)",
+                    ["PreferredDate"] = contactMessage.PreferredDate?.ToString("yyyy-MM-dd") ?? "(not specified)"
                 });
 
                 await _emailService.SendAsync(_settings.AdminEmail, rendered.Subject, rendered.HtmlBody, rendered.PlainTextBody, cancellationToken);

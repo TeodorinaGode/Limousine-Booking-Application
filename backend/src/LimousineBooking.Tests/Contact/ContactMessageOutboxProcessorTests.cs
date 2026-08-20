@@ -88,4 +88,29 @@ public class ContactMessageOutboxProcessorTests
 
         Assert.Equal(0, count);
     }
+
+    [Fact]
+    public async Task ProcessBatchAsync_IncludesPreferredContactFieldsInTheRenderedFields()
+    {
+        var message = new DomainContactMessage("Jane Doe", "jane.doe@example.com", "+41791234567", "Airport transfer",
+            "I would like to book an airport transfer.", "Phone", new DateOnly(2026, 9, 10));
+        _contactMessageRepository.Setup(r => r.GetPendingAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new[] { message });
+
+        await CreateProcessor().ProcessBatchAsync();
+
+        _renderer.Verify(r => r.Render("ContactMessageReceived", "en", It.Is<IReadOnlyDictionary<string, string>>(
+            fields => fields["PreferredContactMethod"] == "Phone" && fields["PreferredDate"] == "2026-09-10")), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessBatchAsync_NoPreferenceGiven_RendersFriendlyPlaceholders()
+    {
+        var message = MakeMessage();
+        _contactMessageRepository.Setup(r => r.GetPendingAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new[] { message });
+
+        await CreateProcessor().ProcessBatchAsync();
+
+        _renderer.Verify(r => r.Render("ContactMessageReceived", "en", It.Is<IReadOnlyDictionary<string, string>>(
+            fields => fields["PreferredContactMethod"] == "(no preference)" && fields["PreferredDate"] == "(not specified)")), Times.Once);
+    }
 }

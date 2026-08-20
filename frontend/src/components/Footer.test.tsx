@@ -28,6 +28,10 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 
@@ -58,7 +62,14 @@ describe("Footer", () => {
   it("only lists services that are actually configured, never invented ones", () => {
     renderFooter();
 
-    expect(screen.getByText("Airport Transfers")).toBeInTheDocument();
+    expect(screen.getByText("Airport Transfer")).toBeInTheDocument();
+    expect(screen.getByText("Corporate Events")).toBeInTheDocument();
     expect(screen.queryByText("Wedding Planning")).not.toBeInTheDocument();
+  });
+
+  it("does not render a social links section when none are configured", () => {
+    renderFooter();
+
+    expect(screen.queryByText("Follow Us")).not.toBeInTheDocument();
   });
 });

@@ -8,4 +8,8 @@ export interface CompanyInfoDto {
   openingHours: string;
   emergencyPhone: string | null;
   description: string | null;
+  operatingCountryCodes: string[];
+  facebookUrl: string | null;
+  instagramUrl: string | null;
+  whatsAppUrl: string | null;
 }

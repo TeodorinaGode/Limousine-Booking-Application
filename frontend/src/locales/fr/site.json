@@ -11,9 +11,9 @@
   },
   "hero": {
     "eyebrow": "Service de chauffeur premium",
-    "title1": "Voyagez confortablement.",
-    "title2": "Arrivez en toute confiance.",
-    "subtitle": "Transferts privés en limousine à travers la Suisse.",
+    "title1": "Voyagez dans le luxe.",
+    "title2": "Pris en charge avec soin.",
+    "subtitle": "Transferts privés premium en Suisse et à travers l'Europe.",
     "ctaPrimary": "Réserver un trajet",
     "ctaSecondary": "Découvrir nos services"
   },
@@ -48,33 +48,29 @@
     "title": "Nos services",
     "subtitle": "Un transport professionnel pour chaque occasion.",
     "bookTransfer": "Réserver votre transfert",
-    "airport": {
-      "title": "Transferts aéroport",
-      "desc": "Voyagez confortablement entre aéroports, hôtels et destinations avec un chauffeur privé professionnel."
+    "airportTransfer": {
+      "title": "Transfert aéroport",
+      "desc": "Commencez ou terminez votre voyage confortablement avec un chauffeur privé professionnel, directement depuis ou vers l'aéroport."
     },
-    "business": {
-      "title": "Transferts d'affaires",
-      "desc": "Transport ponctuel et discret pour réunions, conférences et voyages d'affaires."
+    "corporateEvents": {
+      "title": "Événements d'entreprise",
+      "desc": "Transport professionnel et discret pour réunions d'affaires, événements d'entreprise et déplacements de cadres."
     },
-    "cityToCity": {
-      "title": "Transferts inter-villes",
-      "desc": "Trajets longue distance confortables entre villes suisses, porte à porte."
+    "cityTours": {
+      "title": "Visites de la ville",
+      "desc": "Une manière privée et confortable de découvrir votre destination aux côtés d'un chauffeur professionnel."
     },
-    "corporate": {
-      "title": "Voyages d'entreprise",
-      "desc": "Solutions de transport fiables pour les entreprises et leurs équipes."
+    "pointToPoint": {
+      "title": "Transferts point à point",
+      "desc": "Transport direct, efficace et privé entre deux lieux quelconques de votre trajet."
     },
-    "events": {
-      "title": "Événements & occasions spéciales",
-      "desc": "Transport élégant pour mariages, célébrations et événements spéciaux."
-    },
-    "privateChauffeur": {
-      "title": "Service de chauffeur privé",
-      "desc": "Un chauffeur dédié à votre disposition pour l'ensemble de votre trajet."
+    "professionalChauffeursService": {
+      "title": "Service de chauffeur professionnel",
+      "desc": "Un chauffeur dédié, formé et licencié, attentif à votre sécurité et à votre confort de la prise en charge jusqu'à l'arrivée."
     }
   },
   "airportHighlight": {
-    "title": "Transferts aéroport",
+    "title": "Transfert aéroport",
     "subtitle": "De l'aéroport à votre destination, sans stress.",
     "pickup": "Prise en charge à l'aéroport",
     "chauffeur": "Chauffeur professionnel",
@@ -105,29 +101,17 @@
   },
   "whyUs": {
     "title": "Pourquoi nous choisir",
-    "professional": {
+    "reliability": {
+      "title": "Fiabilité",
+      "desc": "Votre trajet est organisé autour de votre emploi du temps — nous vous conduisons à destination à l'heure, à chaque fois."
+    },
+    "luxury": {
+      "title": "Luxe",
+      "desc": "Voyagez dans un véhicule premium issu d'une flotte pensée pour le confort et l'élégance."
+    },
+    "professionalChauffeurs": {
       "title": "Chauffeurs professionnels",
-      "desc": "Des chauffeurs expérimentés, attentifs à votre confort et à votre sécurité."
-    },
-    "premium": {
-      "title": "Véhicules premium",
-      "desc": "Une flotte bien entretenue pour un trajet confortable."
-    },
-    "reliable": {
-      "title": "Transferts fiables",
-      "desc": "Un service ponctuel sur lequel vous pouvez compter."
-    },
-    "comfortable": {
-      "title": "Trajets confortables",
-      "desc": "Voyagez détendu, à chaque fois."
-    },
-    "personalized": {
-      "title": "Service personnalisé",
-      "desc": "Votre trajet, organisé selon vos besoins."
-    },
-    "simple": {
-      "title": "Réservation simple",
-      "desc": "Réservez votre trajet en quelques étapes, sans compte."
+      "desc": "Des chauffeurs formés, licenciés et expérimentés qui font de votre sécurité et de votre confort une priorité."
     }
   },
   "howItWorks": {
@@ -152,42 +136,42 @@
   "about": {
     "title": "À propos de notre service",
     "subtitle": "Un transport professionnel conçu autour de votre voyage.",
-    "body1": "Nous proposons un transport privé avec chauffeur axé sur le confort, la ponctualité et la discrétion.",
-    "body2": "Chaque trajet est organisé avec le plus grand soin, de la réservation jusqu'à votre arrivée."
+    "body1": "ROI Limousinen propose un service de chauffeur premium sur mesure en Suisse et dans les pays voisins, fondé sur le confort, la fiabilité et la discrétion.",
+    "body2": "Qu'il s'agisse d'un événement spécial, d'un déplacement professionnel, d'un transfert aéroport ou d'un trajet privé, chaque voyage est organisé avec la même attention aux détails, de la réservation jusqu'à l'arrivée."
   },
   "faq": {
     "title": "Questions fréquentes",
     "q1": {
-      "question": "Comment réserver une limousine ?",
-      "answer": "Sélectionnez un trajet ou utilisez le formulaire de réservation, choisissez la date, l'heure et les détails, puis confirmez et payez en ligne."
+      "question": "Comment fonctionnez-vous ?",
+      "answer": "Nous proposons un transport privé avec chauffeur, assuré par des conducteurs professionnels et licenciés, en Suisse et dans les pays voisins. Vous pouvez réserver en ligne, choisir votre trajet, la date et l'heure, puis payer en toute sécurité — sans appel téléphonique."
     },
     "q2": {
-      "question": "Ai-je besoin d'un compte ?",
-      "answer": "Non. Vous pouvez réserver, payer et recevoir votre confirmation entièrement en tant qu'invité."
+      "question": "Dans quels pays intervenez-vous ?",
+      "answer": "Nous intervenons en Suisse, en Autriche, en Italie, en Allemagne, en France, en Belgique et au Luxembourg."
     },
     "q3": {
-      "question": "Puis-je réserver un transfert aéroport ?",
-      "answer": "Oui, les transferts aéroport font partie de nos services principaux — réservez-les comme n'importe quel autre trajet."
+      "question": "Quels véhicules proposez-vous ?",
+      "answer": "Notre flotte actuelle est construite autour de la Mercedes Classe S ; d'autres véhicules seront présentés ici au fur et à mesure de leur disponibilité."
     },
     "q4": {
-      "question": "Combien de temps à l'avance puis-je réserver ?",
-      "answer": "Les réservations nécessitent un délai minimum, indiqué automatiquement lors du processus de réservation."
+      "question": "Comment puis-je effectuer une réservation ?",
+      "answer": "Sélectionnez un trajet ou utilisez le formulaire de réservation sur ce site, choisissez la date, l'heure et les détails, puis confirmez et payez en ligne."
     },
     "q5": {
-      "question": "Puis-je annuler ma réservation ?",
-      "answer": "Les annulations sont traitées par notre équipe — veuillez nous contacter via les coordonnées ci-dessous."
+      "question": "Vos chauffeurs sont-ils des professionnels ?",
+      "answer": "Oui — chaque chauffeur est formé, expérimenté et licencié, et veille à votre sécurité et à votre confort tout au long du trajet."
     },
     "q6": {
-      "question": "Quels moyens de paiement sont acceptés ?",
-      "answer": "Les paiements sont traités en toute sécurité en ligne via notre prestataire de paiement."
+      "question": "Ai-je besoin d'un compte pour réserver ?",
+      "answer": "Non. Vous pouvez réserver, payer et recevoir votre confirmation entièrement en tant qu'invité, sans compte requis."
     },
     "q7": {
-      "question": "Vais-je recevoir une confirmation ?",
-      "answer": "Oui, une confirmation vous est envoyée par e-mail dès que votre réservation est traitée."
+      "question": "Comment puis-je payer ?",
+      "answer": "Les paiements sont traités en toute sécurité en ligne via notre prestataire de paiement à la fin du processus de réservation."
     },
     "q8": {
-      "question": "Puis-je modifier mon adresse de prise en charge ?",
-      "answer": "Veuillez nous contacter dès que possible via les coordonnées ci-dessous, nous serons heureux de vous aider."
+      "question": "Comment vais-je recevoir ma confirmation ?",
+      "answer": "Une confirmation vous est envoyée par e-mail dès que votre réservation est traitée."
     }
   },
   "contact": {
@@ -204,7 +188,11 @@
       "message": "Message",
       "send": "Envoyer le message",
       "sending": "Envoi en cours...",
-      "success": "Merci — votre message a bien été reçu."
+      "success": "Merci — votre message a bien été reçu.",
+      "preferredContactMethod": "Moyen de contact préféré",
+      "phoneOption": "Téléphone",
+      "emailOption": "E-mail",
+      "preferredDate": "Date préférée (facultatif)"
     }
   },
   "finalCta": {
@@ -213,14 +201,15 @@
     "cta": "Réserver un trajet"
   },
   "footer": {
-    "description": "Transport privé avec chauffeur à travers la Suisse.",
+    "description": "Service de chauffeur premium en Suisse et à travers l'Europe.",
     "navigation": "Navigation",
     "services": "Services",
     "contact": "Contact",
     "rights": "Tous droits réservés.",
     "privacyPolicy": "Politique de confidentialité",
     "termsConditions": "Conditions générales",
-    "cookiePolicy": "Politique de cookies"
+    "cookiePolicy": "Politique de cookies",
+    "followUs": "Suivez-nous"
   },
   "legal": {
     "privacyTitle": "Politique de confidentialité",
@@ -232,5 +221,22 @@
     "open": "Ouvrir le menu",
     "close": "Fermer le menu"
   },
-  "backToTop": "Retour en haut"
+  "backToTop": "Retour en haut",
+  "operatingArea": {
+    "title": "Notre zone d'intervention",
+    "subtitle": "Au service de nos clients à travers l'Europe.",
+    "countries": {
+      "CH": "Suisse",
+      "AT": "Autriche",
+      "IT": "Italie",
+      "DE": "Allemagne",
+      "FR": "France",
+      "BE": "Belgique",
+      "LU": "Luxembourg"
+    }
+  },
+  "seo": {
+    "homeTitle": "ROI Limousinen | Service de chauffeur et limousine premium",
+    "homeDescription": "Services premium de limousine et de chauffeur depuis la Suisse pour les transferts aéroport, les voyages d'affaires, les visites de ville et les trajets privés."
+  }
 }

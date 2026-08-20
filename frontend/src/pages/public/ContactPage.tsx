@@ -17,9 +17,19 @@ interface ContactFormValues {
   phone: string;
   subject: string;
   message: string;
+  preferredContactMethod: "" | "Phone" | "Email";
+  preferredDate: string;
 }
 
-const initialValues: ContactFormValues = { name: "", email: "", phone: "", subject: "", message: "" };
+const initialValues: ContactFormValues = {
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+  preferredContactMethod: "",
+  preferredDate: "",
+};
 
 /** Public Contact page + form (Prompt 17, section 17/18) — the customer needs no account; the form posts to POST /api/public/contact. */
 function ContactPage() {
@@ -62,6 +72,8 @@ function ContactPage() {
         phone: values.phone.trim() || undefined,
         subject: values.subject.trim(),
         message: values.message.trim(),
+        preferredContactMethod: values.preferredContactMethod || undefined,
+        preferredDate: values.preferredDate || undefined,
       });
       setIsSubmitted(true);
       setValues(initialValues);
@@ -139,6 +151,32 @@ function ContactPage() {
                   <br />
                   <textarea id="contact-message" value={values.message} onChange={(e) => setValues({ ...values, message: e.target.value })} style={{ maxWidth: "100%" }} />
                   {errors.message && <p className="form-error">{errors.message}</p>}
+                </div>
+
+                <div className="row">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label htmlFor="contact-preferred-method">{t("contact.form.preferredContactMethod")}</label>
+                    <br />
+                    <select
+                      id="contact-preferred-method"
+                      value={values.preferredContactMethod}
+                      onChange={(e) => setValues({ ...values, preferredContactMethod: e.target.value as ContactFormValues["preferredContactMethod"] })}
+                    >
+                      <option value="">—</option>
+                      <option value="Phone">{t("contact.form.phoneOption")}</option>
+                      <option value="Email">{t("contact.form.emailOption")}</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label htmlFor="contact-preferred-date">{t("contact.form.preferredDate")}</label>
+                    <br />
+                    <input
+                      id="contact-preferred-date"
+                      type="date"
+                      value={values.preferredDate}
+                      onChange={(e) => setValues({ ...values, preferredDate: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 {submitError && <p role="alert">{submitError}</p>}

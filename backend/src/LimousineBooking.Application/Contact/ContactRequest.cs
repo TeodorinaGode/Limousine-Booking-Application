@@ -8,4 +8,6 @@ public class ContactRequest
     public string? Phone { get; set; }
     public string Subject { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    public string? PreferredContactMethod { get; set; }
+    public DateOnly? PreferredDate { get; set; }
 }

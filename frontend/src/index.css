@@ -1495,6 +1495,18 @@ tbody tr:last-child td {
   gap: var(--space-6);
   flex-wrap: wrap;
 }
+.site-footer__social {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.site-footer__social a {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+.site-footer__social a:hover {
+  color: var(--color-text-primary);
+}
 .site-footer__legal a {
   color: var(--color-text-muted);
   font-size: 0.8rem;

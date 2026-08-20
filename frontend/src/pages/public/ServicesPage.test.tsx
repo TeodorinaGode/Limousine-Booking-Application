@@ -31,20 +31,23 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 
 describe("ServicesPage", () => {
-  it("lists all six marketing services, each with a booking call to action", () => {
+  it("lists all five real ROI Limousinen services, each with a booking call to action", () => {
     renderPage();
 
-    expect(screen.getAllByText("Airport Transfers").length).toBeGreaterThan(0);
-    expect(screen.getByText("Business Transfers")).toBeInTheDocument();
-    expect(screen.getAllByText("City-to-City Transfers").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Corporate Travel").length).toBeGreaterThan(0);
-    expect(screen.getByText("Events & Special Occasions")).toBeInTheDocument();
-    expect(screen.getAllByText("Private Chauffeur Service").length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Book Your Transfer" })).toHaveLength(6);
+    expect(screen.getAllByText("Airport Transfer").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Corporate Events").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("City Tours").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Point-to-Point Transfers").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Professional Chauffeur Service").length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Book Your Transfer" })).toHaveLength(5);
   });
 
   it("highlights airport transfers with a dedicated call to action", () => {

@@ -114,4 +114,32 @@ public class PublicContactServiceTests
 
         Assert.False(result.Succeeded);
     }
+
+    [Fact]
+    public async Task SubmitAsync_PreferredContactMethodAndDate_ArePersisted()
+    {
+        DomainContactMessage? captured = null;
+        _contactMessageRepository.Setup(r => r.AddAsync(It.IsAny<DomainContactMessage>(), It.IsAny<CancellationToken>()))
+            .Callback<DomainContactMessage, CancellationToken>((m, _) => captured = m)
+            .Returns(Task.CompletedTask);
+        var preferredDate = new DateOnly(2026, 9, 1);
+
+        var result = await CreateService().SubmitAsync(MakeRequest(r =>
+        {
+            r.PreferredContactMethod = "Phone";
+            r.PreferredDate = preferredDate;
+        }));
+
+        Assert.True(result.Succeeded);
+        Assert.Equal("Phone", captured!.PreferredContactMethod);
+        Assert.Equal(preferredDate, captured.PreferredDate);
+    }
+
+    [Fact]
+    public async Task SubmitAsync_InvalidPreferredContactMethod_Fails()
+    {
+        var result = await CreateService().SubmitAsync(MakeRequest(r => r.PreferredContactMethod = "Carrier Pigeon"));
+
+        Assert.False(result.Succeeded);
+    }
 }

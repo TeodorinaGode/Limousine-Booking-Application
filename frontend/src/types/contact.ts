@@ -4,4 +4,6 @@ export interface ContactFormRequest {
   phone?: string;
   subject: string;
   message: string;
+  preferredContactMethod?: "Phone" | "Email";
+  preferredDate?: string;
 }

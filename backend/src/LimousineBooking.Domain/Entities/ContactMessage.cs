@@ -1,3 +1,4 @@
+using System.Linq;
 using LimousineBooking.Domain.Common;
 using LimousineBooking.Domain.Enums;
 
@@ -21,15 +22,23 @@ public class ContactMessage : AuditableEntity
     public string Subject { get; private set; } = string.Empty;
     public string Message { get; private set; } = string.Empty;
 
+    /// <summary>"Phone" or "Email" — how the customer would like to be contacted back (Prompt 18, section 16). Optional; null means no preference was given.</summary>
+    public string? PreferredContactMethod { get; private set; }
+
+    /// <summary>An optional date the customer would like to be contacted by/reached (Prompt 18, section 16) — not validated against "not in the past", since this is only a soft scheduling hint for whoever follows up, not a booking commitment.</summary>
+    public DateOnly? PreferredDate { get; private set; }
+
     public ContactMessageStatus Status { get; private set; } = ContactMessageStatus.Pending;
     public DateTime? SentAt { get; private set; }
     public string? ErrorMessage { get; private set; }
+
+    private static readonly string[] AllowedContactMethods = { "Phone", "Email" };
 
     private ContactMessage()
     {
     }
 
-    public ContactMessage(string name, string email, string? phone, string subject, string message)
+    public ContactMessage(string name, string email, string? phone, string subject, string message, string? preferredContactMethod = null, DateOnly? preferredDate = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name is required.", nameof(name));
@@ -43,12 +52,16 @@ public class ContactMessage : AuditableEntity
             throw new ArgumentException("Subject is required.", nameof(subject));
         if (string.IsNullOrWhiteSpace(message))
             throw new ArgumentException("Message is required.", nameof(message));
+        if (!string.IsNullOrWhiteSpace(preferredContactMethod) && !AllowedContactMethods.Contains(preferredContactMethod, StringComparer.OrdinalIgnoreCase))
+            throw new ArgumentException("Preferred contact method must be 'Phone' or 'Email'.", nameof(preferredContactMethod));
 
         Name = name;
         Email = email;
         Phone = string.IsNullOrWhiteSpace(phone) ? null : phone;
         Subject = subject;
         Message = message;
+        PreferredContactMethod = string.IsNullOrWhiteSpace(preferredContactMethod) ? null : preferredContactMethod;
+        PreferredDate = preferredDate;
     }
 
     public void MarkSent(DateTime sentAtUtc)

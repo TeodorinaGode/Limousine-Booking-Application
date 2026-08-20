@@ -48,6 +48,10 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 
@@ -55,7 +59,7 @@ describe("HomePage", () => {
   it("renders the hero with the primary and secondary calls to action", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("Travel in comfort.");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("Luxury Travel.");
     expect(screen.getAllByRole("link", { name: "Book a Ride" }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Explore Our Services" })).toBeInTheDocument();
   });
@@ -68,12 +72,19 @@ describe("HomePage", () => {
     expect(screen.getAllByText("Premium Vehicles").length).toBeGreaterThan(0);
   });
 
-  it("lists all six marketing services with a booking CTA each", () => {
+  it("lists all five real ROI Limousinen services with a booking CTA each", () => {
     renderPage();
 
-    expect(screen.getAllByText("Airport Transfers").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Private Chauffeur Service").length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Book Your Transfer" })).toHaveLength(6);
+    expect(screen.getAllByText("Airport Transfer").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Professional Chauffeur Service").length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Book Your Transfer" })).toHaveLength(5);
+  });
+
+  it("shows the real operating countries, sourced from the backend", async () => {
+    renderPage();
+
+    expect(await screen.findByText("Switzerland")).toBeInTheDocument();
+    expect(screen.getByText("Austria")).toBeInTheDocument();
   });
 
   it("loads and displays popular routes from the backend, never hard-coded", async () => {

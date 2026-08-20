@@ -23,6 +23,10 @@ public class PublicCompanyService : IPublicCompanyService
         Website = _settings.Website,
         OpeningHours = _settings.OpeningHours,
         EmergencyPhone = string.IsNullOrWhiteSpace(_settings.EmergencyPhone) ? null : _settings.EmergencyPhone,
-        Description = string.IsNullOrWhiteSpace(_settings.Description) ? null : _settings.Description
+        Description = string.IsNullOrWhiteSpace(_settings.Description) ? null : _settings.Description,
+        OperatingCountryCodes = _settings.OperatingCountryCodes,
+        FacebookUrl = string.IsNullOrWhiteSpace(_settings.FacebookUrl) ? null : _settings.FacebookUrl,
+        InstagramUrl = string.IsNullOrWhiteSpace(_settings.InstagramUrl) ? null : _settings.InstagramUrl,
+        WhatsAppUrl = string.IsNullOrWhiteSpace(_settings.WhatsAppUrl) ? null : _settings.WhatsAppUrl
     };
 }

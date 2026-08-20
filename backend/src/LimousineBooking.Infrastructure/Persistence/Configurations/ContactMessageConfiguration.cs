@@ -31,6 +31,12 @@ public class ContactMessageConfiguration : IEntityTypeConfiguration<ContactMessa
             .IsRequired()
             .HasMaxLength(2000);
 
+        builder.Property(c => c.PreferredContactMethod)
+            .HasMaxLength(10);
+
+        builder.Property(c => c.PreferredDate)
+            .HasColumnType("date");
+
         builder.Property(c => c.Status)
             .IsRequired()
             .HasConversion<string>()

@@ -31,6 +31,10 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 
@@ -39,8 +43,9 @@ describe("AboutPage", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: "About Our Service", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Reliability")).toBeInTheDocument();
+    expect(screen.getByText("Luxury")).toBeInTheDocument();
     expect(screen.getByText("Professional Chauffeurs")).toBeInTheDocument();
-    expect(screen.getByText("Simple Booking")).toBeInTheDocument();
   });
 
   it("links the final call to action to the booking flow", () => {

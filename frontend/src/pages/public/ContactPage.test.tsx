@@ -36,6 +36,10 @@ beforeEach(() => {
     openingHours: "",
     emergencyPhone: null,
     description: null,
+    operatingCountryCodes: ["CH", "AT"],
+    facebookUrl: null,
+    instagramUrl: null,
+    whatsAppUrl: null,
   });
 });
 
@@ -107,5 +111,35 @@ describe("ContactPage", () => {
     const callLink = await screen.findByRole("link", { name: "Call Us" });
     expect(callLink).toHaveAttribute("href", "tel:+41 79 000 00 00");
     expect(screen.getByRole("link", { name: "Email Us" })).toHaveAttribute("href", "mailto:info@example.com");
+  });
+
+  it("submits the optional preferred contact method and date when provided", async () => {
+    const user = userEvent.setup();
+    mockedContactService.submitContactForm.mockResolvedValue({ message: "ok" });
+    renderPage();
+
+    await fillValidForm(user);
+    await user.selectOptions(screen.getByLabelText("Preferred contact method"), "Phone");
+    await user.type(screen.getByLabelText("Preferred date (optional)"), "2026-09-10");
+    await user.click(screen.getByRole("button", { name: "Send Message" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(mockedContactService.submitContactForm).toHaveBeenCalledWith(
+      expect.objectContaining({ preferredContactMethod: "Phone", preferredDate: "2026-09-10" })
+    );
+  });
+
+  it("omits preferred contact fields when left unset", async () => {
+    const user = userEvent.setup();
+    mockedContactService.submitContactForm.mockResolvedValue({ message: "ok" });
+    renderPage();
+
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: "Send Message" }));
+
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(mockedContactService.submitContactForm).toHaveBeenCalledWith(
+      expect.objectContaining({ preferredContactMethod: undefined, preferredDate: undefined })
+    );
   });
 });

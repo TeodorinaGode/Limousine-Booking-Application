@@ -25,6 +25,7 @@ public class PublicContactService : IPublicContactService
         var phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
         var subject = request.Subject?.Trim() ?? string.Empty;
         var message = request.Message?.Trim() ?? string.Empty;
+        var preferredContactMethod = string.IsNullOrWhiteSpace(request.PreferredContactMethod) ? null : request.PreferredContactMethod.Trim();
 
         var validationError = Validate(name, subject, message);
         if (validationError is not null)
@@ -33,7 +34,7 @@ public class PublicContactService : IPublicContactService
         DomainContactMessage contactMessage;
         try
         {
-            contactMessage = new DomainContactMessage(name, email, phone, subject, message);
+            contactMessage = new DomainContactMessage(name, email, phone, subject, message, preferredContactMethod, request.PreferredDate);
         }
         catch (ArgumentException ex)
         {

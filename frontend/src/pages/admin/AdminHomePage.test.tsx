@@ -3,17 +3,41 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AdminHomePage from "./AdminHomePage";
 import * as adminBookingService from "../../services/adminBookingService";
+import * as reportService from "../../services/reportService";
 import * as authContext from "../../context/AuthContext";
 import type { AdminDashboardDto } from "../../types/adminBooking";
+import type { ReportSummaryDto } from "../../types/reports";
 
 vi.mock("../../services/adminBookingService");
+vi.mock("../../services/reportService");
 vi.mock("../../context/AuthContext", async () => {
   const actual = await vi.importActual<typeof authContext>("../../context/AuthContext");
   return { ...actual, useAuth: vi.fn() };
 });
 
 const mockedAdminBookingService = vi.mocked(adminBookingService);
+const mockedReportService = vi.mocked(reportService);
 const mockedUseAuth = vi.mocked(authContext.useAuth);
+
+function makeSummary(overrides: Partial<ReportSummaryDto> = {}): ReportSummaryDto {
+  return {
+    dateFrom: "2026-12-01",
+    dateTo: "2026-12-25",
+    totalBookings: 42,
+    confirmedBookings: 30,
+    pendingBookings: 5,
+    completedBookings: 8,
+    cancelledBookings: 5,
+    grossRevenue: 18500,
+    completedRevenue: 13200,
+    averageBookingValue: 148,
+    averageCompletedBookingValue: 183,
+    manualAssignments: 14,
+    automaticAssignments: 111,
+    currency: "CHF",
+    ...overrides,
+  };
+}
 
 function makeDashboard(overrides: Partial<AdminDashboardDto> = {}): AdminDashboardDto {
   return {
@@ -48,6 +72,7 @@ beforeEach(() => {
     login: vi.fn(),
     logout: vi.fn(),
   });
+  mockedReportService.getSummary.mockResolvedValue(makeSummary());
 });
 
 describe("AdminHomePage", () => {
@@ -94,5 +119,23 @@ describe("AdminHomePage", () => {
 
     expect(await screen.findByText("John Smith")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /14:00/ })).toHaveAttribute("href", "/admin/bookings/11111111-1111-1111-1111-111111111111");
+  });
+
+  it("shows this month's completed count and revenue from the reports summary API", async () => {
+    mockedAdminBookingService.getDashboard.mockResolvedValue(makeDashboard());
+    mockedReportService.getSummary.mockResolvedValue(makeSummary({ completedBookings: 8, grossRevenue: 18500 }));
+
+    renderPage();
+
+    expect(await screen.findByText("Completed: 8")).toBeInTheDocument();
+    expect(screen.getByText("Revenue this month: CHF 18500.00")).toBeInTheDocument();
+  });
+
+  it("links to the reports page", async () => {
+    mockedAdminBookingService.getDashboard.mockResolvedValue(makeDashboard());
+
+    renderPage();
+
+    expect(await screen.findByRole("link", { name: "Reports" })).toHaveAttribute("href", "/admin/reports");
   });
 });

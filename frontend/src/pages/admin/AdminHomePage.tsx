@@ -2,7 +2,18 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboard } from "../../services/adminBookingService";
+import { getSummary } from "../../services/reportService";
 import type { AdminDashboardDto } from "../../types/adminBooking";
+import type { ReportSummaryDto } from "../../types/reports";
+
+function zurichToday(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich" }).format(new Date());
+}
+
+function startOfZurichMonth(): string {
+  const today = new Date(`${zurichToday()}T00:00:00`);
+  return new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+}
 
 function formatDate(dateIso: string): string {
   return new Date(`${dateIso}T00:00:00`).toLocaleDateString(undefined, { day: "2-digit", month: "short" });
@@ -17,13 +28,19 @@ function AdminHomePage() {
   const navigate = useNavigate();
 
   const [dashboard, setDashboard] = useState<AdminDashboardDto | null>(null);
+  const [monthSummary, setMonthSummary] = useState<ReportSummaryDto | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!accessToken) return;
     (async () => {
       try {
-        setDashboard(await getDashboard(accessToken));
+        const [dashboardResult, summaryResult] = await Promise.all([
+          getDashboard(accessToken),
+          getSummary({ dateFrom: startOfZurichMonth(), dateTo: zurichToday() }, accessToken),
+        ]);
+        setDashboard(dashboardResult);
+        setMonthSummary(summaryResult);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load dashboard statistics.");
       }
@@ -51,6 +68,8 @@ function AdminHomePage() {
         <Link to="/admin/vehicles">Manage Vehicles</Link>
         {" | "}
         <Link to="/admin/drivers">Manage Drivers</Link>
+        {" | "}
+        <Link to="/admin/reports">Reports</Link>
       </nav>
       <button type="button" onClick={handleLogout}>
         Logout
@@ -70,6 +89,12 @@ function AdminHomePage() {
               <p>Confirmed: {dashboard.confirmedBookings}</p>
               <p>Cancelled: {dashboard.cancelledBookings}</p>
               <p>Upcoming trips: {dashboard.upcomingTripsCount}</p>
+              {monthSummary && <p>Completed: {monthSummary.completedBookings}</p>}
+              {monthSummary && (
+                <p>
+                  Revenue this month: {monthSummary.currency} {monthSummary.grossRevenue.toFixed(2)}
+                </p>
+              )}
             </div>
           </section>
 

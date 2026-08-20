@@ -4,6 +4,7 @@ using LimousineBooking.Application.Bookings;
 using LimousineBooking.Application.Drivers;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Notifications;
+using LimousineBooking.Application.Reports;
 using LimousineBooking.Application.Routes;
 using LimousineBooking.Application.Vehicles;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IPublicBookingService, PublicBookingService>();
         services.AddScoped<IAdminBookingService, AdminBookingService>();
         services.AddScoped<IDriverBookingService, DriverBookingService>();
+        services.AddScoped<IReportService, ReportService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAdminNotificationService, AdminNotificationService>();
         services.AddScoped<INotificationOutboxProcessor, NotificationOutboxProcessor>();

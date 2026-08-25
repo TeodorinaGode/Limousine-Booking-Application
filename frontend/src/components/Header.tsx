@@ -3,6 +3,9 @@ import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { APP_BRAND_NAME } from "../config/brand";
 import LanguageSelector from "./LanguageSelector";
+import ThemeToggle from "./ThemeToggle";
+import CustomCursor from "./CustomCursor";
+import { useTheme } from "../context/ThemeContext";
 
 const NAV_LINKS = [
   { to: "/", key: "home" },
@@ -24,6 +27,7 @@ const NAV_LINKS = [
  */
 function Header() {
   const { t } = useTranslation("site");
+  const { theme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -34,11 +38,25 @@ function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // `data-theme` is applied to <html> only while a page rendering `Header`
+  // (i.e. a public page) is mounted, and removed on unmount — Admin/Driver
+  // pages never render `Header`, so a visitor's saved light-theme choice can
+  // never bleed into those portals, even though ThemeProvider sits above the
+  // whole app for simplicity (see ThemeContext.tsx).
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    return () => document.documentElement.removeAttribute("data-theme");
+  }, [theme]);
+
+  const [brandFirst, ...brandRest] = APP_BRAND_NAME.split(" ");
+
   return (
     <header className={`site-header${isScrolled ? " site-header--scrolled" : ""}`}>
+      <CustomCursor />
       <div className="container site-header__bar">
         <Link to="/" className="site-header__brand" onClick={() => setIsMenuOpen(false)}>
-          {APP_BRAND_NAME}
+          <span>{brandFirst}</span>
+          {brandRest.length > 0 && <span>{brandRest.join(" ")}</span>}
         </Link>
 
         <nav className="site-header__nav" aria-label="Primary">
@@ -56,10 +74,11 @@ function Header() {
 
         <div className="site-header__actions">
           <div className="site-header__language">
+            <ThemeToggle />
             <LanguageSelector />
           </div>
           <Link to="/booking" className="site-header__cta">
-            {t("nav.bookARide")}
+            {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
           </Link>
           <button
             type="button"
@@ -89,9 +108,10 @@ function Header() {
             ))}
           </nav>
           <div className="site-header__mobile-footer">
+            <ThemeToggle />
             <LanguageSelector />
             <Link to="/booking" className="site-header__cta site-header__cta--block" onClick={() => setIsMenuOpen(false)}>
-              {t("nav.bookARide")}
+              {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
             </Link>
           </div>
         </div>

@@ -6,7 +6,38 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
+
+/**
+ * One full-width cinematic reveal per vehicle (Prompt 21, section 16/17) —
+ * its own component (not inlined in a `.map()`) specifically so each
+ * instance gets its own stable `useScrollReveal()` call; calling a hook
+ * inside a loop directly would violate the rules of hooks once the vehicle
+ * list's length changes between renders (0 while loading, then N).
+ */
+function FleetVehicleReveal({ vehicle }: { vehicle: PublicVehicleDto }) {
+  const { t } = useTranslation("site");
+  const reveal = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <div ref={reveal.ref} className={`fleet-cinematic ${reveal.className}`} style={{ marginBottom: "var(--space-8)" }}>
+      <div>
+        <p className="fleet-cinematic__label">{vehicle.vehicleType}</p>
+        <h2 className="fleet-cinematic__name">
+          <span style={{ display: "block" }}>{vehicle.make}</span>
+          <span style={{ display: "block" }}>{vehicle.model}</span>
+        </h2>
+        <p className="text-secondary" style={{ marginTop: "var(--space-4)" }}>
+          {t("fleetPage.passengers")}: {vehicle.passengerCapacity}
+        </p>
+        <Link to="/booking" className="cta-noir cta-noir--solid" style={{ marginTop: "var(--space-4)", display: "inline-flex" }}>
+          {t("fleetTeaser.bookYourJourney")}<span aria-hidden="true"> &rarr;</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 /** Public Fleet page (Prompt 17, section 11/12) — sourced from GET /api/public/vehicles, which already excludes inactive vehicles and internal fields (registration number, notes). Never hard-coded into React. */
 function FleetPage() {
@@ -56,21 +87,7 @@ function FleetPage() {
               <p className="empty-state__title">{t("fleetPage.noVehicles")}</p>
             </div>
           ) : (
-            <div className="grid grid--3">
-              {vehicles.map((vehicle) => (
-                <article className="content-card" key={vehicle.id}>
-                  <div className="content-card__media" role="img" aria-label={`${vehicle.make} ${vehicle.model}`}>🚘</div>
-                  <h2 className="content-card__title" style={{ textTransform: "none" }}>{vehicle.make} {vehicle.model}</h2>
-                  <p className="content-card__desc">{vehicle.vehicleType}</p>
-                  <p className="content-card__meta">
-                    <span>{t("fleetPage.passengers")}: {vehicle.passengerCapacity}</span>
-                  </p>
-                  <Link to="/booking" className="btn-secondary" style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}>
-                    {t("fleetTeaser.bookYourJourney")}
-                  </Link>
-                </article>
-              ))}
-            </div>
+            vehicles.map((vehicle) => <FleetVehicleReveal key={vehicle.id} vehicle={vehicle} />)
           )}
         </div>
       </section>

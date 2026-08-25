@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import FleetPage from "./FleetPage";
 import { AuthProvider } from "../../context/AuthContext";
+import { ThemeProvider } from "../../context/ThemeContext";
 import * as publicVehicleService from "../../services/publicVehicleService";
 import * as companyService from "../../services/companyService";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
@@ -16,9 +17,9 @@ const mockedCompanyService = vi.mocked(companyService);
 function renderPage() {
   return render(
     <MemoryRouter>
-      <AuthProvider>
+      <ThemeProvider><AuthProvider>
         <FleetPage />
-      </AuthProvider>
+      </AuthProvider></ThemeProvider>
     </MemoryRouter>
   );
 }
@@ -52,8 +53,9 @@ describe("FleetPage", () => {
     mockedPublicVehicleService.getActiveVehicles.mockResolvedValue(vehicles);
     renderPage();
 
-    expect(await screen.findByText("Mercedes-Benz S-Class")).toBeInTheDocument();
-    expect(screen.getByText("Mercedes-Benz V-Class")).toBeInTheDocument();
+    expect(await screen.findAllByText("Mercedes-Benz")).toHaveLength(2);
+    expect(screen.getByText("S-Class")).toBeInTheDocument();
+    expect(screen.getByText("V-Class")).toBeInTheDocument();
     expect(mockedPublicVehicleService.getActiveVehicles).toHaveBeenCalled();
   });
 

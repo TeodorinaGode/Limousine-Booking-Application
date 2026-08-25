@@ -8,6 +8,7 @@ import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useCompanyInfo } from "../../hooks/useCompanyInfo";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -36,6 +37,7 @@ function ContactPage() {
   const { t } = useTranslation(["site", "validation"]);
   usePageMeta(`${t("contact.title")} | ${t("footer.description")}`, t("contact.subtitle"));
   const company = useCompanyInfo();
+  const formReveal = useScrollReveal<HTMLElement>();
 
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -88,11 +90,14 @@ function ContactPage() {
     <div>
       <Header />
 
-      <section className="section section--center">
+      <section className="noir-section noir-section--black section--center">
         <div className="container container--medium">
-          <p className="section__eyebrow">{t("nav.contact")}</p>
-          <h1 className="section__title">{t("contact.title")}</h1>
-          <p className="section__subtitle" style={{ marginLeft: "auto", marginRight: "auto" }}>{t("contact.subtitle")}</p>
+          <p className="noir-label">{t("noir.contact.title1")}</p>
+          <h1 className="noir-heading" style={{ marginTop: "var(--space-4)" }}>
+            <span className="light">{t("noir.contact.title2")}</span>
+            <span className="strong">{t("noir.contact.title3")}</span>
+          </h1>
+          <p className="section__subtitle" style={{ marginLeft: "auto", marginRight: "auto", marginTop: "var(--space-8)" }}>{t("contact.subtitle")}</p>
           {company && (
             <div className="row" style={{ justifyContent: "center", marginBottom: "var(--space-8)" }}>
               <a href={`tel:${company.phone}`} className="btn-secondary" style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}>
@@ -101,15 +106,15 @@ function ContactPage() {
               <a href={`mailto:${company.email}`} className="btn-secondary" style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}>
                 {t("contact.emailUs")}
               </a>
-              <Link to="/booking" style={{ display: "inline-block", padding: "0.6em 1.2em" }}>
-                <button type="button">{t("nav.bookARide")}</button>
+              <Link to="/booking" className="cta-noir cta-noir--solid">
+                {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
               </Link>
             </div>
           )}
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 0 }}>
+      <section ref={formReveal.ref} className={`section ${formReveal.className}`} style={{ paddingTop: 0 }}>
         <div className="container container--medium">
           <div className="card">
             <h2 style={{ marginTop: 0 }}>{t("contact.form.title")}</h2>

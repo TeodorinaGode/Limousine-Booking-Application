@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import type { PublicRouteDto } from "../../types/booking";
 import type { PublicLocationsDto } from "../../types/location";
 
@@ -46,6 +47,7 @@ function RoutesPage() {
   }, []);
 
   const showMap = locationsData && locationsData.enabled && locationsData.locations.length > 0;
+  const resultsReveal = useScrollReveal<HTMLElement>();
 
   return (
     <div>
@@ -59,7 +61,7 @@ function RoutesPage() {
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 0 }}>
+      <section ref={resultsReveal.ref} className={`section ${resultsReveal.className}`} style={{ paddingTop: 0 }}>
         <div className="container">
           {error && <p role="alert">{error}</p>}
           {isLoading ? (
@@ -117,29 +119,20 @@ function RoutesPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid--3">
+            <div className="route-editorial">
               {routes.map((route) => (
-                <article className="content-card" key={route.id}>
-                  <div className="trip-card__route" style={{ marginBottom: 0 }}>
+                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row" data-cursor="explore">
+                  <div className="route-editorial__pair">
                     <span>{route.departureLocation}</span>
-                    <span className="trip-card__arrow">&rarr;</span>
+                    <span className="route-editorial__arrow">&rarr;</span>
                     <span>{route.destination}</span>
                   </div>
-                  <p className="content-card__meta">
-                    <span>{t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m</span>
-                  </p>
-                  <p className="trip-card__price" style={{ marginTop: 0 }}>
+                  <div className="route-editorial__details">
+                    {t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m
+                    {" · "}
                     {t("routesTeaser.from")} {route.price.toFixed(2)} {route.currency}
-                  </p>
-                  <Link
-                    to="/booking"
-                    state={{ routeId: route.id }}
-                    className="btn-secondary"
-                    style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}
-                  >
-                    {t("routesTeaser.bookThisRoute")}
-                  </Link>
-                </article>
+                  </div>
+                </Link>
               ))}
             </div>
           )}

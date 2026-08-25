@@ -6,7 +6,7 @@ function MobileBookingCta() {
   const { t } = useTranslation("site");
   return (
     <Link to="/booking" className="mobile-booking-cta">
-      {t("nav.bookARide")}
+      {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
     </Link>
   );
 }

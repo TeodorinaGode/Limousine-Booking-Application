@@ -61,5 +61,9 @@
     "loading": "Chargement...",
     "error": "Une erreur s'est produite.",
     "currency": "CHF"
+  },
+  "themeToggle": {
+    "switchToLight": "Passer au thème clair",
+    "switchToDark": "Passer au thème sombre"
   }
 }

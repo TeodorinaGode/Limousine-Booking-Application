@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import RoutesPage from "./RoutesPage";
 import { AuthProvider } from "../../context/AuthContext";
+import { ThemeProvider } from "../../context/ThemeContext";
 import * as bookingService from "../../services/bookingService";
 import * as companyService from "../../services/companyService";
 import * as locationService from "../../services/locationService";
@@ -31,9 +32,9 @@ const mockedLocationService = vi.mocked(locationService);
 function renderPage() {
   return render(
     <MemoryRouter>
-      <AuthProvider>
+      <ThemeProvider><AuthProvider>
         <RoutesPage />
-      </AuthProvider>
+      </AuthProvider></ThemeProvider>
     </MemoryRouter>
   );
 }
@@ -86,7 +87,7 @@ describe("RoutesPage", () => {
     renderPage();
 
     await screen.findByText("Basel");
-    const bookLinks = screen.getAllByRole("link", { name: "Book This Route" });
+    const bookLinks = screen.getAllByRole("link", { name: /Basel.*Zurich|Geneva.*Bern/s });
     expect(bookLinks).toHaveLength(2);
     expect(bookLinks[0]).toHaveAttribute("href", "/booking");
   });

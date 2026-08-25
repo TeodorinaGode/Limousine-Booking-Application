@@ -247,5 +247,50 @@
     "availableDestinations": "Available destinations",
     "bookThisRoute": "Book This Route",
     "mainDestinations": "Main Destinations"
+  },
+  "noir": {
+    "hero": {
+      "title1": "Move",
+      "title2": "In Silence."
+    },
+    "intro": {
+      "label": "ROI Limousinen",
+      "title1": "Private",
+      "title2": "Travel.",
+      "quote": "Every journey should feel effortless.",
+      "body": "Premium chauffeur transportation designed around your time, your destination and your comfort."
+    },
+    "experience": {
+      "eyebrow": "Not Just A Ride.",
+      "words": [
+        "Privacy.",
+        "Comfort.",
+        "Precision."
+      ]
+    },
+    "chauffeur": {
+      "title1": "The Person",
+      "title2": "Behind",
+      "title3": "The Journey.",
+      "body": "Professional service from the moment you arrive."
+    },
+    "about": {
+      "label": "Who We Are"
+    },
+    "operatingArea": {
+      "title1": "Switzerland.",
+      "title2": "And Beyond."
+    },
+    "finalHero": {
+      "title1": "Your Journey",
+      "title2": "Ends Here."
+    },
+    "contact": {
+      "title1": "Ready?",
+      "title2": "Let's",
+      "title3": "Move."
+    },
+    "ctaBeginJourney": "Begin Your Journey",
+    "ctaBookThisJourney": "Book This Journey"
   }
 }

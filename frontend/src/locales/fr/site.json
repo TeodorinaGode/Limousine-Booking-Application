@@ -247,5 +247,50 @@
     "availableDestinations": "Destinations disponibles",
     "bookThisRoute": "Réserver ce trajet",
     "mainDestinations": "Destinations principales"
+  },
+  "noir": {
+    "hero": {
+      "title1": "Mouvement.",
+      "title2": "Dans le silence."
+    },
+    "intro": {
+      "label": "ROI Limousinen",
+      "title1": "Voyage",
+      "title2": "Privé.",
+      "quote": "Chaque trajet devrait sembler sans effort.",
+      "body": "Transport premium avec chauffeur, pensé autour de votre temps, votre destination et votre confort."
+    },
+    "experience": {
+      "eyebrow": "Pas seulement un trajet.",
+      "words": [
+        "Confidentialité.",
+        "Confort.",
+        "Précision."
+      ]
+    },
+    "chauffeur": {
+      "title1": "La personne",
+      "title2": "derrière",
+      "title3": "le voyage.",
+      "body": "Un service professionnel dès votre arrivée."
+    },
+    "about": {
+      "label": "Qui nous sommes"
+    },
+    "operatingArea": {
+      "title1": "Suisse.",
+      "title2": "Et au-delà."
+    },
+    "finalHero": {
+      "title1": "Votre voyage",
+      "title2": "se termine ici."
+    },
+    "contact": {
+      "title1": "Prêt ?",
+      "title2": "Passons",
+      "title3": "à l'action."
+    },
+    "ctaBeginJourney": "Commencer le voyage",
+    "ctaBookThisJourney": "Réserver ce trajet"
   }
 }

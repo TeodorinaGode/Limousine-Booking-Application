@@ -10,6 +10,7 @@ import MobileBookingCta from "../../components/MobileBookingCta";
 import HeroBookingWidget from "../../components/HeroBookingWidget";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useCompanyInfo } from "../../hooks/useCompanyInfo";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { SERVICES } from "../../config/services";
 import type { PublicRouteDto } from "../../types/booking";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
@@ -26,6 +27,17 @@ const TRUST_ITEMS = [
 
 const WHY_US_ITEMS = ["reliability", "luxury", "professionalChauffeurs"] as const;
 
+/**
+ * Public homepage, redesigned to a dark cinematic identity (Prompt 21). No
+ * real photography was available to migrate/license (see README) — the
+ * "mystery/atmosphere" the spec asks for comes from layered dark gradients,
+ * negative space and large typography instead of photographs; sections that
+ * describe an image in the spec (hero, fleet, chauffeur) render an
+ * atmospheric gradient panel in its place, honestly, rather than faking a
+ * photo. All routes/vehicles/locations/company data below still comes from
+ * the same live backend calls as before (section 41) — only the visual
+ * presentation changed.
+ */
 function HomePage() {
   const { t } = useTranslation(["site", "booking"]);
   usePageMeta(t("seo.homeTitle"), t("seo.homeDescription"));
@@ -34,6 +46,7 @@ function HomePage() {
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [vehicles, setVehicles] = useState<PublicVehicleDto[]>([]);
   const [locationsData, setLocationsData] = useState<PublicLocationsDto | null>(null);
+  const [activeService, setActiveService] = useState(SERVICES[0].key);
 
   useEffect(() => {
     getActiveRoutes().then(setRoutes).catch(() => undefined);
@@ -41,22 +54,40 @@ function HomePage() {
     getLocations().then(setLocationsData).catch(() => undefined);
   }, []);
 
+  const introReveal = useScrollReveal<HTMLElement>();
+  const trustReveal = useScrollReveal<HTMLElement>();
+  const servicesReveal = useScrollReveal<HTMLElement>();
+  const routesReveal = useScrollReveal<HTMLElement>();
+  const mapReveal = useScrollReveal<HTMLElement>();
+  const fleetReveal = useScrollReveal<HTMLElement>();
+  const experienceReveal = useScrollReveal<HTMLElement>();
+  const chauffeurReveal = useScrollReveal<HTMLElement>();
+  const whyUsReveal = useScrollReveal<HTMLElement>();
+  const howItWorksReveal = useScrollReveal<HTMLElement>();
+  const operatingAreaReveal = useScrollReveal<HTMLElement>();
+  const finalHeroReveal = useScrollReveal<HTMLElement>();
+
+  const featuredVehicle = vehicles[0];
+
   return (
     <div>
       <Header />
 
-      <section className="hero fade-in">
-        <div className="container container--medium">
-          <p className="hero__eyebrow">{t("hero.eyebrow")}</p>
-          <h1 className="hero__title">
-            {t("hero.title1")}
-            <br />
-            {t("hero.title2")}
+      <section className="cinematic-hero">
+        <div className="cinematic-hero__scrim" aria-hidden="true" />
+        <div className="container cinematic-hero__content">
+          <p className="cinematic-hero__mark">{t("hero.eyebrow")}</p>
+          <h1 className="cinematic-hero__title">
+            <span className="cinematic-hero__title-light">{t("noir.hero.title1")}</span>
+            <span className="cinematic-hero__title-strong">{t("noir.hero.title2")}</span>
           </h1>
-          <p className="hero__subtitle" style={{ marginLeft: "auto", marginRight: "auto" }}>{t("hero.subtitle")}</p>
-          <div className="row" style={{ justifyContent: "center" }}>
-            <Link to="/booking"><button type="button" style={{ fontSize: "0.9rem", padding: "0.9em 2.2em" }}>{t("hero.ctaPrimary")}</button></Link>
-            <Link to="/services"><button type="button" className="btn-secondary" style={{ fontSize: "0.9rem", padding: "0.9em 2.2em" }}>{t("hero.ctaSecondary")}</button></Link>
+          <div className="cinematic-hero__actions">
+            <Link to="/booking" className="cta-noir cta-noir--solid" data-cursor="view">
+              {t("noir.ctaBeginJourney")}<span aria-hidden="true"> &rarr;</span>
+            </Link>
+            <Link to="/services" className="cta-noir cta-noir--outline">
+              {t("hero.ctaSecondary")}
+            </Link>
           </div>
         </div>
       </section>
@@ -65,7 +96,21 @@ function HomePage() {
         <HeroBookingWidget routes={routes} />
       </div>
 
-      <section className="section section--tight">
+      <section ref={introReveal.ref} className={`noir-section noir-section--black ${introReveal.className}`}>
+        <div className="container container--medium reveal-lines">
+          <p className="noir-label">{t("noir.intro.label")}</p>
+          <h2 className="noir-heading">
+            <span className="light">{t("noir.intro.title1")}</span>
+            <span className="strong">{t("noir.intro.title2")}</span>
+          </h2>
+          <p className="section__subtitle" style={{ fontSize: "1.2rem", color: "var(--color-text-primary)", marginTop: "var(--space-8)" }}>
+            &ldquo;{t("noir.intro.quote")}&rdquo;
+          </p>
+          <p className="text-secondary">{t("noir.intro.body")}</p>
+        </div>
+      </section>
+
+      <section ref={trustReveal.ref} className={`section section--tight ${trustReveal.className}`}>
         <div className="container grid grid--4">
           {TRUST_ITEMS.map((item) => (
             <div className="trust-item" key={item.key}>
@@ -77,27 +122,40 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="section section--elevated">
+      <section ref={servicesReveal.ref} className={`noir-section noir-section--deep ${servicesReveal.className}`}>
         <div className="container section--center">
           <p className="section__eyebrow">{t("nav.services")}</p>
           <h2 className="section__title">{t("services.title")}</h2>
           <p className="section__subtitle">{t("services.subtitle")}</p>
         </div>
-        <div className="container grid grid--3">
-          {SERVICES.map((service) => (
-            <article className="content-card" key={service.key}>
-              <div className="content-card__media" role="img" aria-label={t(`services.${service.key}.title`)}>{service.icon}</div>
-              <h3 className="content-card__title">{t(`services.${service.key}.title`)}</h3>
-              <p className="content-card__desc">{t(`services.${service.key}.desc`)}</p>
-              <Link to="/booking" className="btn-secondary" style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}>
-                {t("services.bookTransfer")}
+        <div className="container row" style={{ alignItems: "flex-start", gap: "var(--space-8)" }}>
+          <div className="editorial-list" style={{ flex: 1, minWidth: 0 }}>
+            {SERVICES.map((service, index) => (
+              <Link
+                key={service.key}
+                to="/booking"
+                className={`editorial-list__row${activeService === service.key ? " editorial-list__row--active" : ""}`}
+                onMouseEnter={() => setActiveService(service.key)}
+                onFocus={() => setActiveService(service.key)}
+                data-cursor="view"
+              >
+                <span className="editorial-list__index">0{index + 1}</span>
+                <span className="editorial-list__title">{t(`services.${service.key}.title`)}</span>
+                <span className="editorial-list__desc">{t(`services.${service.key}.desc`)}</span>
               </Link>
-            </article>
-          ))}
+            ))}
+          </div>
+          <div className="editorial-panel" aria-hidden="true">
+            {SERVICES.map((service) => (
+              <div key={service.key} className={`editorial-panel__image${activeService === service.key ? " editorial-panel__image--active" : ""}`}>
+                {t(`services.${service.key}.title`)}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section">
+      <section ref={routesReveal.ref} className={`section ${routesReveal.className}`}>
         <div className="container">
           <div className="row row--between" style={{ alignItems: "flex-end", marginBottom: "var(--space-8)" }}>
             <div>
@@ -112,27 +170,20 @@ function HomePage() {
               <div className="skeleton skeleton-line" style={{ height: 90 }} />
             </div>
           ) : (
-            <div className="grid grid--3">
+            <div className="route-editorial">
               {routes.slice(0, 3).map((route) => (
-                <article className="content-card" key={route.id}>
-                  <div className="trip-card__route" style={{ marginBottom: 0 }}>
+                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row" data-cursor="explore">
+                  <div className="route-editorial__pair">
                     <span>{route.departureLocation}</span>
-                    <span className="trip-card__arrow">&rarr;</span>
+                    <span className="route-editorial__arrow">&rarr;</span>
                     <span>{route.destination}</span>
                   </div>
-                  <p className="content-card__meta">
-                    <span>{t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m</span>
-                    <span>{t("routesTeaser.from")} {route.price.toFixed(0)} {route.currency}</span>
-                  </p>
-                  <Link
-                    to="/booking"
-                    state={{ routeId: route.id }}
-                    className="btn-secondary"
-                    style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}
-                  >
-                    {t("routesTeaser.bookThisRoute")}
-                  </Link>
-                </article>
+                  <div className="route-editorial__details">
+                    {t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m
+                    {" · "}
+                    {t("routesTeaser.from")} {route.price.toFixed(0)} {route.currency}
+                  </div>
+                </Link>
               ))}
             </div>
           )}
@@ -140,7 +191,7 @@ function HomePage() {
       </section>
 
       {locationsData && locationsData.enabled && locationsData.locations.length > 0 && (
-        <section className="section">
+        <section ref={mapReveal.ref} className={`section ${mapReveal.className}`}>
           <div className="container section--center">
             <p className="section__eyebrow">{t("serviceAreaMap.eyebrow")}</p>
             <h2 className="section__title">{t("serviceAreaMap.title")}</h2>
@@ -161,39 +212,59 @@ function HomePage() {
         </section>
       )}
 
-      <section className="section section--elevated">
-        <div className="container">
-          <div className="row row--between" style={{ alignItems: "flex-end", marginBottom: "var(--space-8)" }}>
-            <div>
-              <p className="section__eyebrow">{t("nav.fleet")}</p>
-              <h2 className="section__title" style={{ marginBottom: 0 }}>{t("fleetTeaser.title")}</h2>
-            </div>
-            <Link to="/fleet">{t("routesTeaser.viewAll")}</Link>
-          </div>
-          {vehicles.length > 0 && (
-            <div className="grid grid--3">
-              {vehicles.slice(0, 3).map((vehicle) => (
-                <article className="content-card" key={vehicle.id}>
-                  <div className="content-card__media" role="img" aria-label={`${vehicle.make} ${vehicle.model}`}>🚘</div>
-                  <h3 className="content-card__title">{vehicle.make} {vehicle.model}</h3>
-                  <p className="content-card__desc">{vehicle.vehicleType}</p>
-                  <p className="content-card__meta"><span>{t("fleetPage.passengers")}: {vehicle.passengerCapacity}</span></p>
-                  <Link to="/booking" className="btn-secondary" style={{ textAlign: "center", padding: "0.6em", borderRadius: "var(--radius-sm)" }}>
-                    {t("fleetTeaser.bookYourJourney")}
+      {featuredVehicle && (
+        <section ref={fleetReveal.ref} className={`noir-section noir-section--deep ${fleetReveal.className}`}>
+          <div className="container">
+            <div className={`fleet-cinematic ${fleetReveal.className}`}>
+              <div>
+                <p className="fleet-cinematic__label">{t("nav.fleet")}</p>
+                <h2 className="fleet-cinematic__name">
+                  <span style={{ display: "block" }}>{featuredVehicle.make}</span>
+                  <span style={{ display: "block" }}>{featuredVehicle.model}</span>
+                </h2>
+                <div className="row" style={{ marginTop: "var(--space-6)" }}>
+                  <Link to="/fleet" className="cta-noir cta-noir--outline">{t("routesTeaser.viewAll")}</Link>
+                  <Link to="/booking" className="cta-noir cta-noir--solid">
+                    {t("fleetTeaser.bookYourJourney")}<span aria-hidden="true"> &rarr;</span>
                   </Link>
-                </article>
-              ))}
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+        </section>
+      )}
+
+      <section ref={experienceReveal.ref} className={`noir-section noir-section--black ${experienceReveal.className}`}>
+        <div className="container container--medium section--center">
+          <p className="section__eyebrow">{t("noir.experience.eyebrow")}</p>
+          <div className="reveal-lines noir-heading" style={{ marginTop: "var(--space-8)" }}>
+            {(t("noir.experience.words", { returnObjects: true }) as string[]).map((word) => (
+              <span className="strong" key={word} style={{ display: "block" }}>{word}</span>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section">
+      <section ref={chauffeurReveal.ref} className={`section section--elevated ${chauffeurReveal.className}`}>
+        <div className="container row" style={{ alignItems: "center", gap: "var(--space-8)", flexWrap: "wrap" }}>
+          <div className="noir-portrait" style={{ flex: "1 1 320px" }} role="img" aria-label={t("noir.chauffeur.title1")} />
+          <div style={{ flex: "1 1 320px" }}>
+            <h2 className="noir-heading">
+              <span className="light">{t("noir.chauffeur.title1")}</span>
+              <span className="strong">{t("noir.chauffeur.title2")}</span>
+              <span className="strong">{t("noir.chauffeur.title3")}</span>
+            </h2>
+            <p className="text-secondary" style={{ marginTop: "var(--space-4)" }}>{t("noir.chauffeur.body")}</p>
+          </div>
+        </div>
+      </section>
+
+      <section ref={whyUsReveal.ref} className={`section ${whyUsReveal.className}`}>
         <div className="container section--center">
           <p className="section__eyebrow">{t("nav.about")}</p>
           <h2 className="section__title">{t("whyUs.title")}</h2>
         </div>
-        <div className="container grid grid--3">
+        <div className="container grid grid--bento">
           {WHY_US_ITEMS.map((key) => (
             <div className="content-card" key={key}>
               <h3 className="content-card__title">{t(`whyUs.${key}.title`)}</h3>
@@ -203,7 +274,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="section section--elevated">
+      <section ref={howItWorksReveal.ref} className={`section section--elevated ${howItWorksReveal.className}`}>
         <div className="container section--center">
           <h2 className="section__title">{t("howItWorks.title")}</h2>
         </div>
@@ -219,26 +290,34 @@ function HomePage() {
       </section>
 
       {company && company.operatingCountryCodes.length > 0 && (
-        <section className="section section--elevated">
+        <section ref={operatingAreaReveal.ref} className={`noir-section noir-section--black ${operatingAreaReveal.className}`}>
           <div className="container section--center">
-            <p className="section__eyebrow">{t("operatingArea.title")}</p>
-            <h2 className="section__title">{t("operatingArea.subtitle")}</h2>
+            <h2 className="noir-heading">
+              <span className="strong">{t("noir.operatingArea.title1")}</span>
+              <span className="light">{t("noir.operatingArea.title2")}</span>
+            </h2>
           </div>
-          <div className="container">
-            <ul style={{ listStyle: "none", padding: 0, display: "flex", gap: "var(--space-6)", justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="container" style={{ marginTop: "var(--space-8)" }}>
+            <ul className="operating-list reveal-lines">
               {company.operatingCountryCodes.map((code) => (
-                <li className="text-secondary" key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
+                <li key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
               ))}
             </ul>
           </div>
         </section>
       )}
 
-      <section className="final-cta">
+      <section ref={finalHeroReveal.ref} className={`noir-section noir-section--black section--center ${finalHeroReveal.className}`} style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)" }}>
         <div className="container container--medium">
-          <h2 className="section__title">{t("finalCta.title")}</h2>
-          <p className="section__subtitle" style={{ marginLeft: "auto", marginRight: "auto" }}>{t("finalCta.subtitle")}</p>
-          <Link to="/booking"><button type="button" style={{ fontSize: "0.9rem", padding: "0.9em 2.2em" }}>{t("finalCta.cta")}</button></Link>
+          <h2 className="noir-heading">
+            <span className="light">{t("noir.finalHero.title1")}</span>
+            <span className="strong">{t("noir.finalHero.title2")}</span>
+          </h2>
+          <div style={{ marginTop: "var(--space-8)" }}>
+            <Link to="/booking" className="cta-noir cta-noir--solid">
+              {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
+            </Link>
+          </div>
         </div>
       </section>
 

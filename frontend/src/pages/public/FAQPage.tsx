@@ -3,6 +3,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MobileBookingCta from "../../components/MobileBookingCta";
 import { usePageMeta } from "../../hooks/usePageMeta";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 
 const FAQ_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"] as const;
 
@@ -10,6 +11,8 @@ const FAQ_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"] as const;
 function FAQPage() {
   const { t } = useTranslation("site");
   usePageMeta(`${t("faq.title")} | ${t("footer.description")}`);
+
+  const listReveal = useScrollReveal<HTMLElement>();
 
   return (
     <div>
@@ -22,7 +25,7 @@ function FAQPage() {
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 0 }}>
+      <section ref={listReveal.ref} className={`section ${listReveal.className}`} style={{ paddingTop: 0 }}>
         <div className="container container--medium">
           {FAQ_KEYS.map((key) => (
             <details className="faq-item" key={key}>

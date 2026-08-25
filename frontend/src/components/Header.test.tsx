@@ -1,16 +1,22 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import Header from "./Header";
 import { AuthProvider } from "../context/AuthContext";
+import { ThemeProvider } from "../context/ThemeContext";
+
+afterEach(() => {
+  localStorage.removeItem("limousine-booking.theme");
+  document.documentElement.removeAttribute("data-theme");
+});
 
 function renderHeader() {
   return render(
     <MemoryRouter>
-      <AuthProvider>
+      <ThemeProvider><AuthProvider>
         <Header />
-      </AuthProvider>
+      </AuthProvider></ThemeProvider>
     </MemoryRouter>
   );
 }
@@ -47,5 +53,32 @@ describe("Header", () => {
 
     await user.click(screen.getByRole("button", { name: "Close menu" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renders a theme toggle button", () => {
+    renderHeader();
+
+    expect(screen.getByRole("button", { name: "Switch to light theme" })).toBeInTheDocument();
+  });
+
+  it("applies data-theme to <html> only while mounted — never bleeds into Admin/Driver, which don't render Header", () => {
+    expect(document.documentElement.getAttribute("data-theme")).toBeNull();
+
+    const { unmount } = renderHeader();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+
+    unmount();
+    expect(document.documentElement.getAttribute("data-theme")).toBeNull();
+  });
+
+  it("switching the toggle updates data-theme on <html> immediately", async () => {
+    const user = userEvent.setup();
+    renderHeader();
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+
+    await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
   });
 });

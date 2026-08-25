@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "./HomePage";
 import { AuthProvider } from "../../context/AuthContext";
+import { ThemeProvider } from "../../context/ThemeContext";
 import * as bookingService from "../../services/bookingService";
 import * as publicVehicleService from "../../services/publicVehicleService";
 import * as companyService from "../../services/companyService";
@@ -27,9 +28,9 @@ const mockedLocationService = vi.mocked(locationService);
 function renderPage() {
   return render(
     <MemoryRouter>
-      <AuthProvider>
+      <ThemeProvider><AuthProvider>
         <HomePage />
-      </AuthProvider>
+      </AuthProvider></ThemeProvider>
     </MemoryRouter>
   );
 }
@@ -77,9 +78,10 @@ describe("HomePage", () => {
   it("renders the hero with the primary and secondary calls to action", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("Luxury Travel.");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("In Silence.");
     expect(screen.getAllByRole("link", { name: "Book a Ride" }).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Explore Our Services" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Begin Your Journey" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Explore Our Services" })).toBeInTheDocument();
   });
 
   it("shows the trust indicators", () => {
@@ -90,12 +92,12 @@ describe("HomePage", () => {
     expect(screen.getAllByText("Premium Vehicles").length).toBeGreaterThan(0);
   });
 
-  it("lists all five real ROI Limousinen services with a booking CTA each", () => {
+  it("lists all five real ROI Limousinen services as an editorial list, each linking to booking", () => {
     renderPage();
 
     expect(screen.getAllByText("Airport Transfer").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Professional Chauffeur Service").length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Book Your Transfer" })).toHaveLength(5);
+    expect(screen.getByRole("link", { name: /01.*Airport Transfer/s })).toHaveAttribute("href", "/booking");
   });
 
   it("shows the real operating countries, sourced from the backend", async () => {
@@ -114,10 +116,11 @@ describe("HomePage", () => {
     expect(mockedBookingService.getActiveRoutes).toHaveBeenCalled();
   });
 
-  it("loads and displays fleet vehicles from the backend", async () => {
+  it("loads and displays the featured fleet vehicle from the backend", async () => {
     renderPage();
 
-    expect(await screen.findByText("Mercedes-Benz S-Class")).toBeInTheDocument();
+    expect(await screen.findByText("Mercedes-Benz")).toBeInTheDocument();
+    expect(screen.getByText("S-Class")).toBeInTheDocument();
     expect(mockedPublicVehicleService.getActiveVehicles).toHaveBeenCalled();
   });
 

@@ -247,5 +247,50 @@
     "availableDestinations": "Verfügbare Ziele",
     "bookThisRoute": "Diese Strecke buchen",
     "mainDestinations": "Hauptziele"
+  },
+  "noir": {
+    "hero": {
+      "title1": "Bewegung.",
+      "title2": "In Stille."
+    },
+    "intro": {
+      "label": "ROI Limousinen",
+      "title1": "Private",
+      "title2": "Reise.",
+      "quote": "Jede Fahrt sollte sich mühelos anfühlen.",
+      "body": "Premium-Chauffeurtransport, abgestimmt auf Ihre Zeit, Ihr Ziel und Ihren Komfort."
+    },
+    "experience": {
+      "eyebrow": "Nicht nur eine Fahrt.",
+      "words": [
+        "Privatsphäre.",
+        "Komfort.",
+        "Präzision."
+      ]
+    },
+    "chauffeur": {
+      "title1": "Der Mensch",
+      "title2": "hinter",
+      "title3": "der Fahrt.",
+      "body": "Professioneller Service ab dem Moment Ihrer Ankunft."
+    },
+    "about": {
+      "label": "Wer wir sind"
+    },
+    "operatingArea": {
+      "title1": "Schweiz.",
+      "title2": "Und darüber hinaus."
+    },
+    "finalHero": {
+      "title1": "Ihre Reise",
+      "title2": "endet hier."
+    },
+    "contact": {
+      "title1": "Bereit?",
+      "title2": "Los",
+      "title3": "geht's."
+    },
+    "ctaBeginJourney": "Reise beginnen",
+    "ctaBookThisJourney": "Diese Fahrt buchen"
   }
 }

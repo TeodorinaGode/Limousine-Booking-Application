@@ -7,11 +7,16 @@
     "strip": "Geschäftsreisen · Flughafentransfers · Private Anlässe"
   },
   "title": "Fahrt buchen",
+  "phases": {
+    "journey": "Reise",
+    "details": "Angaben",
+    "review": "Überprüfung",
+    "payment": "Zahlung",
+    "confirmation": "Bestätigung"
+  },
   "steps": {
-    "trip": "Fahrt",
     "pickupDetails": "Abholdetails",
-    "yourInformation": "Ihre Angaben",
-    "reviewConfirm": "Überprüfen & Bestätigen"
+    "yourInformation": "Ihre Angaben"
   },
   "selectRoute": "Strecke",
   "departure": "Abfahrt",

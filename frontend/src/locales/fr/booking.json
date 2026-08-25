@@ -7,11 +7,16 @@
     "strip": "Transport d'affaires · Transferts aéroport · Événements privés"
   },
   "title": "Réservez votre trajet",
+  "phases": {
+    "journey": "Trajet",
+    "details": "Informations",
+    "review": "Vérification",
+    "payment": "Paiement",
+    "confirmation": "Confirmation"
+  },
   "steps": {
-    "trip": "Trajet",
     "pickupDetails": "Détails de prise en charge",
-    "yourInformation": "Vos informations",
-    "reviewConfirm": "Vérifier et confirmer"
+    "yourInformation": "Vos informations"
   },
   "selectRoute": "Trajet",
   "departure": "Départ",

@@ -7,11 +7,16 @@
     "strip": "Executive Transportation · Airport Transfers · Private Events"
   },
   "title": "Book Your Ride",
+  "phases": {
+    "journey": "Journey",
+    "details": "Details",
+    "review": "Review",
+    "payment": "Payment",
+    "confirmation": "Confirmation"
+  },
   "steps": {
-    "trip": "Trip",
     "pickupDetails": "Pickup Details",
-    "yourInformation": "Your Information",
-    "reviewConfirm": "Review & Confirm"
+    "yourInformation": "Your Information"
   },
   "selectRoute": "Route",
   "departure": "Departure",

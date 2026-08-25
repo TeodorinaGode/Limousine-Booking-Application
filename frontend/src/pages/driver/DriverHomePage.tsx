@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { getMyDashboard } from "../../services/driverBookingService";
 import DriverNav from "../../components/DriverNav";
@@ -16,18 +16,30 @@ function DriverHomePage() {
   const { user, accessToken } = useAuth();
 
   const [dashboard, setDashboard] = useState<DriverDashboardDto | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadDashboard = useCallback(async () => {
     if (!accessToken) return;
-    (async () => {
-      try {
-        setDashboard(await getMyDashboard(accessToken));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load your dashboard.");
-      }
-    })();
+    setIsLoading(true);
+    try {
+      setDashboard(await getMyDashboard(accessToken));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load your dashboard.");
+    } finally {
+      setIsLoading(false);
+    }
   }, [accessToken]);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  // The next trip already gets its own prominent section above — excluding
+  // it here too avoids showing the exact same card twice on one screen.
+  const remainingTodaysTrips = dashboard
+    ? dashboard.todaysTrips.filter((trip) => trip.id !== dashboard.nextTrip?.id)
+    : [];
 
   return (
     <div className="app-shell">
@@ -41,47 +53,57 @@ function DriverHomePage() {
 
         {error && <p role="alert">{error}</p>}
 
-        {dashboard && (
-          <>
-            <section style={{ marginTop: "var(--space-6)", marginBottom: "var(--space-8)" }}>
-              <div className="row">
-                <div className="metric-card">
-                  <div className="metric-card__label">Status</div>
-                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>
-                    Currently: {dashboard.isAvailable ? "Available" : "Unavailable"}
+        {isLoading ? (
+          <div className="stack" style={{ marginTop: "var(--space-6)" }}>
+            <div className="skeleton skeleton-line" style={{ height: 60 }} />
+            <div className="skeleton skeleton-line" style={{ height: 140 }} />
+            <div className="skeleton skeleton-line" style={{ height: 140 }} />
+          </div>
+        ) : (
+          dashboard && (
+            <>
+              <section style={{ marginTop: "var(--space-6)", marginBottom: "var(--space-8)" }}>
+                <div className="row">
+                  <div className="metric-card">
+                    <div className="metric-card__label">Status</div>
+                    <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>
+                      Currently: {dashboard.isAvailable ? "Available" : "Unavailable"}
+                    </div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Today&apos;s trips: {dashboard.todaysTripCount}</div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Completed today: {dashboard.completedTodayCount}</div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Upcoming trips: {dashboard.upcomingTripCount}</div>
                   </div>
                 </div>
-                <div className="metric-card">
-                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Today&apos;s trips: {dashboard.todaysTripCount}</div>
-                </div>
-                <div className="metric-card">
-                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Completed today: {dashboard.completedTodayCount}</div>
-                </div>
-                <div className="metric-card">
-                  <div className="metric-card__value" style={{ fontSize: "1.1rem" }}>Upcoming trips: {dashboard.upcomingTripCount}</div>
-                </div>
-              </div>
-            </section>
-
-            {dashboard.nextTrip && (
-              <section style={{ marginBottom: "var(--space-8)" }}>
-                <h2>Next Trip</h2>
-                <TripCard trip={dashboard.nextTrip} />
               </section>
-            )}
 
-            <section>
-              <h2>Today&apos;s Trips</h2>
-              {dashboard.todaysTrips.length === 0 ? (
-                <div className="empty-state">
-                  <p className="empty-state__title">No Upcoming Trips</p>
-                  <p>Your schedule is currently clear.</p>
-                </div>
-              ) : (
-                dashboard.todaysTrips.map((trip) => <TripCard key={trip.id} trip={trip} />)
+              {dashboard.nextTrip && (
+                <section style={{ marginBottom: "var(--space-8)" }}>
+                  <h2>Next Trip</h2>
+                  <TripCard trip={dashboard.nextTrip} onStatusChanged={loadDashboard} />
+                </section>
               )}
-            </section>
-          </>
+
+              <section>
+                <h2>Today&apos;s Trips</h2>
+                {dashboard.todaysTrips.length === 0 ? (
+                  <div className="empty-state">
+                    <p className="empty-state__title">No Upcoming Trips</p>
+                    <p>Your schedule is currently clear.</p>
+                  </div>
+                ) : remainingTodaysTrips.length === 0 ? (
+                  <p className="text-muted">Your next trip above is the only one remaining today.</p>
+                ) : (
+                  remainingTodaysTrips.map((trip) => <TripCard key={trip.id} trip={trip} onStatusChanged={loadDashboard} />)
+                )}
+              </section>
+            </>
+          )
         )}
       </main>
     </div>

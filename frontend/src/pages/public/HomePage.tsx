@@ -28,15 +28,16 @@ const TRUST_ITEMS = [
 const WHY_US_ITEMS = ["reliability", "luxury", "professionalChauffeurs"] as const;
 
 /**
- * Public homepage, redesigned to a dark cinematic identity (Prompt 21). No
- * real photography was available to migrate/license (see README) — the
- * "mystery/atmosphere" the spec asks for comes from layered dark gradients,
- * negative space and large typography instead of photographs; sections that
- * describe an image in the spec (hero, fleet, chauffeur) render an
- * atmospheric gradient panel in its place, honestly, rather than faking a
- * photo. All routes/vehicles/locations/company data below still comes from
- * the same live backend calls as before (section 41) — only the visual
- * presentation changed.
+ * Public homepage, redesigned to a dark cinematic identity (Prompt 21, later
+ * extended with a real hero photograph, About/FAQ/Contact teasers, and a
+ * card-free "Why ROI" treatment). The hero uses a real, freely-licensed
+ * (Unsplash License) black Mercedes-Benz S-Class night photo — see
+ * public/images/hero-black-mercedes-night(.jpg|-mobile.jpg) and the credit
+ * in README. Fleet/chauffeur sections still render an atmospheric gradient
+ * panel in place of a photo (no licensed asset exists for those yet — see
+ * README known gaps). All routes/vehicles/locations/company data below still
+ * comes from the same live backend calls as before (section 41) — only the
+ * visual presentation changed.
  */
 function HomePage() {
   const { t } = useTranslation(["site", "booking"]);
@@ -65,6 +66,9 @@ function HomePage() {
   const whyUsReveal = useScrollReveal<HTMLElement>();
   const howItWorksReveal = useScrollReveal<HTMLElement>();
   const operatingAreaReveal = useScrollReveal<HTMLElement>();
+  const aboutTeaserReveal = useScrollReveal<HTMLElement>();
+  const faqTeaserReveal = useScrollReveal<HTMLElement>();
+  const contactTeaserReveal = useScrollReveal<HTMLElement>();
   const finalHeroReveal = useScrollReveal<HTMLElement>();
 
   const featuredVehicle = vehicles[0];
@@ -91,10 +95,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      <div className="container" style={{ marginTop: "calc(-1 * var(--space-8))", marginBottom: "var(--space-4)" }}>
-        <HeroBookingWidget routes={routes} />
-      </div>
 
       <section ref={introReveal.ref} className={`noir-section noir-section--black ${introReveal.className}`}>
         <div className="container container--medium reveal-lines">
@@ -163,6 +163,9 @@ function HomePage() {
               <h2 className="section__title" style={{ marginBottom: 0 }}>{t("routesTeaser.title")}</h2>
             </div>
             <Link to="/routes">{t("routesTeaser.viewAll")}</Link>
+          </div>
+          <div style={{ marginBottom: "var(--space-8)" }}>
+            <HeroBookingWidget routes={routes} />
           </div>
           {routes.length === 0 ? (
             <div className="stack">
@@ -264,11 +267,12 @@ function HomePage() {
           <p className="section__eyebrow">{t("nav.about")}</p>
           <h2 className="section__title">{t("whyUs.title")}</h2>
         </div>
-        <div className="container grid grid--bento">
-          {WHY_US_ITEMS.map((key) => (
-            <div className="content-card" key={key}>
-              <h3 className="content-card__title">{t(`whyUs.${key}.title`)}</h3>
-              <p className="content-card__desc">{t(`whyUs.${key}.desc`)}</p>
+        <div className="container pillars">
+          {WHY_US_ITEMS.map((key, index) => (
+            <div className="pillars__item" key={key}>
+              <span className="pillars__index">0{index + 1}</span>
+              <h3 className="pillars__title">{t(`whyUs.${key}.title`)}</h3>
+              <p className="pillars__desc">{t(`whyUs.${key}.desc`)}</p>
             </div>
           ))}
         </div>
@@ -303,6 +307,61 @@ function HomePage() {
                 <li key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
               ))}
             </ul>
+          </div>
+        </section>
+      )}
+
+      <section ref={aboutTeaserReveal.ref} className={`section ${aboutTeaserReveal.className}`}>
+        <div className="container row" style={{ alignItems: "center", gap: "var(--space-8)", flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 320px" }}>
+            <p className="section__eyebrow">{t("homeTeasers.about.label")}</p>
+            <h2 className="section__title">{t("about.title")}</h2>
+            <p className="text-secondary">{t("about.subtitle")}</p>
+          </div>
+          <div style={{ flex: "0 0 auto" }}>
+            <Link to="/about" className="cta-noir cta-noir--outline">
+              {t("homeTeasers.about.cta")}<span aria-hidden="true"> &rarr;</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section ref={faqTeaserReveal.ref} className={`section section--elevated ${faqTeaserReveal.className}`}>
+        <div className="container section--center">
+          <p className="section__eyebrow">{t("homeTeasers.faq.label")}</p>
+          <h2 className="section__title">{t("faq.title")}</h2>
+        </div>
+        <div className="container container--medium">
+          {(["q1", "q2", "q3"] as const).map((key) => (
+            <details className="faq-item" key={key}>
+              <summary className="faq-item__question">{t(`faq.${key}.question`)}</summary>
+              <p className="faq-item__answer">{t(`faq.${key}.answer`)}</p>
+            </details>
+          ))}
+          <div className="section--center" style={{ marginTop: "var(--space-8)" }}>
+            <Link to="/faq" className="cta-noir cta-noir--outline">
+              {t("homeTeasers.faq.cta")}<span aria-hidden="true"> &rarr;</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {company && (
+        <section ref={contactTeaserReveal.ref} className={`noir-section noir-section--deep section--center ${contactTeaserReveal.className}`}>
+          <div className="container container--medium">
+            <p className="noir-label">{t("homeTeasers.contact.label")}</p>
+            <h2 className="noir-heading" style={{ marginTop: "var(--space-4)" }}>
+              <span className="light">{t("noir.contact.title2")}</span>
+              <span className="strong">{t("noir.contact.title3")}</span>
+            </h2>
+            <div className="row" style={{ justifyContent: "center", marginTop: "var(--space-8)" }}>
+              <a href={`tel:${company.phone}`} className="btn-secondary" style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}>
+                {t("contact.callUs")}
+              </a>
+              <Link to="/contact" className="cta-noir cta-noir--solid">
+                {t("homeTeasers.contact.cta")}<span aria-hidden="true"> &rarr;</span>
+              </Link>
+            </div>
           </div>
         </section>
       )}

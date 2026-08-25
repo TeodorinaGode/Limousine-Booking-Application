@@ -27,6 +27,7 @@ import DriverDetailsPage from "../pages/admin/drivers/DriverDetailsPage";
 import BookingsPage from "../pages/admin/bookings/BookingsPage";
 import BookingDetailPage from "../pages/admin/bookings/BookingDetailPage";
 import ReportsPage from "../pages/admin/reports/ReportsPage";
+import SettingsPage from "../pages/admin/SettingsPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
@@ -149,6 +150,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
             <ReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <SettingsPage />
           </ProtectedRoute>
         }
       />

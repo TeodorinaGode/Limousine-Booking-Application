@@ -4,7 +4,7 @@ const VARIANT_BY_STATUS: Record<string, string> = {
   pending: "pending",
   requiresmanualassignment: "warn",
   confirmed: "confirmed",
-  assigned: "confirmed",
+  assigned: "assigned",
   upcoming: "confirmed",
   ontheway: "ontheway",
   passengerpickedup: "pickedup",

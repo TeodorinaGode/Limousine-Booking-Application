@@ -135,7 +135,7 @@ function TripDetailPage() {
       <div className="stack" style={{ marginBottom: "1.5rem" }}>
         {trip.rideStatus === "Upcoming" && (
           <button type="button" className="btn-block" onClick={() => runAction(startRide, "Ride started.")} disabled={isBusy}>
-            Start Ride
+            On The Way
           </button>
         )}
         {trip.rideStatus === "OnTheWay" && (
@@ -150,7 +150,7 @@ function TripDetailPage() {
         )}
         {trip.rideStatus === "PassengerPickedUp" && (
           <button type="button" className="btn-block" onClick={() => runAction(completeRide, "Ride completed.")} disabled={isBusy}>
-            Complete Ride
+            Completed
           </button>
         )}
       </div>

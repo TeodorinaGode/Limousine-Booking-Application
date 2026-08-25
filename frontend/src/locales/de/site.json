@@ -99,6 +99,11 @@
     "passengers": "Passagiere",
     "noVehicles": "Derzeit sind keine Fahrzeuge verfügbar."
   },
+  "homeTeasers": {
+    "about": { "label": "Unsere Geschichte", "cta": "Mehr erfahren" },
+    "faq": { "label": "Fragen", "cta": "Alle FAQs ansehen" },
+    "contact": { "label": "Kontakt", "cta": "Kontaktieren Sie uns" }
+  },
   "whyUs": {
     "title": "Warum wir",
     "reliability": {

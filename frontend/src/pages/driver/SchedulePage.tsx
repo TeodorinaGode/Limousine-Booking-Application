@@ -135,7 +135,7 @@ function SchedulePage() {
           <p>Nothing scheduled for this date range.</p>
         </div>
       ) : (
-        trips.map((trip) => <TripCard key={trip.id} trip={trip} />)
+        trips.map((trip) => <TripCard key={trip.id} trip={trip} onStatusChanged={loadTrips} />)
       )}
 
       {totalPages > 1 && (

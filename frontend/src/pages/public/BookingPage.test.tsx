@@ -70,12 +70,10 @@ async function fillStep1(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: "Next" }));
 }
 
+/** Fills the merged "Details" step (pickup details + customer info are one
+ * screen now, not two) and advances to Review. */
 async function fillStep2(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Pickup address"), "Bahnhofplatz 1, Basel");
-  await user.click(screen.getByRole("button", { name: "Next" }));
-}
-
-async function fillStep3(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("First name"), "Jane");
   await user.type(screen.getByLabelText("Last name"), "Doe");
   await user.type(screen.getByLabelText("Email"), "jane.doe@example.com");
@@ -120,13 +118,13 @@ describe("BookingPage", () => {
     expect(screen.getByText("Pickup time is required.")).toBeInTheDocument();
   });
 
-  it("rejects an invalid email on the customer info step", async () => {
+  it("rejects an invalid email on the details step", async () => {
     const user = userEvent.setup();
     renderPage();
     await screen.findByLabelText("Route");
 
     await fillStep1(user);
-    await fillStep2(user);
+    await user.type(screen.getByLabelText("Pickup address"), "Bahnhofplatz 1, Basel");
     await user.type(screen.getByLabelText("First name"), "Jane");
     await user.type(screen.getByLabelText("Last name"), "Doe");
     await user.type(screen.getByLabelText("Email"), "not-an-email");
@@ -137,6 +135,18 @@ describe("BookingPage", () => {
     expect(mockedBookingService.createBooking).not.toHaveBeenCalled();
   });
 
+  it("clears a field's error as soon as it's corrected, without waiting for the next Next click", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByLabelText("Route");
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByText("Please select a route.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: /Basel.*Zurich/s }));
+    expect(screen.queryByText("Please select a route.")).not.toBeInTheDocument();
+  });
+
   it("walks through all steps and shows a review summary before submitting", async () => {
     const user = userEvent.setup();
     renderPage();
@@ -144,7 +154,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
 
     expect(await screen.findByText("Review & Confirm", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("jane.doe@example.com")).toBeInTheDocument();
@@ -159,7 +168,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
 
     expect(await screen.findByText("Booking Confirmed")).toBeInTheDocument();
@@ -181,7 +189,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
 
     expect(await screen.findByText("Booking Received")).toBeInTheDocument();
@@ -197,7 +204,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
 
     await screen.findByText("Booking Confirmed");
@@ -230,7 +236,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Bookings require at least 120 minutes of lead time.");
@@ -250,7 +255,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
     await screen.findByText("Booking Confirmed");
 
@@ -268,7 +272,6 @@ describe("BookingPage", () => {
 
     await fillStep1(user);
     await fillStep2(user);
-    await fillStep3(user);
     await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
     await screen.findByText("Booking Confirmed");
 

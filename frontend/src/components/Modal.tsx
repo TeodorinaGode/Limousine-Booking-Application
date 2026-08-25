@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 interface ModalProps {
@@ -32,6 +33,14 @@ const contentStyle: React.CSSProperties = {
 
 /** All dialogs use this one dark surface (section 32) — every existing form modal wraps its content in this component. */
 function Modal({ title, onClose, children }: ModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div
       style={overlayStyle}

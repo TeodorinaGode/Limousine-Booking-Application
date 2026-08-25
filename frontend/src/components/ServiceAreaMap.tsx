@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTheme } from "../context/ThemeContext";
 import type { PublicLocationDto } from "../types/location";
 import type { PublicRouteDto } from "../types/booking";
 
-const TILE_URL = import.meta.env.VITE_MAP_TILE_URL ?? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const DARK_TILE_URL = import.meta.env.VITE_MAP_TILE_URL ?? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const LIGHT_TILE_URL = import.meta.env.VITE_MAP_TILE_URL_LIGHT ?? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 const TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
@@ -74,7 +76,14 @@ function FlyToRoute({ matched }: { matched: MatchedRoute | undefined }) {
 function ServiceAreaMap({ locations, routes, defaultLatitude, defaultLongitude, defaultZoom, selectedRouteId, onSelectRoute, height = 420 }: ServiceAreaMapProps) {
   const { t } = useTranslation("site");
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [activeRoute, setActiveRoute] = useState<MatchedRoute | null>(null);
+
+  // The map previously always used dark tiles regardless of site theme — a
+  // dark rectangle sitting in an otherwise light page read as broken, not
+  // "moody." Both tile sets are the same free CARTO basemap (no API key),
+  // so this is a pure visual swap, no new dependency.
+  const tileUrl = theme === "light" ? LIGHT_TILE_URL : DARK_TILE_URL;
 
   const locationsByName = useMemo(() => {
     const map = new Map<string, PublicLocationDto>();
@@ -119,7 +128,7 @@ function ServiceAreaMap({ locations, routes, defaultLatitude, defaultLongitude, 
     <div className="service-area-map">
       <div className="service-area-map__canvas" style={{ height }} role="region" aria-label={t("serviceAreaMap.regionLabel")}>
         <MapContainer center={[defaultLatitude, defaultLongitude]} zoom={defaultZoom} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
-          <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+          <TileLayer key={tileUrl} url={tileUrl} attribution={TILE_ATTRIBUTION} />
           <Circle
             center={SWITZERLAND_CENTER}
             radius={SWITZERLAND_EMPHASIS_RADIUS_METERS}

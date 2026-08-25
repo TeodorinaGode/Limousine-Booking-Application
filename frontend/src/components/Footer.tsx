@@ -14,7 +14,7 @@ function Footer() {
       <div className="container site-footer__grid">
         <div>
           <p className="site-footer__brand">{APP_BRAND_NAME}</p>
-          <p className="text-secondary" style={{ maxWidth: 280 }}>{t("footer.description")}</p>
+          <p className="text-secondary site-footer__blurb">{t("footer.description")}</p>
         </div>
 
         <div>

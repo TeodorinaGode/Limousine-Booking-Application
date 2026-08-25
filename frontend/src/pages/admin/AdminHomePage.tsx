@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboard } from "../../services/adminBookingService";
-import { getSummary } from "../../services/reportService";
+import { getSummary, getBookingsByDay } from "../../services/reportService";
+import { getDrivers } from "../../services/driverService";
+import { getVehicles } from "../../services/vehicleService";
 import AdminNav from "../../components/AdminNav";
 import PageHeader from "../../components/PageHeader";
 import StatusBadge from "../../components/StatusBadge";
+import MetricCard from "./reports/MetricCard";
+import ChartCard from "./reports/ChartCard";
+import BarChart from "./reports/BarChart";
 import type { AdminDashboardDto } from "../../types/adminBooking";
-import type { ReportSummaryDto } from "../../types/reports";
+import type { ReportSummaryDto, BookingsByDayDto } from "../../types/reports";
 
 function zurichToday(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich" }).format(new Date());
@@ -18,6 +23,12 @@ function startOfZurichMonth(): string {
   return new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
 }
 
+function daysAgoIso(days: number): string {
+  const date = new Date(`${zurichToday()}T00:00:00`);
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
+
 function formatDate(dateIso: string): string {
   return new Date(`${dateIso}T00:00:00`).toLocaleDateString(undefined, { day: "2-digit", month: "short" });
 }
@@ -26,34 +37,45 @@ function formatTime(time: string): string {
   return time.slice(0, 5);
 }
 
-function MetricCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="metric-card">
-      <div className="metric-card__label">{label}</div>
-      <div className="metric-card__value">{value}</div>
-    </div>
-  );
+interface DashboardData {
+  dashboard: AdminDashboardDto;
+  monthSummary: ReportSummaryDto;
+  availableDriversCount: number;
+  activeVehiclesCount: number;
+  bookingsTrend: BookingsByDayDto[];
 }
 
 function AdminHomePage() {
   const { accessToken } = useAuth();
 
-  const [dashboard, setDashboard] = useState<AdminDashboardDto | null>(null);
-  const [monthSummary, setMonthSummary] = useState<ReportSummaryDto | null>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!accessToken) return;
     (async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const [dashboardResult, summaryResult] = await Promise.all([
+        const [dashboard, monthSummary, availableDrivers, activeVehicles, bookingsTrend] = await Promise.all([
           getDashboard(accessToken),
           getSummary({ dateFrom: startOfZurichMonth(), dateTo: zurichToday() }, accessToken),
+          getDrivers({ isActive: true, isAvailable: true, page: 1, pageSize: 1 }, accessToken),
+          getVehicles({ isActive: true, page: 1, pageSize: 1 }, accessToken),
+          getBookingsByDay({ dateFrom: daysAgoIso(6), dateTo: zurichToday() }, accessToken),
         ]);
-        setDashboard(dashboardResult);
-        setMonthSummary(summaryResult);
+        setData({
+          dashboard,
+          monthSummary,
+          availableDriversCount: availableDrivers.totalCount,
+          activeVehiclesCount: activeVehicles.totalCount,
+          bookingsTrend,
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load dashboard statistics.");
+      } finally {
+        setIsLoading(false);
       }
     })();
   }, [accessToken]);
@@ -66,91 +88,116 @@ function AdminHomePage() {
 
         {error && <p role="alert">{error}</p>}
 
-        {dashboard && (
-          <>
-            <section style={{ marginBottom: "var(--space-8)" }}>
-              <div className="row">
-                <MetricCard label="Total Bookings" value={dashboard.totalBookings} />
-                <MetricCard label="Today" value={dashboard.todaysBookings} />
-                <MetricCard label="Pending" value={dashboard.pendingBookings} />
-                <MetricCard label="Manual Assignment Required" value={dashboard.requiresManualAssignmentCount} />
-                <MetricCard label="Confirmed" value={dashboard.confirmedBookings} />
-                <MetricCard label="Cancelled" value={dashboard.cancelledBookings} />
-                <MetricCard label="Upcoming Trips" value={dashboard.upcomingTripsCount} />
-                {monthSummary && (
-                  <div className="metric-card">
-                    <div className="metric-card__value" style={{ fontSize: "1rem", fontWeight: 600 }}>
-                      Completed: {monthSummary.completedBookings}
-                    </div>
-                  </div>
-                )}
-                {monthSummary && (
-                  <div className="metric-card">
-                    <div className="metric-card__value" style={{ fontSize: "1rem", fontWeight: 600 }}>
-                      Revenue this month: {monthSummary.currency} {monthSummary.grossRevenue.toFixed(2)}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <section style={{ marginBottom: "var(--space-8)" }}>
-              <h2>Notifications</h2>
-              <div className="row" style={{ marginTop: "var(--space-4)" }}>
-                <p>Pending: {dashboard.notifications.pending}</p>
-                <p>Retrying: {dashboard.notifications.retrying}</p>
-                <p>Failed: {dashboard.notifications.failed}</p>
-                <p>Sent today: {dashboard.notifications.sentToday}</p>
-              </div>
-            </section>
-
-            <section>
-              <h2>Upcoming Bookings</h2>
-              {dashboard.upcomingBookings.length === 0 ? (
-                <div className="empty-state">
-                  <p className="empty-state__title">No Upcoming Trips</p>
-                  <p>The schedule is currently clear.</p>
+        {isLoading ? (
+          <div className="stack" style={{ marginTop: "var(--space-2)" }}>
+            <div className="skeleton skeleton-line" style={{ height: 90 }} />
+            <div className="skeleton skeleton-line" style={{ height: 220 }} />
+            <div className="skeleton skeleton-line" style={{ height: 160 }} />
+          </div>
+        ) : (
+          data && (
+            <>
+              {/* Headline numbers — the four figures an admin most needs at a glance. */}
+              <section style={{ marginBottom: "var(--space-6)" }}>
+                <div className="row">
+                  <MetricCard label="Total Bookings" value={data.dashboard.totalBookings} />
+                  <MetricCard label="Today's Bookings" value={data.dashboard.todaysBookings} />
+                  <MetricCard label="Upcoming Trips" value={data.dashboard.upcomingTripsCount} />
+                  <MetricCard label="Revenue This Month" value={`${data.monthSummary.currency} ${data.monthSummary.grossRevenue.toFixed(2)}`} />
                 </div>
-              ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Time</th>
-                        <th>Route</th>
-                        <th>Customer</th>
-                        <th>Driver</th>
-                        <th>Vehicle</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dashboard.upcomingBookings.map((item) => (
-                        <tr key={item.id}>
-                          <td>
-                            <Link to={`/admin/bookings/${item.id}`}>
-                              {formatDate(item.bookingDate)} {formatTime(item.pickupTime)}
-                            </Link>
-                          </td>
-                          <td>
-                            {item.route.departureLocation} &rarr; {item.route.destination}
-                          </td>
-                          <td>
-                            {item.customerFirstName} {item.customerLastName}
-                          </td>
-                          <td>{item.driverName ?? "—"}</td>
-                          <td>{item.vehicleDescription ?? "—"}</td>
-                          <td>
-                            <StatusBadge status={item.status} />
-                          </td>
+              </section>
+
+              {/* Resource availability — can today's demand actually be served. */}
+              <section style={{ marginBottom: "var(--space-6)" }}>
+                <div className="row">
+                  <MetricCard label="Available Drivers" value={data.availableDriversCount} />
+                  <MetricCard label="Active Vehicles" value={data.activeVehiclesCount} />
+                  <MetricCard label="Completed This Month" value={data.monthSummary.completedBookings} />
+                </div>
+              </section>
+
+              {/* Booking-status breakdown. */}
+              <section style={{ marginBottom: "var(--space-8)" }}>
+                <div className="row">
+                  <MetricCard label="Pending" value={data.dashboard.pendingBookings} />
+                  <MetricCard label="Confirmed" value={data.dashboard.confirmedBookings} />
+                  <MetricCard label="Cancelled" value={data.dashboard.cancelledBookings} />
+                  <MetricCard label="Manual Assignment Required" value={data.dashboard.requiresManualAssignmentCount} />
+                </div>
+              </section>
+
+              <ChartCard
+                title="Bookings — Last 7 Days"
+                isLoading={false}
+                error={null}
+                isEmpty={data.bookingsTrend.length === 0}
+                emptyMessage="No bookings in the last 7 days."
+              >
+                <BarChart
+                  series={[{ name: "Bookings", color: "var(--color-accent-strong)" }]}
+                  data={data.bookingsTrend.map((day) => ({ label: formatDate(day.date), values: [day.total] }))}
+                  height={180}
+                />
+              </ChartCard>
+
+              <section style={{ marginBottom: "var(--space-8)" }}>
+                <h2>Notifications</h2>
+                <div className="row" style={{ marginTop: "var(--space-4)" }}>
+                  <p>Pending: {data.dashboard.notifications.pending}</p>
+                  <p>Retrying: {data.dashboard.notifications.retrying}</p>
+                  <p>Failed: {data.dashboard.notifications.failed}</p>
+                  <p>Sent today: {data.dashboard.notifications.sentToday}</p>
+                </div>
+              </section>
+
+              <section>
+                <h2>Upcoming Bookings</h2>
+                {data.dashboard.upcomingBookings.length === 0 ? (
+                  <div className="empty-state">
+                    <p className="empty-state__title">No Upcoming Trips</p>
+                    <p>The schedule is currently clear.</p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>Route</th>
+                          <th>Customer</th>
+                          <th>Driver</th>
+                          <th>Vehicle</th>
+                          <th>Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          </>
+                      </thead>
+                      <tbody>
+                        {data.dashboard.upcomingBookings.map((item) => (
+                          <tr key={item.id}>
+                            <td>
+                              <Link to={`/admin/bookings/${item.id}`}>
+                                {formatDate(item.bookingDate)} {formatTime(item.pickupTime)}
+                              </Link>
+                            </td>
+                            <td>
+                              {item.route.departureLocation} &rarr; {item.route.destination}
+                            </td>
+                            <td>
+                              {item.customerFirstName} {item.customerLastName}
+                            </td>
+                            <td>{item.driverName ?? "—"}</td>
+                            <td>{item.vehicleDescription ?? "—"}</td>
+                            <td>
+                              <StatusBadge status={item.status} />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+            </>
+          )
         )}
       </main>
     </div>

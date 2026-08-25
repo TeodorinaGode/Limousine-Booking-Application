@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DriverHomePage from "./DriverHomePage";
@@ -95,5 +96,38 @@ describe("DriverHomePage", () => {
     renderPage();
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Network error");
+  });
+
+  it("does not repeat the next trip inside Today's Trips", async () => {
+    const shared = makeTrip();
+    mockedDriverBookingService.getMyDashboard.mockResolvedValue(
+      makeDashboard({ nextTrip: shared, todaysTrips: [shared] })
+    );
+
+    renderPage();
+
+    await screen.findByText("Next Trip");
+    expect(screen.getByText("Your next trip above is the only one remaining today.")).toBeInTheDocument();
+  });
+
+  it("advances ride status directly from the card and refreshes the dashboard, with no detail-page navigation required", async () => {
+    mockedDriverBookingService.getMyDashboard
+      .mockResolvedValueOnce(makeDashboard())
+      .mockResolvedValueOnce(makeDashboard({ nextTrip: makeTrip({ rideStatus: "OnTheWay" }), todaysTrips: [makeTrip({ rideStatus: "OnTheWay" })] }));
+    mockedDriverBookingService.startRide.mockResolvedValue({} as never);
+    const user = userEvent.setup();
+
+    renderPage();
+    await screen.findByText("Next Trip");
+
+    await user.click(screen.getByRole("button", { name: "On The Way" }));
+
+    await waitFor(() => {
+      expect(mockedDriverBookingService.startRide).toHaveBeenCalledWith(
+        "11111111-1111-1111-1111-111111111111",
+        "test-token"
+      );
+    });
+    await waitFor(() => expect(mockedDriverBookingService.getMyDashboard).toHaveBeenCalledTimes(2));
   });
 });

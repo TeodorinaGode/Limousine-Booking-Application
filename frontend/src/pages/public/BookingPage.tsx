@@ -45,18 +45,45 @@ const initialValues: FormValues = {
   notes: "",
 };
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3;
 
-function stepTitles(t: TFunction): Record<Step, string> {
-  return {
-    1: t("booking:steps.trip"),
-    2: t("booking:steps.pickupDetails"),
-    3: t("booking:steps.yourInformation"),
-    4: t("booking:steps.reviewConfirm"),
-  };
+/** The 5 named phases shown in the progress indicator — Journey/Details/Review map
+ * to the 3 form steps below; Payment/Confirmation happen after booking creation
+ * (still on this page for Payment, then via the Stripe redirect for Confirmation),
+ * so they're tracked separately from `step` (see `activePhaseIndex`). */
+const PHASE_KEYS = ["journey", "details", "review", "payment", "confirmation"] as const;
+
+function BookingProgress({ activeIndex, t }: { activeIndex: number; t: TFunction }) {
+  return (
+    <div>
+      <div className="booking-progress" role="list" aria-label={t("booking:title")}>
+        {PHASE_KEYS.map((key, index) => {
+          const isActive = index === activeIndex;
+          const isDone = index < activeIndex;
+          return (
+            <div
+              key={key}
+              className={`booking-progress__step${isActive ? " booking-progress__step--active" : ""}${isDone ? " booking-progress__step--done" : ""}`}
+              role="listitem"
+              aria-current={isActive ? "step" : undefined}
+            >
+              <span className="booking-progress__badge" aria-hidden="true">{isDone ? "✓" : index + 1}</span>
+              <span className="booking-progress__label">{t(`booking:phases.${key}`)}</span>
+              {index < PHASE_KEYS.length - 1 && <span className="booking-progress__line" />}
+            </div>
+          );
+        })}
+      </div>
+      {/* Mobile-only (≤640px, see .booking-progress__current in index.css) —
+       * the inline per-step label is hidden on narrow phones (it has no width
+       * limit and could overflow), replaced by this single wrapping-safe line
+       * naming the current phase, so "where am I" stays answered either way. */}
+      <p className="booking-progress__current" aria-live="polite">{t(`booking:phases.${PHASE_KEYS[activeIndex]}`)}</p>
+    </div>
+  );
 }
 
-function validateStep1(values: FormValues, t: TFunction): Record<string, string> {
+function validateJourney(values: FormValues, t: TFunction): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!values.routeId) errors.routeId = t("validation:selectRoute");
   if (!values.bookingDate) {
@@ -68,17 +95,16 @@ function validateStep1(values: FormValues, t: TFunction): Record<string, string>
   return errors;
 }
 
-function validateStep2(values: FormValues, t: TFunction): Record<string, string> {
+/** Validates every field on the merged "Details" step — pickup details and
+ * customer contact information together on one screen, rather than two
+ * separate steps, so the flow stays to 3 real form steps (Journey / Details /
+ * Review) before Payment and Confirmation. */
+function validateDetails(values: FormValues, t: TFunction): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!values.pickupAddress.trim()) errors.pickupAddress = t("validation:pickupAddressRequired");
   if (!Number.isFinite(values.passengerCount) || values.passengerCount < 1) {
     errors.passengerCount = t("validation:passengersRequired");
   }
-  return errors;
-}
-
-function validateStep3(values: FormValues, t: TFunction): Record<string, string> {
-  const errors: Record<string, string> = {};
   if (!values.customerFirstName.trim()) errors.customerFirstName = t("validation:firstNameRequired");
   if (!values.customerLastName.trim()) errors.customerLastName = t("validation:lastNameRequired");
   if (!values.customerEmail.trim()) {
@@ -134,15 +160,27 @@ function BookingPage() {
 
   const selectedRoute = routes.find((r) => r.id === values.routeId);
 
+  /** Updates one field and immediately clears its own error, if any — so a
+   * validation message disappears the moment the customer starts fixing it,
+   * rather than staying stale until the next "Next" click re-validates. */
+  const updateField = <K extends keyof FormValues>(key: K, value: FormValues[K]) => {
+    setValues((current) => ({ ...current, [key]: value }));
+    setErrors((current) => {
+      if (!(key in current)) return current;
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  };
+
   const goToNextStep = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const stepErrors =
-      step === 1 ? validateStep1(values, t) : step === 2 ? validateStep2(values, t) : validateStep3(values, t);
+    const stepErrors = step === 1 ? validateJourney(values, t) : validateDetails(values, t);
     setErrors(stepErrors);
     if (Object.keys(stepErrors).length > 0) return;
 
-    setStep((current) => (current < 4 ? ((current + 1) as Step) : current));
+    setStep((current) => (current < 3 ? ((current + 1) as Step) : current));
   };
 
   const goToPreviousStep = () => {
@@ -200,7 +238,10 @@ function BookingPage() {
     return (
       <>
       <Header />
-      <div className="container container--narrow fade-in" style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)", textAlign: "center" }}>
+      <div className="container container--medium" style={{ paddingTop: "var(--space-8)" }}>
+        <BookingProgress activeIndex={3} t={t} />
+      </div>
+      <div className="container container--narrow fade-in" style={{ paddingBottom: "var(--space-16)", textAlign: "center" }}>
         <div className="card">
           {isConfirmed && (
             <div aria-hidden="true" style={{ fontSize: "1.5rem", marginBottom: "var(--space-3)" }}>
@@ -264,24 +305,13 @@ function BookingPage() {
     );
   }
 
-  const titles = stepTitles(t);
-
   return (
     <>
     <Header />
     <div className="container container--medium" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-16)" }}>
       <h1>{t("booking:title")}</h1>
 
-      <div className="progress-steps" role="list" aria-label="Booking progress">
-        {([1, 2, 3, 4] as const).map((s) => (
-          <div key={s} className="progress-step" role="listitem">
-            <span className={`progress-step__label${s === step ? " progress-step--active" : ""}${s < step ? " progress-step--done" : ""}`}>
-              0{s} {titles[s]}
-            </span>
-            {s < 4 && <span className={`progress-step__line${s < step ? " progress-step--done" : ""}`} />}
-          </div>
-        ))}
-      </div>
+      <BookingProgress activeIndex={step - 1} t={t} />
 
       {loadError && <p role="alert">{loadError}</p>}
 
@@ -291,7 +321,7 @@ function BookingPage() {
           <div className="skeleton skeleton-line" style={{ height: 90 }} />
         </div>
       ) : (
-        <form onSubmit={step < 4 ? goToNextStep : (e) => e.preventDefault()} noValidate>
+        <form onSubmit={step < 3 ? goToNextStep : (e) => e.preventDefault()} noValidate>
           {step === 1 && (
             <>
               <div className="form-group">
@@ -308,7 +338,7 @@ function BookingPage() {
                         aria-checked={isSelected}
                         className={`trip-card${isSelected ? " trip-card--selected" : ""}`}
                         style={{ textAlign: "left", background: isSelected ? "var(--color-surface-elevated)" : undefined, width: "100%" }}
-                        onClick={() => setValues({ ...values, routeId: route.id })}
+                        onClick={() => updateField("routeId", route.id)}
                       >
                         <div className="trip-card__route">
                           <span>{route.departureLocation}</span>
@@ -332,8 +362,9 @@ function BookingPage() {
                   <input
                     id="bookingDate"
                     type="date"
+                    min={new Date().toISOString().slice(0, 10)}
                     value={values.bookingDate}
-                    onChange={(e) => setValues({ ...values, bookingDate: e.target.value })}
+                    onChange={(e) => updateField("bookingDate", e.target.value)}
                   />
                   {errors.bookingDate && <p className="form-error">{errors.bookingDate}</p>}
                 </div>
@@ -345,7 +376,7 @@ function BookingPage() {
                     id="pickupTime"
                     type="time"
                     value={values.pickupTime}
-                    onChange={(e) => setValues({ ...values, pickupTime: e.target.value })}
+                    onChange={(e) => updateField("pickupTime", e.target.value)}
                   />
                   {errors.pickupTime && <p className="form-error">{errors.pickupTime}</p>}
                 </div>
@@ -355,15 +386,18 @@ function BookingPage() {
 
           {step === 2 && (
             <>
+              <p className="section__eyebrow" style={{ marginTop: 0 }}>{t("booking:steps.pickupDetails")}</p>
+
               <div className="form-group">
                 <label htmlFor="pickupAddress">{t("booking:pickupAddress")}</label>
                 <br />
                 <input
                   id="pickupAddress"
                   type="text"
+                  autoComplete="street-address"
                   placeholder={t("booking:pickupAddressPlaceholder")}
                   value={values.pickupAddress}
-                  onChange={(e) => setValues({ ...values, pickupAddress: e.target.value })}
+                  onChange={(e) => updateField("pickupAddress", e.target.value)}
                 />
                 {errors.pickupAddress && <p className="form-error">{errors.pickupAddress}</p>}
               </div>
@@ -374,9 +408,10 @@ function BookingPage() {
                 <input
                   id="passengerCount"
                   type="number"
+                  inputMode="numeric"
                   min={1}
                   value={values.passengerCount}
-                  onChange={(e) => setValues({ ...values, passengerCount: Number(e.target.value) })}
+                  onChange={(e) => updateField("passengerCount", Number(e.target.value))}
                 />
                 {errors.passengerCount && <p className="form-error">{errors.passengerCount}</p>}
               </div>
@@ -388,14 +423,12 @@ function BookingPage() {
                   id="notes"
                   placeholder={t("booking:notesPlaceholder")}
                   value={values.notes}
-                  onChange={(e) => setValues({ ...values, notes: e.target.value })}
+                  onChange={(e) => updateField("notes", e.target.value)}
                 />
               </div>
-            </>
-          )}
 
-          {step === 3 && (
-            <>
+              <p className="section__eyebrow" style={{ marginTop: "var(--space-6)" }}>{t("booking:steps.yourInformation")}</p>
+
               <div className="row">
                 <div className="form-group">
                   <label htmlFor="customerFirstName">{t("booking:firstName")}</label>
@@ -403,8 +436,9 @@ function BookingPage() {
                   <input
                     id="customerFirstName"
                     type="text"
+                    autoComplete="given-name"
                     value={values.customerFirstName}
-                    onChange={(e) => setValues({ ...values, customerFirstName: e.target.value })}
+                    onChange={(e) => updateField("customerFirstName", e.target.value)}
                   />
                   {errors.customerFirstName && <p className="form-error">{errors.customerFirstName}</p>}
                 </div>
@@ -415,8 +449,9 @@ function BookingPage() {
                   <input
                     id="customerLastName"
                     type="text"
+                    autoComplete="family-name"
                     value={values.customerLastName}
-                    onChange={(e) => setValues({ ...values, customerLastName: e.target.value })}
+                    onChange={(e) => updateField("customerLastName", e.target.value)}
                   />
                   {errors.customerLastName && <p className="form-error">{errors.customerLastName}</p>}
                 </div>
@@ -428,8 +463,10 @@ function BookingPage() {
                 <input
                   id="customerEmail"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   value={values.customerEmail}
-                  onChange={(e) => setValues({ ...values, customerEmail: e.target.value })}
+                  onChange={(e) => updateField("customerEmail", e.target.value)}
                 />
                 {errors.customerEmail && <p className="form-error">{errors.customerEmail}</p>}
               </div>
@@ -440,55 +477,60 @@ function BookingPage() {
                 <input
                   id="customerPhone"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   value={values.customerPhone}
-                  onChange={(e) => setValues({ ...values, customerPhone: e.target.value })}
+                  onChange={(e) => updateField("customerPhone", e.target.value)}
                 />
                 {errors.customerPhone && <p className="form-error">{errors.customerPhone}</p>}
               </div>
             </>
           )}
 
-          {step === 4 && selectedRoute && (
-            <dl className="card">
-              <dt>{t("booking:success.trip")}</dt>
-              <dd>
-                {selectedRoute.departureLocation} &rarr; {selectedRoute.destination}
-              </dd>
+          {step === 3 && selectedRoute && (
+            <>
+              <h2 style={{ marginTop: 0 }}>{t("booking:review")}</h2>
+              <dl className="card">
+                <dt>{t("booking:success.trip")}</dt>
+                <dd>
+                  {selectedRoute.departureLocation} &rarr; {selectedRoute.destination}
+                </dd>
 
-              <dt>{t("booking:success.dateTime")}</dt>
-              <dd>
-                {values.bookingDate} at {values.pickupTime}
-              </dd>
+                <dt>{t("booking:success.dateTime")}</dt>
+                <dd>
+                  {values.bookingDate} at {values.pickupTime}
+                </dd>
 
-              <dt>{t("booking:pickupAddress")}</dt>
-              <dd>{values.pickupAddress}</dd>
+                <dt>{t("booking:pickupAddress")}</dt>
+                <dd>{values.pickupAddress}</dd>
 
-              <dt>{t("booking:passengers")}</dt>
-              <dd>{values.passengerCount}</dd>
+                <dt>{t("booking:passengers")}</dt>
+                <dd>{values.passengerCount}</dd>
 
-              {values.notes && (
-                <>
-                  <dt>{t("booking:notes")}</dt>
-                  <dd>{values.notes}</dd>
-                </>
-              )}
+                {values.notes && (
+                  <>
+                    <dt>{t("booking:notes")}</dt>
+                    <dd>{values.notes}</dd>
+                  </>
+                )}
 
-              <dt>{t("booking:firstName")}</dt>
-              <dd>
-                {values.customerFirstName} {values.customerLastName}
-              </dd>
+                <dt>{t("booking:firstName")}</dt>
+                <dd>
+                  {values.customerFirstName} {values.customerLastName}
+                </dd>
 
-              <dt>{t("booking:email")}</dt>
-              <dd>{values.customerEmail}</dd>
+                <dt>{t("booking:email")}</dt>
+                <dd>{values.customerEmail}</dd>
 
-              <dt>{t("booking:phone")}</dt>
-              <dd>{values.customerPhone}</dd>
+                <dt>{t("booking:phone")}</dt>
+                <dd>{values.customerPhone}</dd>
 
-              <dt>{t("booking:estimatedPrice")}</dt>
-              <dd>
-                {selectedRoute.price.toFixed(2)} {selectedRoute.currency}
-              </dd>
-            </dl>
+                <dt>{t("booking:estimatedPrice")}</dt>
+                <dd style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-primary)" }}>
+                  {selectedRoute.price.toFixed(2)} {selectedRoute.currency}
+                </dd>
+              </dl>
+            </>
           )}
 
           {submitError && <p role="alert">{submitError}</p>}
@@ -499,7 +541,7 @@ function BookingPage() {
                 {t("common:buttons.back")}
               </button>
             )}
-            {step < 4 ? (
+            {step < 3 ? (
               <button type="submit">{t("common:buttons.next")}</button>
             ) : (
               <button type="button" onClick={handleConfirm} disabled={isSubmitting}>

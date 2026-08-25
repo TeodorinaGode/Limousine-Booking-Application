@@ -36,11 +36,12 @@ function AboutPage() {
         <div className="container section--center">
           <h2 className="section__title">{t("whyUs.title")}</h2>
         </div>
-        <div className="container grid grid--bento">
-          {WHY_US_ITEMS.map((key) => (
-            <div className="content-card" key={key}>
-              <h3 className="content-card__title">{t(`whyUs.${key}.title`)}</h3>
-              <p className="content-card__desc">{t(`whyUs.${key}.desc`)}</p>
+        <div className="container pillars">
+          {WHY_US_ITEMS.map((key, index) => (
+            <div className="pillars__item" key={key}>
+              <span className="pillars__index">0{index + 1}</span>
+              <h3 className="pillars__title">{t(`whyUs.${key}.title`)}</h3>
+              <p className="pillars__desc">{t(`whyUs.${key}.desc`)}</p>
             </div>
           ))}
         </div>

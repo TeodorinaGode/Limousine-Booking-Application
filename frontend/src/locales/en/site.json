@@ -99,6 +99,11 @@
     "passengers": "Passengers",
     "noVehicles": "No vehicles are currently available."
   },
+  "homeTeasers": {
+    "about": { "label": "Our Story", "cta": "Learn More" },
+    "faq": { "label": "Questions", "cta": "View All FAQs" },
+    "contact": { "label": "Get In Touch", "cta": "Contact Us" }
+  },
   "whyUs": {
     "title": "Why Choose Us",
     "reliability": {

@@ -61,14 +61,14 @@ beforeEach(() => {
 });
 
 describe("TripDetailPage", () => {
-  it("shows the Start Ride action for an Upcoming trip", async () => {
+  it("shows the On The Way action for an Upcoming trip", async () => {
     mockedDriverBookingService.getMyBookingById.mockResolvedValue(makeTrip());
 
     renderPage();
 
-    expect(await screen.findByRole("button", { name: "Start Ride" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "On The Way" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Passenger Picked Up" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Complete Ride" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Completed" })).not.toBeInTheDocument();
   });
 
   it("starts the ride and shows the next available action", async () => {
@@ -77,7 +77,7 @@ describe("TripDetailPage", () => {
     const user = userEvent.setup();
 
     renderPage();
-    await user.click(await screen.findByRole("button", { name: "Start Ride" }));
+    await user.click(await screen.findByRole("button", { name: "On The Way" }));
 
     await waitFor(() => {
       expect(mockedDriverBookingService.startRide).toHaveBeenCalledWith(
@@ -95,9 +95,9 @@ describe("TripDetailPage", () => {
     renderPage();
 
     await screen.findByText("Trip LM-20261225-123456");
-    expect(screen.queryByRole("button", { name: "Start Ride" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "On The Way" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Passenger Picked Up" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Complete Ride" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Completed" })).not.toBeInTheDocument();
   });
 
   it("shows the backend's conflict error when a double action is attempted", async () => {

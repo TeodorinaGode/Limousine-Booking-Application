@@ -4,12 +4,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import AdminHomePage from "./AdminHomePage";
 import * as adminBookingService from "../../services/adminBookingService";
 import * as reportService from "../../services/reportService";
+import * as driverService from "../../services/driverService";
+import * as vehicleService from "../../services/vehicleService";
 import * as authContext from "../../context/AuthContext";
 import type { AdminDashboardDto } from "../../types/adminBooking";
 import type { ReportSummaryDto } from "../../types/reports";
 
 vi.mock("../../services/adminBookingService");
 vi.mock("../../services/reportService");
+vi.mock("../../services/driverService");
+vi.mock("../../services/vehicleService");
 vi.mock("../../context/AuthContext", async () => {
   const actual = await vi.importActual<typeof authContext>("../../context/AuthContext");
   return { ...actual, useAuth: vi.fn() };
@@ -17,6 +21,8 @@ vi.mock("../../context/AuthContext", async () => {
 
 const mockedAdminBookingService = vi.mocked(adminBookingService);
 const mockedReportService = vi.mocked(reportService);
+const mockedDriverService = vi.mocked(driverService);
+const mockedVehicleService = vi.mocked(vehicleService);
 const mockedUseAuth = vi.mocked(authContext.useAuth);
 
 function makeSummary(overrides: Partial<ReportSummaryDto> = {}): ReportSummaryDto {
@@ -73,6 +79,9 @@ beforeEach(() => {
     logout: vi.fn(),
   });
   mockedReportService.getSummary.mockResolvedValue(makeSummary());
+  mockedReportService.getBookingsByDay.mockResolvedValue([]);
+  mockedDriverService.getDrivers.mockResolvedValue({ items: [], page: 1, pageSize: 1, totalCount: 6, totalPages: 1 });
+  mockedVehicleService.getVehicles.mockResolvedValue({ items: [], page: 1, pageSize: 1, totalCount: 4, totalPages: 1 });
 });
 
 describe("AdminHomePage", () => {
@@ -122,13 +131,34 @@ describe("AdminHomePage", () => {
   });
 
   it("shows this month's completed count and revenue from the reports summary API", async () => {
-    mockedAdminBookingService.getDashboard.mockResolvedValue(makeDashboard());
+    mockedAdminBookingService.getDashboard.mockResolvedValue(makeDashboard({ upcomingTripsCount: 3 }));
     mockedReportService.getSummary.mockResolvedValue(makeSummary({ completedBookings: 8, grossRevenue: 18500 }));
 
     renderPage();
 
-    expect(await screen.findByText("Completed: 8")).toBeInTheDocument();
-    expect(screen.getByText("Revenue this month: CHF 18500.00")).toBeInTheDocument();
+    const completedLabel = await screen.findByText("Completed This Month");
+    expect(completedLabel.closest(".metric-card")).toHaveTextContent("8");
+    expect(screen.getByText("Revenue This Month").closest(".metric-card")).toHaveTextContent("CHF 18500.00");
+  });
+
+  it("shows available drivers and active vehicles counts, sourced from the existing driver/vehicle endpoints", async () => {
+    mockedAdminBookingService.getDashboard.mockResolvedValue(makeDashboard());
+    mockedDriverService.getDrivers.mockResolvedValue({ items: [], page: 1, pageSize: 1, totalCount: 6, totalPages: 1 });
+    mockedVehicleService.getVehicles.mockResolvedValue({ items: [], page: 1, pageSize: 1, totalCount: 4, totalPages: 1 });
+
+    renderPage();
+
+    const driversLabel = await screen.findByText("Available Drivers");
+    expect(driversLabel.closest(".metric-card")).toHaveTextContent("6");
+    expect(screen.getByText("Active Vehicles").closest(".metric-card")).toHaveTextContent("4");
+    expect(mockedDriverService.getDrivers).toHaveBeenCalledWith(
+      expect.objectContaining({ isActive: true, isAvailable: true }),
+      "test-token"
+    );
+    expect(mockedVehicleService.getVehicles).toHaveBeenCalledWith(
+      expect.objectContaining({ isActive: true }),
+      "test-token"
+    );
   });
 
   it("links to the reports page", async () => {

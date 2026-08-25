@@ -18,6 +18,7 @@ function AdminNav() {
     { to: "/admin/vehicles", label: t("nav.vehicles") },
     { to: "/admin/routes", label: t("nav.routes") },
     { to: "/admin/reports", label: t("nav.reports") },
+    { to: "/admin/settings", label: t("nav.settings") },
   ];
 
   const handleLogout = () => {

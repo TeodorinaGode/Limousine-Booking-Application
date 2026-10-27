@@ -92,7 +92,7 @@ describe("HomePage", () => {
     expect(screen.getAllByText("Premium Vehicles").length).toBeGreaterThan(0);
   });
 
-  it("lists all five real ROI Limousinen services as an editorial list, each linking to booking", () => {
+  it("lists all five real Limousinen services as an editorial list, each linking to booking", () => {
     renderPage();
 
     expect(screen.getAllByText("Airport Transfer").length).toBeGreaterThan(0);

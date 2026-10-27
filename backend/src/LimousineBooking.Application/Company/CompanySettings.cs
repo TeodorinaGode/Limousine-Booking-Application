@@ -9,7 +9,7 @@ namespace LimousineBooking.Application.Company;
 /// is exactly what a future Admin-editable "Company Information" screen would
 /// read from and write to (section 49).
 ///
-/// Defaults below are the real ROI Limousinen business identity, migrated
+/// Defaults below are the real Limousinen business identity, migrated
 /// from the company's existing website (roi-limousinen.ch) per Prompt 18 —
 /// verified live against that site rather than invented. <see cref="Address"/>
 /// and <see cref="OpeningHours"/> remain honest placeholders because the old
@@ -21,7 +21,7 @@ public class CompanySettings
 {
     public const string SectionName = "CompanySettings";
 
-    public string CompanyName { get; set; } = "ROI Limousinen";
+    public string CompanyName { get; set; } = "Limousinen";
     public string Tagline { get; set; } = "Premium / Luxury Chauffeur Service";
     public string Phone { get; set; } = "+41 78 264 85 85";
     public string Email { get; set; } = "contact@roi-limousinen.ch";

@@ -6,7 +6,7 @@ namespace LimousineBooking.Domain.Entities;
 /// <summary>
 /// A public map pin for the service-area map (Prompt 19, section 16) —
 /// marketing/reference geography (a city, airport, or nearby destination
-/// ROI Limousinen serves), deliberately separate from <see cref="Route"/>.
+/// Limousinen serves), deliberately separate from <see cref="Route"/>.
 /// A <see cref="Location"/> being on the map does not mean a bookable route
 /// exists to/from it (section 25) — the frontend matches active routes to
 /// locations by name to decide which pins get a "Book This Route" line, but

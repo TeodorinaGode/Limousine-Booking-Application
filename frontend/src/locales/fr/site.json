@@ -141,7 +141,7 @@
   "about": {
     "title": "À propos de notre service",
     "subtitle": "Un transport professionnel conçu autour de votre voyage.",
-    "body1": "ROI Limousinen propose un service de chauffeur premium sur mesure en Suisse et dans les pays voisins, fondé sur le confort, la fiabilité et la discrétion.",
+    "body1": "Limousinen propose un service de chauffeur premium sur mesure en Suisse et dans les pays voisins, fondé sur le confort, la fiabilité et la discrétion.",
     "body2": "Qu'il s'agisse d'un événement spécial, d'un déplacement professionnel, d'un transfert aéroport ou d'un trajet privé, chaque voyage est organisé avec la même attention aux détails, de la réservation jusqu'à l'arrivée."
   },
   "faq": {
@@ -241,14 +241,14 @@
     }
   },
   "seo": {
-    "homeTitle": "ROI Limousinen | Service de chauffeur et limousine premium",
+    "homeTitle": "Limousinen | Service de chauffeur et limousine premium",
     "homeDescription": "Services premium de limousine et de chauffeur depuis la Suisse pour les transferts aéroport, les voyages d'affaires, les visites de ville et les trajets privés."
   },
   "serviceAreaMap": {
     "eyebrow": "Notre zone de service",
     "title": "Service de chauffeur en Suisse et à travers l'Europe",
-    "subtitle": "De la Suisse vers les principales destinations européennes, ROI Limousinen propose un transport premium avec chauffeur pour vos voyages professionnels et privés.",
-    "regionLabel": "Carte interactive de la zone de service de ROI Limousinen",
+    "subtitle": "De la Suisse vers les principales destinations européennes, Limousinen propose un transport premium avec chauffeur pour vos voyages professionnels et privés.",
+    "regionLabel": "Carte interactive de la zone de service de Limousinen",
     "availableDestinations": "Destinations disponibles",
     "bookThisRoute": "Réserver ce trajet",
     "mainDestinations": "Destinations principales"
@@ -259,7 +259,7 @@
       "title2": "Dans le silence."
     },
     "intro": {
-      "label": "ROI Limousinen",
+      "label": "Limousinen",
       "title1": "Voyage",
       "title2": "Privé.",
       "quote": "Chaque trajet devrait sembler sans effort.",

@@ -17,7 +17,7 @@ const mockedUseAuth = vi.mocked(authContext.useAuth);
 
 function makeCompany(overrides: Partial<CompanyInfoDto> = {}): CompanyInfoDto {
   return {
-    companyName: "ROI Limousinen",
+    companyName: "Limousinen",
     tagline: "Premium Chauffeur Service",
     phone: "+41 79 000 00 00",
     email: "info@example.com",
@@ -60,7 +60,7 @@ describe("SettingsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("ROI Limousinen")).toBeInTheDocument();
+    expect(await screen.findByText("Limousinen")).toBeInTheDocument();
     expect(screen.getByText("+41 79 000 00 00")).toBeInTheDocument();
     expect(screen.getByText("info@example.com")).toBeInTheDocument();
     expect(screen.getByText("CH")).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe("SettingsPage", () => {
 
     renderPage();
 
-    await screen.findByText("ROI Limousinen");
+    await screen.findByText("Limousinen");
     const emergencyPhoneRow = screen.getByText("Emergency Phone");
     expect(emergencyPhoneRow.nextElementSibling).toHaveTextContent("—");
   });

@@ -38,7 +38,6 @@ function ServicesPage() {
                 className={`editorial-list__row${activeService === service.key ? " editorial-list__row--active" : ""}`}
                 onMouseEnter={() => setActiveService(service.key)}
                 onFocus={() => setActiveService(service.key)}
-                data-cursor="view"
               >
                 <span className="editorial-list__index">0{index + 1}</span>
                 <span className="editorial-list__title">{t(`services.${service.key}.title`)}</span>

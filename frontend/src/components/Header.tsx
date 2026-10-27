@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { APP_BRAND_NAME } from "../config/brand";
 import LanguageSelector from "./LanguageSelector";
 import ThemeToggle from "./ThemeToggle";
-import CustomCursor from "./CustomCursor";
 import { useTheme } from "../context/ThemeContext";
 
 const NAV_LINKS = [
@@ -52,7 +51,6 @@ function Header() {
 
   return (
     <header className={`site-header${isScrolled ? " site-header--scrolled" : ""}`}>
-      <CustomCursor />
       <div className="container site-header__bar">
         <Link to="/" className="site-header__brand" onClick={() => setIsMenuOpen(false)}>
           <span>{brandFirst}</span>

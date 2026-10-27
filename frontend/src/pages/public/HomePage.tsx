@@ -86,7 +86,7 @@ function HomePage() {
             <span className="cinematic-hero__title-strong">{t("noir.hero.title2")}</span>
           </h1>
           <div className="cinematic-hero__actions">
-            <Link to="/booking" className="cta-noir cta-noir--solid" data-cursor="view">
+            <Link to="/booking" className="cta-noir cta-noir--solid">
               {t("noir.ctaBeginJourney")}<span aria-hidden="true"> &rarr;</span>
             </Link>
             <Link to="/services" className="cta-noir cta-noir--outline">
@@ -137,7 +137,6 @@ function HomePage() {
                 className={`editorial-list__row${activeService === service.key ? " editorial-list__row--active" : ""}`}
                 onMouseEnter={() => setActiveService(service.key)}
                 onFocus={() => setActiveService(service.key)}
-                data-cursor="view"
               >
                 <span className="editorial-list__index">0{index + 1}</span>
                 <span className="editorial-list__title">{t(`services.${service.key}.title`)}</span>
@@ -175,7 +174,7 @@ function HomePage() {
           ) : (
             <div className="route-editorial">
               {routes.slice(0, 3).map((route) => (
-                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row" data-cursor="explore">
+                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row">
                   <div className="route-editorial__pair">
                     <span>{route.departureLocation}</span>
                     <span className="route-editorial__arrow">&rarr;</span>

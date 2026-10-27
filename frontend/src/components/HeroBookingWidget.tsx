@@ -83,19 +83,18 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
         <input id="widget-time" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
       </div>
 
-      <div className="form-group" style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-end" }}>
-        <div style={{ flex: 1 }}>
-          <label htmlFor="widget-passengers">{t("widget.passengers")}</label>
-          <input
-            id="widget-passengers"
-            type="number"
-            min={1}
-            value={passengerCount}
-            onChange={(e) => setPassengerCount(Number(e.target.value))}
-          />
-        </div>
-        <button type="submit" style={{ flexShrink: 0 }}>{t("widget.checkAvailability")}</button>
+      <div className="form-group">
+        <label htmlFor="widget-passengers">{t("widget.passengers")}</label>
+        <input
+          id="widget-passengers"
+          type="number"
+          min={1}
+          value={passengerCount}
+          onChange={(e) => setPassengerCount(Number(e.target.value))}
+        />
       </div>
+
+      <button type="submit" className="hero-widget__submit">{t("widget.checkAvailability")}</button>
     </form>
   );
 }

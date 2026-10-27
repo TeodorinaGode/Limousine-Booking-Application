@@ -141,7 +141,7 @@
   "about": {
     "title": "Über unseren Service",
     "subtitle": "Professioneller Transport, ganz auf Ihre Reise abgestimmt.",
-    "body1": "ROI Limousinen bietet massgeschneiderten Premium-Chauffeurtransport in der Schweiz und den Nachbarländern — mit Fokus auf Komfort, Zuverlässigkeit und Diskretion.",
+    "body1": "Limousinen bietet massgeschneiderten Premium-Chauffeurtransport in der Schweiz und den Nachbarländern — mit Fokus auf Komfort, Zuverlässigkeit und Diskretion.",
     "body2": "Ob für einen besonderen Anlass, einen Firmentermin, einen Flughafentransfer oder eine private Reise — jede Fahrt wird mit derselben Sorgfalt organisiert, von der Buchung bis zur Ankunft."
   },
   "faq": {
@@ -241,14 +241,14 @@
     }
   },
   "seo": {
-    "homeTitle": "ROI Limousinen | Premium-Chauffeur- und Limousinenservice",
+    "homeTitle": "Limousinen | Premium-Chauffeur- und Limousinenservice",
     "homeDescription": "Premium-Limousinen- und Chauffeurservice aus der Schweiz für Flughafentransfers, Geschäftsreisen, Stadtrundfahrten und private Fahrten."
   },
   "serviceAreaMap": {
     "eyebrow": "Unser Einsatzgebiet",
     "title": "Chauffeurservice in der Schweiz und in ganz Europa",
-    "subtitle": "Von der Schweiz zu wichtigen Zielen in ganz Europa — ROI Limousinen bietet Premium-Chauffeurtransport für Geschäfts- und Privatreisen.",
-    "regionLabel": "Interaktive Karte des Einsatzgebiets von ROI Limousinen",
+    "subtitle": "Von der Schweiz zu wichtigen Zielen in ganz Europa — Limousinen bietet Premium-Chauffeurtransport für Geschäfts- und Privatreisen.",
+    "regionLabel": "Interaktive Karte des Einsatzgebiets von Limousinen",
     "availableDestinations": "Verfügbare Ziele",
     "bookThisRoute": "Diese Strecke buchen",
     "mainDestinations": "Hauptziele"
@@ -259,7 +259,7 @@
       "title2": "In Stille."
     },
     "intro": {
-      "label": "ROI Limousinen",
+      "label": "Limousinen",
       "title1": "Private",
       "title2": "Reise.",
       "quote": "Jede Fahrt sollte sich mühelos anfühlen.",

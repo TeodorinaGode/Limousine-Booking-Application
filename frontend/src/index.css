@@ -1653,7 +1653,11 @@ tbody tr:last-child td {
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  /* 5 equal fields, then a 6th column sized to the submit button's own
+     content — it used to share a single 1fr column with the passengers
+     input (via an inline flex hack) and had nowhere to go but to overflow
+     the widget's right edge. */
+  grid-template-columns: repeat(5, 1fr) auto;
   gap: var(--space-4);
   align-items: end;
   max-width: 980px;
@@ -1663,9 +1667,15 @@ tbody tr:last-child td {
 .hero-widget .form-group {
   margin-bottom: 0;
 }
+.hero-widget__submit {
+  white-space: nowrap;
+}
 @media (max-width: 900px) {
   .hero-widget {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-widget__submit {
+    grid-column: 1 / -1;
   }
 }
 @media (max-width: 480px) {
@@ -2707,41 +2717,6 @@ tbody tr:last-child td {
 .operating-list > li {
   font-size: 1.1rem;
   color: var(--color-text-secondary);
-}
-
-/* ---- Custom cursor (desktop, pointer-fine only) ---- */
-.noir-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: var(--color-text-primary);
-  pointer-events: none;
-  z-index: 9999;
-  transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
-  will-change: transform;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--noir-0);
-  font-weight: 700;
-}
-.noir-cursor--link {
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-}
-.noir-cursor--label {
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
-  background: rgba(245, 245, 245, 0.92);
 }
 
 /* ---- Map: cinematic tone (grayscale + slightly darker than the raw tiles) ----

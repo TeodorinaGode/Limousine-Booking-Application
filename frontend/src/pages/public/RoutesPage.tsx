@@ -121,7 +121,7 @@ function RoutesPage() {
           ) : (
             <div className="route-editorial">
               {routes.map((route) => (
-                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row" data-cursor="explore">
+                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row">
                   <div className="route-editorial__pair">
                     <span>{route.departureLocation}</span>
                     <span className="route-editorial__arrow">&rarr;</span>

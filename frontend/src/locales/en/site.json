@@ -141,7 +141,7 @@
   "about": {
     "title": "About Our Service",
     "subtitle": "Professional transportation designed around your journey.",
-    "body1": "ROI Limousinen provides premium, tailored chauffeur transportation across Switzerland and neighbouring countries, built around comfort, reliability and discretion.",
+    "body1": "Limousinen provides premium, tailored chauffeur transportation across Switzerland and neighbouring countries, built around comfort, reliability and discretion.",
     "body2": "Whether for a special event, a corporate function, an airport transfer or a private journey, every trip is arranged with the same attention to detail — from the moment you book to the moment you arrive."
   },
   "faq": {
@@ -241,14 +241,14 @@
     }
   },
   "seo": {
-    "homeTitle": "ROI Limousinen | Premium Chauffeur & Limousine Service",
+    "homeTitle": "Limousinen | Premium Chauffeur & Limousine Service",
     "homeDescription": "Premium limousine and chauffeur services from Switzerland for airport transfers, corporate travel, city tours and private journeys."
   },
   "serviceAreaMap": {
     "eyebrow": "Our Service Area",
     "title": "Chauffeur Services Across Switzerland and Europe",
-    "subtitle": "From Switzerland to major destinations across Europe, ROI Limousinen provides premium chauffeur transportation for business and private journeys.",
-    "regionLabel": "Interactive map of ROI Limousinen's service area",
+    "subtitle": "From Switzerland to major destinations across Europe, Limousinen provides premium chauffeur transportation for business and private journeys.",
+    "regionLabel": "Interactive map of Limousinen's service area",
     "availableDestinations": "Available destinations",
     "bookThisRoute": "Book This Route",
     "mainDestinations": "Main Destinations"
@@ -259,7 +259,7 @@
       "title2": "In Silence."
     },
     "intro": {
-      "label": "ROI Limousinen",
+      "label": "Limousinen",
       "title1": "Private",
       "title2": "Travel.",
       "quote": "Every journey should feel effortless.",

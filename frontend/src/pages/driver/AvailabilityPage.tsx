@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import {
   createAvailability,
   deleteAvailability,
@@ -7,6 +8,7 @@ import {
   setCurrentAvailability,
   updateAvailability,
 } from "../../services/availabilityService";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import DriverNav from "../../components/DriverNav";
 import PageHeader from "../../components/PageHeader";
 import StatusBadge from "../../components/StatusBadge";
@@ -27,14 +29,16 @@ function formatTime(time: string): string {
 
 function AvailabilityPage() {
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [isCurrentlyAvailable, setIsCurrentlyAvailable] = useState(false);
   const [schedule, setSchedule] = useState<AvailabilityDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTogglingAvailability, setIsTogglingAvailability] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [modalState, setModalState] = useState<{ availability?: AvailabilityDto } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AvailabilityDto | null>(null);
 
   const loadSchedule = useCallback(async () => {
     if (!accessToken) return;
@@ -56,12 +60,6 @@ function AvailabilityPage() {
     loadSchedule();
   }, [loadSchedule]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const handleToggleCurrentAvailability = async () => {
     if (!accessToken) return;
 
@@ -70,7 +68,7 @@ function AvailabilityPage() {
     try {
       const result = await setCurrentAvailability(!isCurrentlyAvailable, accessToken);
       setIsCurrentlyAvailable(result.isAvailable);
-      setSuccessMessage(`Current availability set to ${result.isAvailable ? "Available" : "Unavailable"}.`);
+      showToast(`Current availability set to ${result.isAvailable ? "Available" : "Unavailable"}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update your current availability.");
     } finally {
@@ -91,28 +89,29 @@ function AvailabilityPage() {
 
     if (modalState?.availability) {
       await updateAvailability(modalState.availability.id, payload, accessToken);
-      setSuccessMessage("Availability updated successfully.");
+      showToast("Availability updated successfully.");
     } else {
       await createAvailability(payload, accessToken);
-      setSuccessMessage("Availability created successfully.");
+      showToast("Availability created successfully.");
     }
 
     setModalState(null);
     await loadSchedule();
   };
 
-  const handleDelete = async (availability: AvailabilityDto) => {
-    if (!accessToken) return;
+  const handleConfirmDelete = async () => {
+    if (!accessToken || !deleteTarget || deletingId) return;
 
-    const confirmed = window.confirm("Are you sure you want to remove this availability period?");
-    if (!confirmed) return;
-
+    setDeletingId(deleteTarget.id);
     try {
-      await deleteAvailability(availability.id, accessToken);
-      setSuccessMessage("Availability removed.");
+      await deleteAvailability(deleteTarget.id, accessToken);
+      showToast("Availability removed.");
       await loadSchedule();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to remove the availability period.");
+    } finally {
+      setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -132,7 +131,6 @@ function AvailabilityPage() {
         </button>
       </section>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       <section>
@@ -151,7 +149,7 @@ function AvailabilityPage() {
             <p>Add a period to start managing your schedule.</p>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-responsive" style={{ overflowX: "auto" }}>
           <table>
             <thead>
               <tr>
@@ -166,20 +164,30 @@ function AvailabilityPage() {
             <tbody>
               {schedule.map((item) => (
                 <tr key={item.id}>
-                  <td>{formatDate(item.date)}</td>
-                  <td>{formatTime(item.startTime)}</td>
-                  <td>{formatTime(item.endTime)}</td>
-                  <td>
+                  <td data-label="Date">{formatDate(item.date)}</td>
+                  <td data-label="Start">{formatTime(item.startTime)}</td>
+                  <td data-label="End">{formatTime(item.endTime)}</td>
+                  <td data-label="Status">
                     <StatusBadge status={item.isAvailable ? "Available" : "Unavailable"} />
                   </td>
-                  <td>{item.notes}</td>
-                  <td>
+                  <td data-label="Notes">{item.notes}</td>
+                  <td data-label="Actions">
                     <div className="row" style={{ gap: "var(--space-2)" }}>
-                      <button type="button" className="btn-ghost" onClick={() => setModalState({ availability: item })}>
+                      <button
+                        type="button"
+                        className="btn-ghost"
+                        onClick={() => setModalState({ availability: item })}
+                        disabled={deletingId === item.id}
+                      >
                         Edit
                       </button>
-                      <button type="button" className="btn-ghost" onClick={() => handleDelete(item)}>
-                        Remove
+                      <button
+                        type="button"
+                        className="btn-ghost"
+                        onClick={() => setDeleteTarget(item)}
+                        disabled={deletingId === item.id}
+                      >
+                        {deletingId === item.id ? "Removing..." : "Remove"}
                       </button>
                     </div>
                   </td>
@@ -196,6 +204,18 @@ function AvailabilityPage() {
           availability={modalState.availability}
           onSave={handleSave}
           onClose={() => setModalState(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Remove Availability Period"
+          message={`Remove the ${formatDate(deleteTarget.date)} ${formatTime(deleteTarget.startTime)}–${formatTime(deleteTarget.endTime)} period from your schedule?`}
+          confirmLabel="Remove"
+          danger
+          isBusy={deletingId === deleteTarget.id}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteTarget(null)}
         />
       )}
       </main>

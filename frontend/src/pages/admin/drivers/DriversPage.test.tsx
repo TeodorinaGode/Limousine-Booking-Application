@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DriversPage from "./DriversPage";
+import { ToastProvider } from "../../../context/ToastContext";
 import * as driverService from "../../../services/driverService";
 import * as vehicleService from "../../../services/vehicleService";
 import * as authContext from "../../../context/AuthContext";
@@ -60,7 +61,9 @@ function pagedResult<T>(items: T[]): PagedResult<T> {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <DriversPage />
+      <ToastProvider>
+        <DriversPage />
+      </ToastProvider>
     </MemoryRouter>
   );
 }
@@ -277,15 +280,16 @@ describe("DriversPage", () => {
 
   it("does not deactivate a driver when the confirmation is declined", async () => {
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([makeDriver()]));
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Driver" });
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
-    expect(window.confirm).toHaveBeenCalledWith("Are you sure you want to deactivate this driver?");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedDriverService.deactivateDriver).not.toHaveBeenCalled();
   });
 
@@ -293,13 +297,14 @@ describe("DriversPage", () => {
     const driver = makeDriver();
     mockedDriverService.getDrivers.mockResolvedValue(pagedResult([driver]));
     mockedDriverService.deactivateDriver.mockResolvedValue({ ...driver, isActive: false });
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("John Smith");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Driver" });
+    await user.click(within(dialog).getByRole("button", { name: "Deactivate" }));
 
     await waitFor(() => {
       expect(mockedDriverService.deactivateDriver).toHaveBeenCalledWith(driver.id, "test-token");

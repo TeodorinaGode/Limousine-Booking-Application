@@ -84,21 +84,21 @@ function VehicleFormModal({ vehicle, onSave, onClose }: VehicleFormModalProps) {
             value={values.registrationNumber}
             onChange={(e) => setValues({ ...values, registrationNumber: e.target.value })}
           />
-          {errors.registrationNumber && <p role="alert">{errors.registrationNumber}</p>}
+          {errors.registrationNumber && <p className="form-error">{errors.registrationNumber}</p>}
         </div>
 
         <div>
           <label htmlFor="make">Make</label>
           <br />
           <input id="make" type="text" value={values.make} onChange={(e) => setValues({ ...values, make: e.target.value })} />
-          {errors.make && <p role="alert">{errors.make}</p>}
+          {errors.make && <p className="form-error">{errors.make}</p>}
         </div>
 
         <div>
           <label htmlFor="model">Model</label>
           <br />
           <input id="model" type="text" value={values.model} onChange={(e) => setValues({ ...values, model: e.target.value })} />
-          {errors.model && <p role="alert">{errors.model}</p>}
+          {errors.model && <p className="form-error">{errors.model}</p>}
         </div>
 
         <div>
@@ -116,7 +116,7 @@ function VehicleFormModal({ vehicle, onSave, onClose }: VehicleFormModalProps) {
               <option key={type} value={type} />
             ))}
           </datalist>
-          {errors.vehicleType && <p role="alert">{errors.vehicleType}</p>}
+          {errors.vehicleType && <p className="form-error">{errors.vehicleType}</p>}
         </div>
 
         <div>
@@ -128,7 +128,7 @@ function VehicleFormModal({ vehicle, onSave, onClose }: VehicleFormModalProps) {
             value={values.passengerCapacity}
             onChange={(e) => setValues({ ...values, passengerCapacity: Number(e.target.value) })}
           />
-          {errors.passengerCapacity && <p role="alert">{errors.passengerCapacity}</p>}
+          {errors.passengerCapacity && <p className="form-error">{errors.passengerCapacity}</p>}
         </div>
 
         <div>

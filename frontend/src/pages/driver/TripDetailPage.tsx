@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import { completeRide, getMyBookingById, markPassengerPickedUp, startRide } from "../../services/driverBookingService";
 import DriverNav from "../../components/DriverNav";
 import StatusBadge from "../../components/StatusBadge";
@@ -21,11 +22,11 @@ function formatDateTime(iso: string): string {
 function TripDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [trip, setTrip] = useState<DriverBookingDetailDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
   const loadTrip = useCallback(async () => {
@@ -45,20 +46,13 @@ function TripDetailPage() {
     loadTrip();
   }, [loadTrip]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const runAction = async (action: (id: string, accessToken: string) => Promise<DriverBookingDetailDto>, message: string) => {
     if (!accessToken || !id) return;
     setError(null);
-    setSuccessMessage(null);
     setIsBusy(true);
     try {
       setTrip(await action(id, accessToken));
-      setSuccessMessage(message);
+      showToast(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update the ride status.");
     } finally {
@@ -93,7 +87,6 @@ function TripDetailPage() {
         <Link to="/driver/schedule">&larr; Back to Schedule</Link>
       </p>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       <section style={{ marginBottom: "1.5rem" }}>
@@ -135,7 +128,7 @@ function TripDetailPage() {
       <div className="stack" style={{ marginBottom: "1.5rem" }}>
         {trip.rideStatus === "Upcoming" && (
           <button type="button" className="btn-block" onClick={() => runAction(startRide, "Ride started.")} disabled={isBusy}>
-            On The Way
+            {isBusy ? "Updating..." : "On The Way"}
           </button>
         )}
         {trip.rideStatus === "OnTheWay" && (
@@ -145,12 +138,12 @@ function TripDetailPage() {
             onClick={() => runAction(markPassengerPickedUp, "Passenger marked as picked up.")}
             disabled={isBusy}
           >
-            Passenger Picked Up
+            {isBusy ? "Updating..." : "Passenger Picked Up"}
           </button>
         )}
         {trip.rideStatus === "PassengerPickedUp" && (
           <button type="button" className="btn-block" onClick={() => runAction(completeRide, "Ride completed.")} disabled={isBusy}>
-            Completed
+            {isBusy ? "Updating..." : "Completed"}
           </button>
         )}
       </div>
@@ -158,7 +151,7 @@ function TripDetailPage() {
       {trip.rideStatusHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Ride Status History</h2>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-responsive" style={{ overflowX: "auto" }}>
           <table>
             <thead>
               <tr>
@@ -170,9 +163,9 @@ function TripDetailPage() {
             <tbody>
               {trip.rideStatusHistory.map((entry, index) => (
                 <tr key={index}>
-                  <td>{entry.previousStatus}</td>
-                  <td>{entry.newStatus}</td>
-                  <td>{formatDateTime(entry.changedAt)}</td>
+                  <td data-label="From">{entry.previousStatus}</td>
+                  <td data-label="To">{entry.newStatus}</td>
+                  <td data-label="Changed At">{formatDateTime(entry.changedAt)}</td>
                 </tr>
               ))}
             </tbody>

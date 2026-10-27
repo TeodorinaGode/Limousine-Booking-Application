@@ -83,6 +83,7 @@ async function fillStep2(user: ReturnType<typeof userEvent.setup>) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  sessionStorage.clear();
   mockedBookingService.getActiveRoutes.mockResolvedValue([makeRoute()]);
 });
 

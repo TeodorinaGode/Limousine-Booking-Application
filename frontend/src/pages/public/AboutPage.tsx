@@ -21,7 +21,7 @@ function AboutPage() {
       <Header />
 
       <section ref={introReveal.ref} className={`noir-section noir-section--black section--center ${introReveal.className}`}>
-        <div className="container container--medium reveal-lines">
+        <div className={`container container--medium reveal-lines ${introReveal.className}`}>
           <p className="noir-label">{t("noir.about.label")}</p>
           <h1 className="noir-heading" style={{ marginTop: "var(--space-4)" }}>
             <span className="strong">{t("about.title")}</span>

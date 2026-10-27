@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
 import { assignDriver, autoAssign, cancelBooking, getBookingById, refundPayment, resendConfirmation, updateBooking } from "../../../services/adminBookingService";
 import { getDrivers } from "../../../services/driverService";
 import { getRoutes } from "../../../services/routeService";
 import AdminNav from "../../../components/AdminNav";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 import StatusBadge from "../../../components/StatusBadge";
 import type { AdminBookingDetailDto, AssignDriverRequest, UpdateBookingRequest } from "../../../types/adminBooking";
 import type { DriverDto } from "../../../types/driver";
@@ -27,16 +29,18 @@ function formatDateTime(iso: string): string {
 function BookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [booking, setBooking] = useState<AdminBookingDetailDto | null>(null);
   const [drivers, setDrivers] = useState<DriverDto[]>([]);
   const [routes, setRoutes] = useState<RouteDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAssignOpen, setIsAssignOpen] = useState(false);
-  const [isBusy, setIsBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"autoAssign" | "resend" | "refund" | "cancel" | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<"refund" | "cancel" | null>(null);
+  const isBusy = busyAction !== null;
 
   const loadBooking = useCallback(async () => {
     if (!accessToken || !id) return;
@@ -71,86 +75,77 @@ function BookingDetailPage() {
     })();
   }, [accessToken]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const handleSaveEdit = async (values: UpdateBookingRequest) => {
     if (!accessToken || !id) return;
     setBooking(await updateBooking(id, values, accessToken));
     setIsEditOpen(false);
-    setSuccessMessage("Booking updated successfully.");
+    showToast("Booking updated successfully.");
   };
 
   const handleAssign = async (values: AssignDriverRequest) => {
     if (!accessToken || !id) return;
     setBooking(await assignDriver(id, values, accessToken));
     setIsAssignOpen(false);
-    setSuccessMessage("Driver assigned successfully.");
+    showToast("Driver assigned successfully.");
   };
 
   const handleAutoAssign = async () => {
     if (!accessToken || !id) return;
     setError(null);
-    setIsBusy(true);
+    setBusyAction("autoAssign");
     try {
       setBooking(await autoAssign(id, accessToken));
-      setSuccessMessage("Automatic assignment completed.");
+      showToast("Automatic assignment completed.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run automatic assignment.");
     } finally {
-      setIsBusy(false);
+      setBusyAction(null);
     }
   };
 
   const handleResendConfirmation = async () => {
     if (!accessToken || !id) return;
     setError(null);
-    setIsBusy(true);
+    setBusyAction("resend");
     try {
       await resendConfirmation(id, accessToken);
-      setSuccessMessage("Confirmation email queued for resend.");
+      showToast("Confirmation email queued for resend.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to resend the confirmation email.");
     } finally {
-      setIsBusy(false);
+      setBusyAction(null);
     }
   };
 
   const handleRefund = async () => {
     if (!accessToken || !id) return;
-    const confirmed = window.confirm("Refund this payment via the payment provider? This cannot be undone.");
-    if (!confirmed) return;
 
     setError(null);
-    setIsBusy(true);
+    setBusyAction("refund");
     try {
       setBooking(await refundPayment(id, accessToken));
-      setSuccessMessage("Payment refunded.");
+      showToast("Payment refunded.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to refund the payment.");
     } finally {
-      setIsBusy(false);
+      setBusyAction(null);
+      setConfirmDialog(null);
     }
   };
 
-  const handleCancel = async () => {
+  const handleCancel = async (reason?: string) => {
     if (!accessToken || !id) return;
-    const confirmed = window.confirm("Are you sure you want to cancel this booking?");
-    if (!confirmed) return;
-    const reason = window.prompt("Cancellation reason (optional):") ?? undefined;
 
     setError(null);
-    setIsBusy(true);
+    setBusyAction("cancel");
     try {
       setBooking(await cancelBooking(id, { reason }, accessToken));
-      setSuccessMessage("Booking cancelled.");
+      showToast("Booking cancelled.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to cancel the booking.");
     } finally {
-      setIsBusy(false);
+      setBusyAction(null);
+      setConfirmDialog(null);
     }
   };
 
@@ -184,7 +179,6 @@ function BookingDetailPage() {
         <Link to="/admin/bookings">&larr; Back to Bookings</Link>
       </p>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       <section style={{ marginBottom: "1.5rem" }}>
@@ -270,7 +264,13 @@ function BookingDetailPage() {
               {booking.payment.paidAt && <span>Paid {formatDateTime(booking.payment.paidAt)}</span>}
             </div>
             {booking.payment.status === "Paid" && (
-              <button type="button" className="btn-danger" style={{ marginTop: "var(--space-3)" }} onClick={handleRefund} disabled={isBusy}>
+              <button
+                type="button"
+                className="btn-danger"
+                style={{ marginTop: "var(--space-3)" }}
+                onClick={() => setConfirmDialog("refund")}
+                disabled={isBusy}
+              >
                 Refund Payment
               </button>
             )}
@@ -280,7 +280,8 @@ function BookingDetailPage() {
         )}
 
         {booking.paymentHistory.length > 0 && (
-          <table style={{ marginTop: "var(--space-4)" }}>
+          <div className="table-responsive" style={{ marginTop: "var(--space-4)" }}>
+          <table>
             <thead>
               <tr>
                 <th>Status</th>
@@ -293,25 +294,27 @@ function BookingDetailPage() {
             <tbody>
               {booking.paymentHistory.map((entry, index) => (
                 <tr key={index}>
-                  <td>
+                  <td data-label="Status">
                     <StatusBadge status={entry.status} />
                   </td>
-                  <td>
+                  <td data-label="Amount">
                     {entry.amount.toFixed(2)} {entry.currency}
                   </td>
-                  <td>{formatDateTime(entry.createdAt)}</td>
-                  <td>{entry.paidAt ? formatDateTime(entry.paidAt) : "—"}</td>
-                  <td>{entry.failureReason ?? "—"}</td>
+                  <td data-label="Created">{formatDateTime(entry.createdAt)}</td>
+                  <td data-label="Paid At">{entry.paidAt ? formatDateTime(entry.paidAt) : "—"}</td>
+                  <td data-label="Failure Reason">{entry.failureReason ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
 
       {booking.assignmentHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Assignment History</h2>
+          <div className="table-responsive">
           <table>
             <thead>
               <tr>
@@ -325,21 +328,23 @@ function BookingDetailPage() {
             <tbody>
               {booking.assignmentHistory.map((entry, index) => (
                 <tr key={index}>
-                  <td>{entry.driverName}</td>
-                  <td>{entry.vehicleDescription}</td>
-                  <td>{entry.assignmentType}</td>
-                  <td>{entry.assignedByEmail ?? "System (automatic)"}</td>
-                  <td>{formatDateTime(entry.assignedAt)}</td>
+                  <td data-label="Driver">{entry.driverName}</td>
+                  <td data-label="Vehicle">{entry.vehicleDescription}</td>
+                  <td data-label="Type">{entry.assignmentType}</td>
+                  <td data-label="Assigned By">{entry.assignedByEmail ?? "System (automatic)"}</td>
+                  <td data-label="Assigned At">{formatDateTime(entry.assignedAt)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </section>
       )}
 
       {booking.rideStatusHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Ride Status History</h2>
+          <div className="table-responsive">
           <table>
             <thead>
               <tr>
@@ -351,13 +356,14 @@ function BookingDetailPage() {
             <tbody>
               {booking.rideStatusHistory.map((entry, index) => (
                 <tr key={index}>
-                  <td>{entry.previousStatus}</td>
-                  <td>{entry.newStatus}</td>
-                  <td>{formatDateTime(entry.changedAt)}</td>
+                  <td data-label="From">{entry.previousStatus}</td>
+                  <td data-label="To">{entry.newStatus}</td>
+                  <td data-label="Changed At">{formatDateTime(entry.changedAt)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </section>
       )}
 
@@ -374,16 +380,16 @@ function BookingDetailPage() {
         )}
         {canEdit && (
           <button type="button" className="btn-secondary" onClick={handleAutoAssign} disabled={isBusy}>
-            Run Automatic Assignment
+            {busyAction === "autoAssign" ? "Assigning..." : "Run Automatic Assignment"}
           </button>
         )}
         {booking.status === "Confirmed" && (
           <button type="button" className="btn-secondary" onClick={handleResendConfirmation} disabled={isBusy}>
-            Resend Confirmation Email
+            {busyAction === "resend" ? "Sending..." : "Resend Confirmation Email"}
           </button>
         )}
         {canCancel && (
-          <button type="button" className="btn-danger" onClick={handleCancel} disabled={isBusy}>
+          <button type="button" className="btn-danger" onClick={() => setConfirmDialog("cancel")} disabled={isBusy}>
             Cancel Booking
           </button>
         )}
@@ -392,6 +398,30 @@ function BookingDetailPage() {
       {isEditOpen && <EditBookingModal booking={booking} routes={routes} onSave={handleSaveEdit} onClose={() => setIsEditOpen(false)} />}
       {isAssignOpen && (
         <AssignBookingModal booking={booking} drivers={drivers} onAssign={handleAssign} onClose={() => setIsAssignOpen(false)} />
+      )}
+      {confirmDialog === "refund" && (
+        <ConfirmDialog
+          title="Refund Payment"
+          message="Refund this payment via the payment provider? This cannot be undone."
+          confirmLabel="Refund Payment"
+          danger
+          isBusy={busyAction === "refund"}
+          onConfirm={handleRefund}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
+      {confirmDialog === "cancel" && (
+        <ConfirmDialog
+          title="Cancel Booking"
+          message="Are you sure you want to cancel this booking? The customer will be notified."
+          confirmLabel="Cancel Booking"
+          cancelLabel="Keep Booking"
+          reasonLabel="Cancellation reason (optional)"
+          danger
+          isBusy={busyAction === "cancel"}
+          onConfirm={handleCancel}
+          onCancel={() => setConfirmDialog(null)}
+        />
       )}
       </main>
     </div>

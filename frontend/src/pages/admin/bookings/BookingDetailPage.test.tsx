@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import BookingDetailPage from "./BookingDetailPage";
+import { ToastProvider } from "../../../context/ToastContext";
 import * as adminBookingService from "../../../services/adminBookingService";
 import * as driverService from "../../../services/driverService";
 import * as routeService from "../../../services/routeService";
@@ -89,9 +90,11 @@ function pagedResult<T>(items: T[]): PagedResult<T> {
 function renderPage(id = "11111111-1111-1111-1111-111111111111") {
   return render(
     <MemoryRouter initialEntries={[`/admin/bookings/${id}`]}>
-      <Routes>
-        <Route path="/admin/bookings/:id" element={<BookingDetailPage />} />
-      </Routes>
+      <ToastProvider>
+        <Routes>
+          <Route path="/admin/bookings/:id" element={<BookingDetailPage />} />
+        </Routes>
+      </ToastProvider>
     </MemoryRouter>
   );
 }
@@ -200,14 +203,15 @@ describe("BookingDetailPage", () => {
   it("cancels the booking after confirmation", async () => {
     mockedAdminBookingService.getBookingById.mockResolvedValue(makeBooking());
     mockedAdminBookingService.cancelBooking.mockResolvedValue(makeBooking({ status: "Cancelled" }));
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-    vi.spyOn(window, "prompt").mockReturnValue("Customer requested cancellation");
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("LM-20261225-123456", { exact: false });
 
     await user.click(screen.getByRole("button", { name: "Cancel Booking" }));
+    const dialog = await screen.findByRole("dialog", { name: "Cancel Booking" });
+    await user.type(within(dialog).getByLabelText("Cancellation reason (optional)"), "Customer requested cancellation");
+    await user.click(within(dialog).getByRole("button", { name: "Cancel Booking" }));
 
     await waitFor(() => {
       expect(mockedAdminBookingService.cancelBooking).toHaveBeenCalledWith(
@@ -220,14 +224,16 @@ describe("BookingDetailPage", () => {
 
   it("does not cancel when the confirmation is declined", async () => {
     mockedAdminBookingService.getBookingById.mockResolvedValue(makeBooking());
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("LM-20261225-123456", { exact: false });
 
     await user.click(screen.getByRole("button", { name: "Cancel Booking" }));
+    const dialog = await screen.findByRole("dialog", { name: "Cancel Booking" });
+    await user.click(within(dialog).getByRole("button", { name: "Keep Booking" }));
 
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedAdminBookingService.cancelBooking).not.toHaveBeenCalled();
   });
 
@@ -268,13 +274,14 @@ describe("BookingDetailPage", () => {
     mockedAdminBookingService.refundPayment.mockResolvedValue(
       makeBooking({ payment: { status: "Refunded", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
     );
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByRole("button", { name: "Refund Payment" });
 
     await user.click(screen.getByRole("button", { name: "Refund Payment" }));
+    const dialog = await screen.findByRole("dialog", { name: "Refund Payment" });
+    await user.click(within(dialog).getByRole("button", { name: "Refund Payment" }));
 
     await waitFor(() => {
       expect(mockedAdminBookingService.refundPayment).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111", "test-token");
@@ -286,14 +293,16 @@ describe("BookingDetailPage", () => {
     mockedAdminBookingService.getBookingById.mockResolvedValue(
       makeBooking({ payment: { status: "Paid", amount: 180, currency: "CHF", provider: "Stripe", paidAt: "2026-08-19T10:00:00Z" } })
     );
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByRole("button", { name: "Refund Payment" });
 
     await user.click(screen.getByRole("button", { name: "Refund Payment" }));
+    const dialog = await screen.findByRole("dialog", { name: "Refund Payment" });
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedAdminBookingService.refundPayment).not.toHaveBeenCalled();
   });
 

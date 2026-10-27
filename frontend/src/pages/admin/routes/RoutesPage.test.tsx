@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import RoutesPage from "./RoutesPage";
+import { ToastProvider } from "../../../context/ToastContext";
 import * as routeService from "../../../services/routeService";
 import * as authContext from "../../../context/AuthContext";
 import type { RouteDto } from "../../../types/route";
@@ -39,7 +40,9 @@ function pagedResult(items: RouteDto[]): PagedResult<RouteDto> {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <RoutesPage />
+      <ToastProvider>
+        <RoutesPage />
+      </ToastProvider>
     </MemoryRouter>
   );
 }
@@ -155,15 +158,16 @@ describe("RoutesPage", () => {
 
   it("does not deactivate a route when the confirmation is declined", async () => {
     mockedRouteService.getRoutes.mockResolvedValue(pagedResult([makeRoute()]));
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("Zurich");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Route" });
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
-    expect(window.confirm).toHaveBeenCalledWith("Are you sure you want to deactivate this route?");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedRouteService.deactivateRoute).not.toHaveBeenCalled();
   });
 
@@ -171,13 +175,14 @@ describe("RoutesPage", () => {
     const route = makeRoute();
     mockedRouteService.getRoutes.mockResolvedValue(pagedResult([route]));
     mockedRouteService.deactivateRoute.mockResolvedValue({ ...route, isActive: false });
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("Zurich");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Route" });
+    await user.click(within(dialog).getByRole("button", { name: "Deactivate" }));
 
     await waitFor(() => {
       expect(mockedRouteService.deactivateRoute).toHaveBeenCalledWith(route.id, "test-token");

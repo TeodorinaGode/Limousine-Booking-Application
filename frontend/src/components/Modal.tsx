@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
 interface ModalProps {
@@ -31,15 +31,49 @@ const contentStyle: React.CSSProperties = {
   overflowY: "auto",
 };
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /** All dialogs use this one dark surface (section 32) — every existing form modal wraps its content in this component. */
 function Modal({ title, onClose, children }: ModalProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab" || !contentRef.current) return;
+
+      const focusable = Array.from(contentRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const firstFocusable = contentRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    (firstFocusable ?? contentRef.current)?.focus();
+
+    return () => {
+      previouslyFocused?.focus();
+    };
+  }, []);
 
   return (
     <div
@@ -50,7 +84,7 @@ function Modal({ title, onClose, children }: ModalProps) {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div style={contentStyle} role="dialog" aria-modal="true" aria-label={title} className="fade-in">
+      <div ref={contentRef} style={contentStyle} role="dialog" aria-modal="true" aria-label={title} className="fade-in" tabIndex={-1}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)" }}>
           <h2 style={{ margin: 0, border: "none", padding: 0 }}>{title}</h2>
           <button type="button" className="btn-ghost" onClick={onClose} aria-label="Close" style={{ fontSize: "1.1rem", padding: "0.2em 0.6em" }}>

@@ -80,7 +80,7 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             value={values.departureLocation}
             onChange={(e) => setValues({ ...values, departureLocation: e.target.value })}
           />
-          {errors.departureLocation && <p role="alert">{errors.departureLocation}</p>}
+          {errors.departureLocation && <p className="form-error">{errors.departureLocation}</p>}
         </div>
 
         <div>
@@ -92,7 +92,7 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             value={values.destination}
             onChange={(e) => setValues({ ...values, destination: e.target.value })}
           />
-          {errors.destination && <p role="alert">{errors.destination}</p>}
+          {errors.destination && <p className="form-error">{errors.destination}</p>}
         </div>
 
         <div>
@@ -104,7 +104,7 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             value={values.estimatedDurationMinutes}
             onChange={(e) => setValues({ ...values, estimatedDurationMinutes: Number(e.target.value) })}
           />
-          {errors.estimatedDurationMinutes && <p role="alert">{errors.estimatedDurationMinutes}</p>}
+          {errors.estimatedDurationMinutes && <p className="form-error">{errors.estimatedDurationMinutes}</p>}
         </div>
 
         <div>
@@ -117,7 +117,7 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             value={values.price}
             onChange={(e) => setValues({ ...values, price: Number(e.target.value) })}
           />
-          {errors.price && <p role="alert">{errors.price}</p>}
+          {errors.price && <p className="form-error">{errors.price}</p>}
         </div>
 
         <div>
@@ -129,7 +129,7 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             value={values.currency}
             onChange={(e) => setValues({ ...values, currency: e.target.value })}
           />
-          {errors.currency && <p role="alert">{errors.currency}</p>}
+          {errors.currency && <p className="form-error">{errors.currency}</p>}
         </div>
 
         {isEdit && (

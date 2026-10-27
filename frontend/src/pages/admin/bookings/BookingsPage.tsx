@@ -332,7 +332,7 @@ function BookingsPage() {
           <p>Try adjusting your filters.</p>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-responsive" style={{ overflowX: "auto" }}>
         <table>
           <thead>
             <tr>
@@ -355,32 +355,32 @@ function BookingsPage() {
           <tbody>
             {bookings.map((booking) => (
               <tr key={booking.id}>
-                <td>{booking.bookingReference}</td>
-                <td>
+                <td data-label="Booking">{booking.bookingReference}</td>
+                <td data-label="Customer">
                   {booking.customerFirstName} {booking.customerLastName}
                 </td>
-                <td>
+                <td data-label="Route">
                   {booking.route.departureLocation} &rarr; {booking.route.destination}
                 </td>
-                <td>{formatDate(booking.bookingDate)}</td>
-                <td>{formatTime(booking.pickupTime)}</td>
-                <td>{booking.passengerCount}</td>
-                <td>
+                <td data-label="Date">{formatDate(booking.bookingDate)}</td>
+                <td data-label="Time">{formatTime(booking.pickupTime)}</td>
+                <td data-label="Passengers">{booking.passengerCount}</td>
+                <td data-label="Price">
                   {booking.price.toFixed(2)} {booking.currency}
                 </td>
-                <td>
+                <td data-label="Status">
                   <StatusBadge status={booking.status} />
                 </td>
-                <td>
+                <td data-label="Ride Status">
                   <StatusBadge status={booking.rideStatus} />
                 </td>
-                <td>
+                <td data-label="Payment">
                   <StatusBadge status={booking.paymentStatus} />
                 </td>
-                <td>{booking.driverName ?? "—"}</td>
-                <td>{booking.vehicleDescription ?? "—"}</td>
-                <td>{booking.assignment}</td>
-                <td>
+                <td data-label="Driver">{booking.driverName ?? "—"}</td>
+                <td data-label="Vehicle">{booking.vehicleDescription ?? "—"}</td>
+                <td data-label="Assignment">{booking.assignment}</td>
+                <td data-label="Actions">
                   <Link to={`/admin/bookings/${booking.id}`}>View</Link>
                 </td>
               </tr>

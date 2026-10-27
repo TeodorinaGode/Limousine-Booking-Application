@@ -46,7 +46,7 @@ function ResetPasswordModal({ driver, onSave, onClose }: ResetPasswordModalProps
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
-          {error && <p role="alert">{error}</p>}
+          {error && <p className="form-error">{error}</p>}
         </div>
 
         {submitError && <p role="alert">{submitError}</p>}

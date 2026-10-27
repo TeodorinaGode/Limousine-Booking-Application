@@ -158,7 +158,7 @@ function AdminHomePage() {
                     <p>The schedule is currently clear.</p>
                   </div>
                 ) : (
-                  <div style={{ overflowX: "auto" }}>
+                  <div className="table-responsive" style={{ overflowX: "auto" }}>
                     <table>
                       <thead>
                         <tr>
@@ -173,20 +173,20 @@ function AdminHomePage() {
                       <tbody>
                         {data.dashboard.upcomingBookings.map((item) => (
                           <tr key={item.id}>
-                            <td>
+                            <td data-label="Time">
                               <Link to={`/admin/bookings/${item.id}`}>
                                 {formatDate(item.bookingDate)} {formatTime(item.pickupTime)}
                               </Link>
                             </td>
-                            <td>
+                            <td data-label="Route">
                               {item.route.departureLocation} &rarr; {item.route.destination}
                             </td>
-                            <td>
+                            <td data-label="Customer">
                               {item.customerFirstName} {item.customerLastName}
                             </td>
-                            <td>{item.driverName ?? "—"}</td>
-                            <td>{item.vehicleDescription ?? "—"}</td>
-                            <td>
+                            <td data-label="Driver">{item.driverName ?? "—"}</td>
+                            <td data-label="Vehicle">{item.vehicleDescription ?? "—"}</td>
+                            <td data-label="Status">
                               <StatusBadge status={item.status} />
                             </td>
                           </tr>

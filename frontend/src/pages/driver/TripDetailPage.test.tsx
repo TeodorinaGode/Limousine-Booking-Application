@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import TripDetailPage from "./TripDetailPage";
+import { ToastProvider } from "../../context/ToastContext";
 import * as driverBookingService from "../../services/driverBookingService";
 import * as authContext from "../../context/AuthContext";
 import type { DriverBookingDetailDto } from "../../types/driverBooking";
@@ -41,9 +42,11 @@ function makeTrip(overrides: Partial<DriverBookingDetailDto> = {}): DriverBookin
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={["/driver/bookings/11111111-1111-1111-1111-111111111111"]}>
-      <Routes>
-        <Route path="/driver/bookings/:id" element={<TripDetailPage />} />
-      </Routes>
+      <ToastProvider>
+        <Routes>
+          <Route path="/driver/bookings/:id" element={<TripDetailPage />} />
+        </Routes>
+      </ToastProvider>
     </MemoryRouter>
   );
 }

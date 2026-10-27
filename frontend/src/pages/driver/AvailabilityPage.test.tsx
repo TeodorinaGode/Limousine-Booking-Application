@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AvailabilityPage from "./AvailabilityPage";
+import { ToastProvider } from "../../context/ToastContext";
 import * as availabilityService from "../../services/availabilityService";
 import * as authContext from "../../context/AuthContext";
 import type { AvailabilityDto, DriverScheduleDto } from "../../types/availability";
@@ -20,7 +21,9 @@ const mockedUseAuth = vi.mocked(authContext.useAuth);
 function renderPage() {
   return render(
     <MemoryRouter>
-      <AvailabilityPage />
+      <ToastProvider>
+        <AvailabilityPage />
+      </ToastProvider>
     </MemoryRouter>
   );
 }
@@ -172,15 +175,15 @@ describe("AvailabilityPage", () => {
   it("removes an availability period after confirmation", async () => {
     const item = makeAvailability();
     mockedAvailabilityService.getMySchedule.mockResolvedValue(schedule([item]));
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("08:00");
 
     await user.click(screen.getByRole("button", { name: "Remove" }));
+    const dialog = await screen.findByRole("dialog", { name: "Remove Availability Period" });
+    await user.click(within(dialog).getByRole("button", { name: "Remove" }));
 
-    expect(window.confirm).toHaveBeenCalledWith("Are you sure you want to remove this availability period?");
     await waitFor(() => {
       expect(mockedAvailabilityService.deleteAvailability).toHaveBeenCalledWith(item.id, "test-token");
     });
@@ -189,14 +192,16 @@ describe("AvailabilityPage", () => {
   it("does not remove an availability period when the confirmation is declined", async () => {
     const item = makeAvailability();
     mockedAvailabilityService.getMySchedule.mockResolvedValue(schedule([item]));
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("08:00");
 
     await user.click(screen.getByRole("button", { name: "Remove" }));
+    const dialog = await screen.findByRole("dialog", { name: "Remove Availability Period" });
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedAvailabilityService.deleteAvailability).not.toHaveBeenCalled();
   });
 });

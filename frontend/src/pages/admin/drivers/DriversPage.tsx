@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
 import {
   activateDriver,
   createDriver,
@@ -11,6 +12,7 @@ import {
 } from "../../../services/driverService";
 import { getVehicles } from "../../../services/vehicleService";
 import AdminNav from "../../../components/AdminNav";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 import PageHeader from "../../../components/PageHeader";
 import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, AvailabilityFilter, DriverDto, VehicleFilter } from "../../../types/driver";
@@ -40,6 +42,7 @@ function toHasVehicle(filter: VehicleFilter): boolean | undefined {
 
 function DriversPage() {
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [drivers, setDrivers] = useState<DriverDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -51,10 +54,11 @@ function DriversPage() {
   const [vehicleFilter, setVehicleFilter] = useState<VehicleFilter>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [modalState, setModalState] = useState<{ driver?: DriverDto } | null>(null);
   const [passwordResetDriver, setPasswordResetDriver] = useState<DriverDto | null>(null);
   const [activeVehicles, setActiveVehicles] = useState<VehicleDto[]>([]);
+  const [deactivateTarget, setDeactivateTarget] = useState<DriverDto | null>(null);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
 
   const loadDrivers = useCallback(async () => {
     if (!accessToken) return;
@@ -109,12 +113,6 @@ function DriversPage() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const handleSave = async (values: DriverFormValues) => {
     if (!accessToken) return;
 
@@ -131,7 +129,7 @@ function DriversPage() {
         },
         accessToken
       );
-      setSuccessMessage("Driver updated successfully.");
+      showToast("Driver updated successfully.");
     } else {
       await createDriver(
         {
@@ -144,7 +142,7 @@ function DriversPage() {
         },
         accessToken
       );
-      setSuccessMessage("Driver created successfully.");
+      showToast("Driver created successfully.");
     }
 
     setModalState(null);
@@ -156,21 +154,32 @@ function DriversPage() {
     if (!accessToken) return;
 
     if (driver.isActive) {
-      const confirmed = window.confirm("Are you sure you want to deactivate this driver?");
-      if (!confirmed) return;
+      setDeactivateTarget(driver);
+      return;
     }
 
     try {
-      if (driver.isActive) {
-        await deactivateDriver(driver.id, accessToken);
-        setSuccessMessage("Driver deactivated.");
-      } else {
-        await activateDriver(driver.id, accessToken);
-        setSuccessMessage("Driver activated.");
-      }
+      await activateDriver(driver.id, accessToken);
+      showToast("Driver activated.");
       await loadDrivers();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update the driver.");
+    }
+  };
+
+  const handleConfirmDeactivate = async () => {
+    if (!accessToken || !deactivateTarget) return;
+
+    setIsTogglingActive(true);
+    try {
+      await deactivateDriver(deactivateTarget.id, accessToken);
+      showToast("Driver deactivated.");
+      await loadDrivers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update the driver.");
+    } finally {
+      setIsTogglingActive(false);
+      setDeactivateTarget(null);
     }
   };
 
@@ -179,7 +188,7 @@ function DriversPage() {
 
     await resetDriverPassword(passwordResetDriver.id, { newPassword }, accessToken);
     setPasswordResetDriver(null);
-    setSuccessMessage("Password reset successfully.");
+    showToast("Password reset successfully.");
   };
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -253,7 +262,6 @@ function DriversPage() {
         </label>
       </div>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
@@ -267,7 +275,7 @@ function DriversPage() {
           <p>Try adjusting your filters.</p>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-responsive" style={{ overflowX: "auto" }}>
         <table>
           <thead>
             <tr>
@@ -283,19 +291,19 @@ function DriversPage() {
           <tbody>
             {drivers.map((driver) => (
               <tr key={driver.id}>
-                <td>
+                <td data-label="Driver">
                   {driver.firstName} {driver.lastName}
                 </td>
-                <td>{driver.email}</td>
-                <td>{driver.phone}</td>
-                <td>
+                <td data-label="Email">{driver.email}</td>
+                <td data-label="Phone">{driver.phone}</td>
+                <td data-label="Availability">
                   <StatusBadge status={driver.isAvailable ? "Available" : "Unavailable"} />
                 </td>
-                <td>{driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}` : "Not assigned"}</td>
-                <td>
+                <td data-label="Vehicle">{driver.vehicle ? `${driver.vehicle.make} ${driver.vehicle.model}` : "Not assigned"}</td>
+                <td data-label="Status">
                   <StatusBadge status={driver.isActive ? "Active" : "Inactive"} />
                 </td>
-                <td>
+                <td data-label="Actions">
                   <div className="row" style={{ gap: "var(--space-2)" }}>
                     <Link to={`/admin/drivers/${driver.id}`}>View Details</Link>
                     <button type="button" className="btn-ghost" onClick={() => setModalState({ driver })}>
@@ -344,6 +352,18 @@ function DriversPage() {
           driver={passwordResetDriver}
           onSave={handleResetPassword}
           onClose={() => setPasswordResetDriver(null)}
+        />
+      )}
+
+      {deactivateTarget && (
+        <ConfirmDialog
+          title="Deactivate Driver"
+          message={`Deactivate ${deactivateTarget.firstName} ${deactivateTarget.lastName}? They will no longer be able to log in or be assigned new bookings.`}
+          confirmLabel="Deactivate"
+          danger
+          isBusy={isTogglingActive}
+          onConfirm={handleConfirmDeactivate}
+          onCancel={() => setDeactivateTarget(null)}
         />
       )}
       </main>

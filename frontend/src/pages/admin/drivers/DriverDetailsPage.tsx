@@ -129,7 +129,7 @@ function DriverDetailsPage() {
             <p>Nothing scheduled for this range.</p>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-responsive" style={{ overflowX: "auto" }}>
           <table>
             <thead>
               <tr>
@@ -143,13 +143,13 @@ function DriverDetailsPage() {
             <tbody>
               {schedule.map((item) => (
                 <tr key={item.id}>
-                  <td>{formatDate(item.date)}</td>
-                  <td>{formatTime(item.startTime)}</td>
-                  <td>{formatTime(item.endTime)}</td>
-                  <td>
+                  <td data-label="Date">{formatDate(item.date)}</td>
+                  <td data-label="Start">{formatTime(item.startTime)}</td>
+                  <td data-label="End">{formatTime(item.endTime)}</td>
+                  <td data-label="Status">
                     <StatusBadge status={item.isAvailable ? "Available" : "Unavailable"} />
                   </td>
-                  <td>{item.notes}</td>
+                  <td data-label="Notes">{item.notes}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
 import {
   activateRoute,
   createRoute,
@@ -8,6 +9,7 @@ import {
   updateRoute,
 } from "../../../services/routeService";
 import AdminNav from "../../../components/AdminNav";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 import PageHeader from "../../../components/PageHeader";
 import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, RouteDto } from "../../../types/route";
@@ -23,6 +25,7 @@ function toIsActive(filter: ActiveFilter): boolean | undefined {
 
 function RoutesPage() {
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [routes, setRoutes] = useState<RouteDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -32,8 +35,9 @@ function RoutesPage() {
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [modalState, setModalState] = useState<{ route?: RouteDto } | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<RouteDto | null>(null);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
 
   const loadRoutes = useCallback(async () => {
     if (!accessToken) return;
@@ -67,21 +71,15 @@ function RoutesPage() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const handleSave = async (values: RouteFormValues) => {
     if (!accessToken) return;
 
     if (modalState?.route) {
       await updateRoute(modalState.route.id, values, accessToken);
-      setSuccessMessage("Route updated successfully.");
+      showToast("Route updated successfully.");
     } else {
       await createRoute(values, accessToken);
-      setSuccessMessage("Route created successfully.");
+      showToast("Route created successfully.");
     }
 
     setModalState(null);
@@ -92,21 +90,32 @@ function RoutesPage() {
     if (!accessToken) return;
 
     if (route.isActive) {
-      const confirmed = window.confirm("Are you sure you want to deactivate this route?");
-      if (!confirmed) return;
+      setDeactivateTarget(route);
+      return;
     }
 
     try {
-      if (route.isActive) {
-        await deactivateRoute(route.id, accessToken);
-        setSuccessMessage("Route deactivated.");
-      } else {
-        await activateRoute(route.id, accessToken);
-        setSuccessMessage("Route activated.");
-      }
+      await activateRoute(route.id, accessToken);
+      showToast("Route activated.");
       await loadRoutes();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update the route.");
+    }
+  };
+
+  const handleConfirmDeactivate = async () => {
+    if (!accessToken || !deactivateTarget) return;
+
+    setIsTogglingActive(true);
+    try {
+      await deactivateRoute(deactivateTarget.id, accessToken);
+      showToast("Route deactivated.");
+      await loadRoutes();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update the route.");
+    } finally {
+      setIsTogglingActive(false);
+      setDeactivateTarget(null);
     }
   };
 
@@ -151,7 +160,6 @@ function RoutesPage() {
         </label>
       </div>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
@@ -165,7 +173,7 @@ function RoutesPage() {
           <p>Try adjusting your filters.</p>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-responsive" style={{ overflowX: "auto" }}>
         <table>
           <thead>
             <tr>
@@ -181,15 +189,15 @@ function RoutesPage() {
           <tbody>
             {routes.map((route) => (
               <tr key={route.id}>
-                <td>{route.departureLocation}</td>
-                <td>{route.destination}</td>
-                <td>{route.estimatedDurationMinutes} min</td>
-                <td>{route.price.toFixed(2)}</td>
-                <td>{route.currency}</td>
-                <td>
+                <td data-label="Departure">{route.departureLocation}</td>
+                <td data-label="Destination">{route.destination}</td>
+                <td data-label="Duration">{route.estimatedDurationMinutes} min</td>
+                <td data-label="Price">{route.price.toFixed(2)}</td>
+                <td data-label="Currency">{route.currency}</td>
+                <td data-label="Status">
                   <StatusBadge status={route.isActive ? "Active" : "Inactive"} />
                 </td>
-                <td>
+                <td data-label="Actions">
                   <div className="row" style={{ gap: "var(--space-2)" }}>
                     <button type="button" className="btn-ghost" onClick={() => setModalState({ route })}>
                       Edit
@@ -222,6 +230,18 @@ function RoutesPage() {
 
       {modalState && (
         <RouteFormModal route={modalState.route} onSave={handleSave} onClose={() => setModalState(null)} />
+      )}
+
+      {deactivateTarget && (
+        <ConfirmDialog
+          title="Deactivate Route"
+          message={`Deactivate ${deactivateTarget.departureLocation} → ${deactivateTarget.destination}? It will no longer be bookable by customers.`}
+          confirmLabel="Deactivate"
+          danger
+          isBusy={isTogglingActive}
+          onConfirm={handleConfirmDeactivate}
+          onCancel={() => setDeactivateTarget(null)}
+        />
       )}
       </main>
     </div>

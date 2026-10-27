@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
 import {
   activateVehicle,
   createVehicle,
@@ -8,6 +9,7 @@ import {
   updateVehicle,
 } from "../../../services/vehicleService";
 import AdminNav from "../../../components/AdminNav";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 import PageHeader from "../../../components/PageHeader";
 import StatusBadge from "../../../components/StatusBadge";
 import type { ActiveFilter, VehicleDto } from "../../../types/vehicle";
@@ -29,6 +31,7 @@ function toMinCapacity(filter: CapacityFilter): number | undefined {
 
 function VehiclesPage() {
   const { accessToken } = useAuth();
+  const { showToast } = useToast();
 
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -39,8 +42,9 @@ function VehiclesPage() {
   const [capacityFilter, setCapacityFilter] = useState<CapacityFilter>("All");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [modalState, setModalState] = useState<{ vehicle?: VehicleDto } | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<VehicleDto | null>(null);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
 
   const loadVehicles = useCallback(async () => {
     if (!accessToken) return;
@@ -80,12 +84,6 @@ function VehiclesPage() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const timeout = setTimeout(() => setSuccessMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [successMessage]);
-
   const handleSave = async (values: VehicleFormValues) => {
     if (!accessToken) return;
 
@@ -93,10 +91,10 @@ function VehiclesPage() {
 
     if (modalState?.vehicle) {
       await updateVehicle(modalState.vehicle.id, payload, accessToken);
-      setSuccessMessage("Vehicle updated successfully.");
+      showToast("Vehicle updated successfully.");
     } else {
       await createVehicle(payload, accessToken);
-      setSuccessMessage("Vehicle created successfully.");
+      showToast("Vehicle created successfully.");
     }
 
     setModalState(null);
@@ -107,21 +105,32 @@ function VehiclesPage() {
     if (!accessToken) return;
 
     if (vehicle.isActive) {
-      const confirmed = window.confirm("Are you sure you want to deactivate this vehicle?");
-      if (!confirmed) return;
+      setDeactivateTarget(vehicle);
+      return;
     }
 
     try {
-      if (vehicle.isActive) {
-        await deactivateVehicle(vehicle.id, accessToken);
-        setSuccessMessage("Vehicle deactivated.");
-      } else {
-        await activateVehicle(vehicle.id, accessToken);
-        setSuccessMessage("Vehicle activated.");
-      }
+      await activateVehicle(vehicle.id, accessToken);
+      showToast("Vehicle activated.");
       await loadVehicles();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update the vehicle.");
+    }
+  };
+
+  const handleConfirmDeactivate = async () => {
+    if (!accessToken || !deactivateTarget) return;
+
+    setIsTogglingActive(true);
+    try {
+      await deactivateVehicle(deactivateTarget.id, accessToken);
+      showToast("Vehicle deactivated.");
+      await loadVehicles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update the vehicle.");
+    } finally {
+      setIsTogglingActive(false);
+      setDeactivateTarget(null);
     }
   };
 
@@ -183,7 +192,6 @@ function VehiclesPage() {
         </label>
       </div>
 
-      {successMessage && <p role="status">{successMessage}</p>}
       {error && <p role="alert">{error}</p>}
 
       {isLoading ? (
@@ -197,7 +205,7 @@ function VehiclesPage() {
           <p>Try adjusting your filters.</p>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-responsive" style={{ overflowX: "auto" }}>
         <table>
           <thead>
             <tr>
@@ -213,15 +221,15 @@ function VehiclesPage() {
           <tbody>
             {vehicles.map((vehicle) => (
               <tr key={vehicle.id}>
-                <td>{vehicle.registrationNumber}</td>
-                <td>{vehicle.make}</td>
-                <td>{vehicle.model}</td>
-                <td>{vehicle.vehicleType}</td>
-                <td>{vehicle.passengerCapacity}</td>
-                <td>
+                <td data-label="Registration">{vehicle.registrationNumber}</td>
+                <td data-label="Make">{vehicle.make}</td>
+                <td data-label="Model">{vehicle.model}</td>
+                <td data-label="Type">{vehicle.vehicleType}</td>
+                <td data-label="Capacity">{vehicle.passengerCapacity}</td>
+                <td data-label="Status">
                   <StatusBadge status={vehicle.isActive ? "Active" : "Inactive"} />
                 </td>
-                <td>
+                <td data-label="Actions">
                   <div className="row" style={{ gap: "var(--space-2)" }}>
                     <button type="button" className="btn-ghost" onClick={() => setModalState({ vehicle })}>
                       Edit
@@ -254,6 +262,18 @@ function VehiclesPage() {
 
       {modalState && (
         <VehicleFormModal vehicle={modalState.vehicle} onSave={handleSave} onClose={() => setModalState(null)} />
+      )}
+
+      {deactivateTarget && (
+        <ConfirmDialog
+          title="Deactivate Vehicle"
+          message={`Deactivate ${deactivateTarget.make} ${deactivateTarget.model} (${deactivateTarget.registrationNumber})? It will no longer be eligible for new bookings.`}
+          confirmLabel="Deactivate"
+          danger
+          isBusy={isTogglingActive}
+          onConfirm={handleConfirmDeactivate}
+          onCancel={() => setDeactivateTarget(null)}
+        />
       )}
       </main>
     </div>

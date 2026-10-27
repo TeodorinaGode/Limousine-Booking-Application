@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VehiclesPage from "./VehiclesPage";
+import { ToastProvider } from "../../../context/ToastContext";
 import * as vehicleService from "../../../services/vehicleService";
 import * as authContext from "../../../context/AuthContext";
 import type { VehicleDto } from "../../../types/vehicle";
@@ -40,7 +41,9 @@ function pagedResult(items: VehicleDto[]): PagedResult<VehicleDto> {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <VehiclesPage />
+      <ToastProvider>
+        <VehiclesPage />
+      </ToastProvider>
     </MemoryRouter>
   );
 }
@@ -196,15 +199,16 @@ describe("VehiclesPage", () => {
 
   it("does not deactivate a vehicle when the confirmation is declined", async () => {
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([makeVehicle()]));
-    vi.spyOn(window, "confirm").mockReturnValue(false);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("V-Class");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Vehicle" });
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
-    expect(window.confirm).toHaveBeenCalledWith("Are you sure you want to deactivate this vehicle?");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mockedVehicleService.deactivateVehicle).not.toHaveBeenCalled();
   });
 
@@ -212,13 +216,14 @@ describe("VehiclesPage", () => {
     const vehicle = makeVehicle();
     mockedVehicleService.getVehicles.mockResolvedValue(pagedResult([vehicle]));
     mockedVehicleService.deactivateVehicle.mockResolvedValue({ ...vehicle, isActive: false });
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const user = userEvent.setup();
 
     renderPage();
     await screen.findByText("V-Class");
 
     await user.click(screen.getByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("dialog", { name: "Deactivate Vehicle" });
+    await user.click(within(dialog).getByRole("button", { name: "Deactivate" }));
 
     await waitFor(() => {
       expect(mockedVehicleService.deactivateVehicle).toHaveBeenCalledWith(vehicle.id, "test-token");

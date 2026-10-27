@@ -97,7 +97,7 @@ function HomePage() {
       </section>
 
       <section ref={introReveal.ref} className={`noir-section noir-section--black ${introReveal.className}`}>
-        <div className="container container--medium reveal-lines">
+        <div className={`container container--medium reveal-lines ${introReveal.className}`}>
           <p className="noir-label">{t("noir.intro.label")}</p>
           <h2 className="noir-heading">
             <span className="light">{t("noir.intro.title1")}</span>
@@ -240,7 +240,7 @@ function HomePage() {
       <section ref={experienceReveal.ref} className={`noir-section noir-section--black ${experienceReveal.className}`}>
         <div className="container container--medium section--center">
           <p className="section__eyebrow">{t("noir.experience.eyebrow")}</p>
-          <div className="reveal-lines noir-heading" style={{ marginTop: "var(--space-8)" }}>
+          <div className={`reveal-lines noir-heading ${experienceReveal.className}`} style={{ marginTop: "var(--space-8)" }}>
             {(t("noir.experience.words", { returnObjects: true }) as string[]).map((word) => (
               <span className="strong" key={word} style={{ display: "block" }}>{word}</span>
             ))}
@@ -302,7 +302,7 @@ function HomePage() {
             </h2>
           </div>
           <div className="container" style={{ marginTop: "var(--space-8)" }}>
-            <ul className="operating-list reveal-lines">
+            <ul className={`operating-list reveal-lines ${operatingAreaReveal.className}`}>
               {company.operatingCountryCodes.map((code) => (
                 <li key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
               ))}

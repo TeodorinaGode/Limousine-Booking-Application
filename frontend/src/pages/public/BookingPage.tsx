@@ -46,6 +46,35 @@ const initialValues: FormValues = {
 };
 
 type Step = 1 | 2 | 3;
+const DRAFT_STORAGE_KEY = "limousine-booking.draft";
+interface BookingDraft {
+  step: Step;
+  values: FormValues;
+}
+
+function readDraft(): BookingDraft | null {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as BookingDraft) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+}
+
+/** A draft with nothing but the untouched defaults isn't worth telling the
+ * customer we "restored" — only resume (and announce) one with real content. */
+function isMeaningfulDraft(draft: BookingDraft): boolean {
+  return (
+    draft.step > 1 ||
+    draft.values.routeId !== "" ||
+    draft.values.customerFirstName.trim() !== "" ||
+    draft.values.customerEmail.trim() !== ""
+  );
+}
 
 /** The 5 named phases shown in the progress indicator — Journey/Details/Review map
  * to the 3 form steps below; Payment/Confirmation happen after booking creation
@@ -129,14 +158,25 @@ function BookingPage() {
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [step, setStep] = useState<Step>(1);
-  const [values, setValues] = useState<FormValues>(() => ({
-    ...initialValues,
-    routeId: prefill?.routeId ?? initialValues.routeId,
-    bookingDate: prefill?.bookingDate ?? initialValues.bookingDate,
-    pickupTime: prefill?.pickupTime ?? initialValues.pickupTime,
-    passengerCount: prefill?.passengerCount ?? initialValues.passengerCount,
-  }));
+  // An explicit prefill (homepage widget / "Book This Route") always means a
+  // deliberate fresh start — it wins over any leftover draft from an earlier,
+  // abandoned attempt rather than silently merging with it.
+  const resumedDraft = prefill ? null : readDraft();
+  const [showResumedNotice, setShowResumedNotice] = useState(
+    () => resumedDraft !== null && isMeaningfulDraft(resumedDraft)
+  );
+
+  const [step, setStep] = useState<Step>(() => resumedDraft?.step ?? 1);
+  const [values, setValues] = useState<FormValues>(() => {
+    if (resumedDraft) return resumedDraft.values;
+    return {
+      ...initialValues,
+      routeId: prefill?.routeId ?? initialValues.routeId,
+      bookingDate: prefill?.bookingDate ?? initialValues.bookingDate,
+      pickupTime: prefill?.pickupTime ?? initialValues.pickupTime,
+      passengerCount: prefill?.passengerCount ?? initialValues.passengerCount,
+    };
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -157,6 +197,12 @@ function BookingPage() {
       }
     })();
   }, [t]);
+
+  // Keeps the in-progress form recoverable across an accidental reload/crash —
+  // cleared the moment a booking actually gets created (see handleConfirm).
+  useEffect(() => {
+    sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ step, values }));
+  }, [step, values]);
 
   const selectedRoute = routes.find((r) => r.id === values.routeId);
 
@@ -188,6 +234,14 @@ function BookingPage() {
     setStep((current) => (current > 1 ? ((current - 1) as Step) : current));
   };
 
+  const handleStartOver = () => {
+    clearDraft();
+    setShowResumedNotice(false);
+    setErrors({});
+    setStep(1);
+    setValues(initialValues);
+  };
+
   const handleConfirm = async () => {
     setSubmitError(null);
     setIsSubmitting(true);
@@ -209,6 +263,7 @@ function BookingPage() {
         languageCode: i18n.resolvedLanguage,
       });
       setConfirmedBooking(booking);
+      clearDraft();
     } catch (err) {
       setSubmitError(
         err instanceof ApiError ? err.message : err instanceof Error ? err.message : t("common:misc.error")
@@ -312,6 +367,15 @@ function BookingPage() {
       <h1>{t("booking:title")}</h1>
 
       <BookingProgress activeIndex={step - 1} t={t} />
+
+      {showResumedNotice && (
+        <p role="status" style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
+          <span>We've restored your in-progress booking.</span>
+          <button type="button" className="btn-ghost" onClick={handleStartOver}>
+            Start Over
+          </button>
+        </p>
+      )}
 
       {loadError && <p role="alert">{loadError}</p>}
 

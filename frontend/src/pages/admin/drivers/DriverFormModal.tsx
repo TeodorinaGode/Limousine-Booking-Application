@@ -83,7 +83,7 @@ function DriverFormModal({ driver, activeVehicles, onSave, onClose }: DriverForm
             value={values.firstName}
             onChange={(e) => setValues({ ...values, firstName: e.target.value })}
           />
-          {errors.firstName && <p role="alert">{errors.firstName}</p>}
+          {errors.firstName && <p className="form-error">{errors.firstName}</p>}
         </div>
 
         <div>
@@ -95,21 +95,21 @@ function DriverFormModal({ driver, activeVehicles, onSave, onClose }: DriverForm
             value={values.lastName}
             onChange={(e) => setValues({ ...values, lastName: e.target.value })}
           />
-          {errors.lastName && <p role="alert">{errors.lastName}</p>}
+          {errors.lastName && <p className="form-error">{errors.lastName}</p>}
         </div>
 
         <div>
           <label htmlFor="email">Email</label>
           <br />
           <input id="email" type="email" value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} />
-          {errors.email && <p role="alert">{errors.email}</p>}
+          {errors.email && <p className="form-error">{errors.email}</p>}
         </div>
 
         <div>
           <label htmlFor="phone">Phone</label>
           <br />
           <input id="phone" type="text" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
-          {errors.phone && <p role="alert">{errors.phone}</p>}
+          {errors.phone && <p className="form-error">{errors.phone}</p>}
         </div>
 
         {!isEdit && (
@@ -122,7 +122,7 @@ function DriverFormModal({ driver, activeVehicles, onSave, onClose }: DriverForm
               value={values.password}
               onChange={(e) => setValues({ ...values, password: e.target.value })}
             />
-            {errors.password && <p role="alert">{errors.password}</p>}
+            {errors.password && <p className="form-error">{errors.password}</p>}
           </div>
         )}
 

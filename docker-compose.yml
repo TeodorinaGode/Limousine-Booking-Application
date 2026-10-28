@@ -38,6 +38,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      # The Dockerfile now has dev/build/production stages (dev server vs. a
+      # production nginx image) — pin local Compose usage to the dev stage
+      # explicitly so docker-compose up keeps behaving exactly as before.
+      target: dev
     ports:
       - "5173:5173"
     environment:

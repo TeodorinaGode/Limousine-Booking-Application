@@ -4,7 +4,6 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ContactPage from "./ContactPage";
 import { AuthProvider } from "../../context/AuthContext";
-import { ThemeProvider } from "../../context/ThemeContext";
 import * as contactService from "../../services/contactService";
 import * as companyService from "../../services/companyService";
 import { ApiError } from "../../services/apiClient";
@@ -18,9 +17,9 @@ const mockedCompanyService = vi.mocked(companyService);
 function renderPage() {
   return render(
     <MemoryRouter>
-      <ThemeProvider><AuthProvider>
+      <AuthProvider>
         <ContactPage />
-      </AuthProvider></ThemeProvider>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

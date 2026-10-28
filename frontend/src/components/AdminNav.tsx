@@ -12,13 +12,13 @@ function AdminNav() {
   const { t } = useTranslation(["admin", "common"]);
 
   const links = [
-    { to: "/admin", label: t("nav.dashboard") },
+    { to: "/admin/crm", label: t("nav.crm") },
+    { to: "/admin/dashboard", label: t("nav.dashboard") },
     { to: "/admin/bookings", label: t("nav.bookings") },
     { to: "/admin/drivers", label: t("nav.drivers") },
     { to: "/admin/vehicles", label: t("nav.vehicles") },
     { to: "/admin/routes", label: t("nav.routes") },
     { to: "/admin/reports", label: t("nav.reports") },
-    { to: "/admin/settings", label: t("nav.settings") },
   ];
 
   const handleLogout = () => {

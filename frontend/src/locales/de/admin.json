@@ -5,8 +5,8 @@
     "drivers": "Fahrer",
     "vehicles": "Fahrzeuge",
     "routes": "Strecken",
-    "reports": "Berichte",
-    "settings": "Einstellungen"
+    "crm": "CRM",
+    "reports": "Berichte"
   },
   "brand": {
     "suffix": "Verwaltung"

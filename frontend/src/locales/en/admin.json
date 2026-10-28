@@ -5,8 +5,8 @@
     "drivers": "Drivers",
     "vehicles": "Vehicles",
     "routes": "Routes",
-    "reports": "Reports",
-    "settings": "Settings"
+    "crm": "CRM",
+    "reports": "Reports"
   },
   "brand": {
     "suffix": "Administration"

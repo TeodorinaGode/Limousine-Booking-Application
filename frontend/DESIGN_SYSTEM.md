@@ -24,7 +24,7 @@ This codebase's component model is **CSS classes + tokens, not a wrapping React 
 | `--noir-0..5`, `--noir-silver` | `#030303 → #181818`, `#c7c7c7` | Additive depth levels for the cinematic public sections (`.noir-section--black/--deep/--surface`) — layered *on top of* the base tokens, never replacing them, specifically so Admin/Driver (which only read the base tokens) can't be affected |
 | `--color-status-*-bg/-border/-text` | grayscale + opacity | Status color is conveyed by **brightness/opacity, not hue** — confirmed/completed reads brighter and whiter, cancelled/pending reads dimmer. No green "success" or red "error" anywhere; this is the rule, not an oversight. |
 
-**Light theme** (`:root[data-theme="light"]`, `index.css:121+`) is a complete 1:1 override of every token above — opt-in via `ThemeToggle`, public-site only (see §9). No component ever branches on theme directly; it only ever reads tokens.
+The app is dark-only by design — there is no light theme or theme toggle. No component ever branches on theme; it only ever reads tokens.
 
 **Rule:** never introduce a new hex color inline. If a new surface/text/border need arises, it's a new token in this block, documented here.
 
@@ -134,8 +134,8 @@ The public site currently has no modals — every public interaction (booking, p
 
 Two intentionally different navigation chromes for two intentionally different contexts:
 
-- **Public (`Header.tsx`)** — the brand-facing nav. Transparent at page top, becomes dark glass (`site-header--scrolled`, backdrop blur) on scroll. Desktop: horizontal links + language dropdown + theme toggle + `.cta-noir` "Book a Ride". Mobile: full-screen dark dialog panel (`role="dialog"`), not a slide-out drawer — matches the cinematic full-bleed language used everywhere else on the public site.
-- **Admin/Driver (`AdminNav.tsx`/`DriverNav.tsx`)** — a functional sidebar (`.app-nav`, 220px fixed, collapses to a horizontal scrollable bar ≤900px). Deliberately plainer — internal tool chrome, not brand storytelling. Shares the base tokens (so it's never visually broken) but never receives `Header`'s cinematic treatment (custom cursor, theme toggle, scroll-glass) — those are structurally gated to only mount inside `Header`.
+- **Public (`Header.tsx`)** — the brand-facing nav. Transparent at page top, becomes dark glass (`site-header--scrolled`, backdrop blur) on scroll. Desktop: horizontal links + language dropdown + `.cta-noir` "Book a Ride". Mobile: full-screen dark dialog panel (`role="dialog"`), not a slide-out drawer — matches the cinematic full-bleed language used everywhere else on the public site.
+- **Admin/Driver (`AdminNav.tsx`/`DriverNav.tsx`)** — a functional sidebar (`.app-nav`, 220px fixed, collapses to a horizontal scrollable bar ≤900px). Deliberately plainer — internal tool chrome, not brand storytelling. Shares the base tokens (so it's never visually broken) but never receives `Header`'s cinematic treatment (custom cursor, scroll-glass) — those are structurally gated to only mount inside `Header`.
 
 **Rule:** never let Admin/Driver inherit public-site cinematic flourishes, and never simplify the public nav toward the admin sidebar's utilitarian style. They're different products wearing the same base tokens.
 

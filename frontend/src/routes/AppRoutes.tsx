@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "../pages/public/HomePage";
 import ServicesPage from "../pages/public/ServicesPage";
 import PublicRoutesPage from "../pages/public/RoutesPage";
@@ -27,7 +27,19 @@ import DriverDetailsPage from "../pages/admin/drivers/DriverDetailsPage";
 import BookingsPage from "../pages/admin/bookings/BookingsPage";
 import BookingDetailPage from "../pages/admin/bookings/BookingDetailPage";
 import ReportsPage from "../pages/admin/reports/ReportsPage";
-import SettingsPage from "../pages/admin/SettingsPage";
+import CrmCompaniesPage from "../pages/admin/crm/companies/CrmCompaniesPage";
+import CrmCompanyDetailsPage from "../pages/admin/crm/companies/CrmCompanyDetailsPage";
+import CrmContactsPage from "../pages/admin/crm/contacts/CrmContactsPage";
+import CrmContactDetailsPage from "../pages/admin/crm/contacts/CrmContactDetailsPage";
+import CrmDealsPage from "../pages/admin/crm/deals/CrmDealsPage";
+import CrmDealDetailsPage from "../pages/admin/crm/deals/CrmDealDetailsPage";
+import CrmActivitiesPage from "../pages/admin/crm/activities/CrmActivitiesPage";
+import CrmTasksPage from "../pages/admin/crm/tasks/CrmTasksPage";
+import CrmOverviewPage from "../pages/admin/crm/CrmOverviewPage";
+import CrmReportsPage from "../pages/admin/crm/CrmReportsPage";
+import EmailSettingsPage from "../pages/admin/crm/email/EmailSettingsPage";
+import CrmInboxPage from "../pages/admin/crm/email/CrmInboxPage";
+import EmailTemplatesPage from "../pages/admin/crm/email/EmailTemplatesPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
@@ -93,6 +105,14 @@ function AppRoutes() {
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
+            <Navigate to="/admin/crm" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
             <AdminHomePage />
           </ProtectedRoute>
         }
@@ -146,18 +166,114 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/admin/reports"
+        path="/admin/crm"
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
-            <ReportsPage />
+            <CrmOverviewPage />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/admin/settings"
+        path="/admin/crm/reports"
         element={
           <ProtectedRoute allowedRoles={["Administrator"]}>
-            <SettingsPage />
+            <CrmReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/companies"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmCompaniesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/companies/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmCompanyDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/contacts"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmContactsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/contacts/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmContactDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/deals"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmDealsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/deals/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmDealDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/activities"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmActivitiesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/tasks"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmTasksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/inbox"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <CrmInboxPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/inbox/templates"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <EmailTemplatesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/crm/inbox/settings"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <EmailSettingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/reports"
+        element={
+          <ProtectedRoute allowedRoles={["Administrator"]}>
+            <ReportsPage />
           </ProtectedRoute>
         }
       />

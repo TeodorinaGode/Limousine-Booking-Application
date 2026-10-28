@@ -27,3 +27,6 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code local session state (tool-permission allowlist, agent scratch worktrees)
+.claude/

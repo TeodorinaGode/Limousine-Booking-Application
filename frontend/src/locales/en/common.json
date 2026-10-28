@@ -61,9 +61,5 @@
     "loading": "Loading...",
     "error": "Something went wrong.",
     "currency": "CHF"
-  },
-  "themeToggle": {
-    "switchToLight": "Switch to light theme",
-    "switchToDark": "Switch to dark theme"
   }
 }

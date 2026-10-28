@@ -7,7 +7,6 @@ import * as bookingService from "../../services/bookingService";
 import * as paymentService from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import { AuthProvider } from "../../context/AuthContext";
-import { ThemeProvider } from "../../context/ThemeContext";
 import i18n, { DEFAULT_LANGUAGE } from "../../i18n/i18n";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
@@ -50,9 +49,9 @@ function makeBooking(overrides: Partial<BookingDto> = {}): BookingDto {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <ThemeProvider><AuthProvider>
+      <AuthProvider>
         <BookingPage />
-      </AuthProvider></ThemeProvider>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

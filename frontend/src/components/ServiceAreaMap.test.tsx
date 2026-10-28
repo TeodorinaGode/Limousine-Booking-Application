@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import ServiceAreaMap from "./ServiceAreaMap";
-import { ThemeProvider } from "../context/ThemeContext";
 import type { PublicLocationDto } from "../types/location";
 import type { PublicRouteDto } from "../types/booking";
 
@@ -47,14 +46,12 @@ function renderMap(props: Partial<React.ComponentProps<typeof ServiceAreaMap>> =
     defaultZoom: 6,
   };
   return render(
-    <ThemeProvider>
-      <MemoryRouter initialEntries={["/routes"]}>
-        <Routes>
-          <Route path="/routes" element={<ServiceAreaMap {...defaultProps} {...props} />} />
-          <Route path="/booking" element={<RouteStateCapture />} />
-        </Routes>
-      </MemoryRouter>
-    </ThemeProvider>
+    <MemoryRouter initialEntries={["/routes"]}>
+      <Routes>
+        <Route path="/routes" element={<ServiceAreaMap {...defaultProps} {...props} />} />
+        <Route path="/booking" element={<RouteStateCapture />} />
+      </Routes>
+    </MemoryRouter>
   );
 }
 

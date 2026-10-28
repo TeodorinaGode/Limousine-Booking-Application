@@ -122,132 +122,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ==================================================================
-   LIGHT THEME (Prompt 21 follow-up) — an opt-in alternative to the dark
-   default, toggled via `<ThemeToggle />` and applied as `data-theme="light"`
-   on <html> only while a public page is mounted (see Header.tsx). Every
-   token below is a straight override of the dark values above — nothing
-   here is a new token, so every existing component/page picks it up
-   automatically with no per-component light/dark branching.
-   ================================================================== */
-:root[data-theme="light"] {
-  --color-background: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-elevated: #f4f4f4;
-  --color-surface-hover: #ececec;
-
-  --color-border: #e2e2e2;
-  --color-border-light: #cfcfcf;
-
-  --color-text-primary: #141414;
-  --color-text-secondary: #5a5a5a;
-  --color-text-muted: #8a8a8a;
-
-  --color-accent: #5a5a5a;
-  --color-accent-strong: #2a2a2a;
-
-  --color-status-pending-bg: rgba(90, 90, 90, 0.08);
-  --color-status-pending-border: #cfcfcf;
-  --color-status-pending-text: #4a4a4a;
-
-  --color-status-confirmed-bg: rgba(20, 20, 20, 0.05);
-  --color-status-confirmed-border: #b8b8b8;
-  --color-status-confirmed-text: #141414;
-
-  --color-status-active-bg: rgba(20, 20, 20, 0.08);
-  --color-status-active-border: #8a8a8a;
-  --color-status-active-text: #2a2a2a;
-
-  --color-status-completed-bg: rgba(20, 20, 20, 0.1);
-  --color-status-completed-border: #141414;
-  --color-status-completed-text: #141414;
-
-  --color-status-cancelled-bg: rgba(138, 138, 138, 0.08);
-  --color-status-cancelled-border: #c8c8c8;
-  --color-status-cancelled-text: #8a8a8a;
-
-  --color-status-warn-bg: rgba(90, 90, 90, 0.1);
-  --color-status-warn-border: #a8a8a8;
-  --color-status-warn-text: #4a4a4a;
-
-  --noir-0: #ffffff;
-  --noir-1: #fafafa;
-  --noir-2: #f2f2f2;
-  --noir-3: #eaeaea;
-  --noir-4: #e2e2e2;
-  --noir-5: #d4d4d4;
-  --noir-silver: #6a6a6a;
-
-  color-scheme: light;
-}
-:root[data-theme="light"] * {
-  scrollbar-color: var(--color-border-light) var(--color-surface);
-}
-:root[data-theme="light"] body {
-  background:
-    radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(20, 20, 20, 0.03), transparent 60%),
-    linear-gradient(160deg, #ffffff, #f2f2f2 60%);
-}
-:root[data-theme="light"] ::selection {
-  background: var(--color-text-primary);
-  color: var(--color-white);
-}
-
-/* ---- Light-theme overrides for cinematic glow effects (Prompt 21 follow-up) ----
-   Every gradient below was originally authored as a light-colored highlight
-   meant to sit on top of a near-black base — in light theme the base itself
-   inverts to near-white via the noir-* tokens, so the SAME light-colored
-   glow becomes invisible (or just flattens the whole panel to solid white).
-   These overrides swap each highlight for a dark equivalent so the same
-   "atmosphere" depth effect still reads correctly in light mode. */
-:root[data-theme="light"] .final-cta {
-  background:
-    radial-gradient(ellipse 900px 400px at 50% 0%, rgba(20, 20, 20, 0.04), transparent 60%),
-    var(--color-surface);
-}
-:root[data-theme="light"] .cinematic-hero {
-  /* background-image (not the `background` shorthand) — the shorthand would
-     reset background-position/size/repeat from the base rule below to their
-     initial values, and previously also silently dropped the photo URL
-     entirely (the shorthand here never included a 4th url() layer), leaving
-     the whole hero photo-less in light theme.
-     The tint layer uses translucent white (rgba), not the solid --noir-*
-     tokens those resolve to in light theme — solid color here would opaquely
-     paint over the photo layer beneath it, hiding it completely again even
-     with the url() restored. Mirrors how the dark theme's own tint layer
-     (base rule below) uses translucent black over the same photo. */
-  background-image:
-    radial-gradient(ellipse 900px 500px at 78% 18%, rgba(20, 20, 20, 0.05), transparent 60%),
-    radial-gradient(ellipse 700px 900px at 15% 100%, rgba(20, 20, 20, 0.03), transparent 55%),
-    linear-gradient(200deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 45%, rgba(255, 255, 255, 0.35) 100%),
-    url("/images/hero-black-mercedes-night.jpg");
-}
-@media (max-width: 640px) {
-  :root[data-theme="light"] .cinematic-hero {
-    background-image:
-      radial-gradient(ellipse 900px 500px at 78% 18%, rgba(20, 20, 20, 0.05), transparent 60%),
-      radial-gradient(ellipse 700px 900px at 15% 100%, rgba(20, 20, 20, 0.03), transparent 55%),
-      linear-gradient(200deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 45%, rgba(255, 255, 255, 0.35) 100%),
-      url("/images/hero-black-mercedes-night-mobile.jpg");
-  }
-}
-:root[data-theme="light"] .cinematic-hero::before {
-  background: linear-gradient(115deg, transparent 40%, rgba(20, 20, 20, 0.04) 55%, transparent 70%);
-}
-:root[data-theme="light"] .cinematic-hero__scrim {
-  background: linear-gradient(0deg, var(--noir-0) 0%, rgba(255, 255, 255, 0.4) 45%, transparent 75%);
-}
-:root[data-theme="light"] .fleet-cinematic {
-  background:
-    radial-gradient(ellipse 700px 500px at 85% 10%, rgba(20, 20, 20, 0.05), transparent 60%),
-    linear-gradient(200deg, var(--noir-4), var(--noir-0));
-}
-:root[data-theme="light"] .noir-portrait {
-  background:
-    radial-gradient(ellipse 500px 400px at 30% 20%, rgba(20, 20, 20, 0.04), transparent 60%),
-    linear-gradient(160deg, var(--noir-3), var(--noir-0));
-}
-
 * {
   box-sizing: border-box;
 }
@@ -404,18 +278,39 @@ hr {
    consistent; .btn-secondary / .btn-ghost / .btn-danger are opt-in for
    pages that need a visual hierarchy of actions (section 17). */
 
-button {
+/* `.btn-secondary`/`.btn-ghost`/`.btn-danger` are modifiers meant to layer on
+   top of this base — they only override color/background/border, relying on
+   this rule for padding/radius/font/cursor/no-underline. That's fine for a
+   <button>, but an <a>/<Link> carrying one of those classes (e.g. a nav
+   button that's really a page link) never gets this base at all, since
+   `button` is an element selector — it renders as a bare underlined link
+   with just a color tint. Listing the variant classes on anchors here too
+   closes that gap without changing anything for the many places that
+   already just use a plain <button>. */
+button,
+a.btn-secondary,
+a.btn-ghost,
+a.btn-danger {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-text-primary);
   padding: 0.65em 1.4em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+}
+/* The default filled look stays scoped to a plain `<button>` (specificity
+   equal to the `a.btn-*` rules above would otherwise be fine, but the
+   variant overrides below are deliberately the lower-specificity plain
+   `.btn-secondary` etc. — keeping color/background/border off the shared
+   selector list above is what lets those overrides win on an anchor too). */
+button {
+  border: 1px solid var(--color-text-primary);
   background-color: var(--color-text-primary);
   color: var(--color-background);
-  cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
 }
 button:hover:not(:disabled) {
   background-color: var(--color-accent-strong);
@@ -425,7 +320,10 @@ button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-button:focus-visible {
+button:focus-visible,
+a.btn-secondary:focus-visible,
+a.btn-ghost:focus-visible,
+a.btn-danger:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -543,11 +441,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   filter: invert(1) brightness(1.8) contrast(1.2);
   cursor: pointer;
 }
-:root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator,
-:root[data-theme="light"] input[type="time"]::-webkit-calendar-picker-indicator,
-:root[data-theme="light"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: none;
-}
 
 .form-group {
   margin-bottom: var(--space-4);
@@ -618,6 +511,22 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* Admin-panel polish: every table lives in a `.table-responsive` wrapper
+   already (for the mobile stacked-card transform below) — giving that same
+   wrapper a border/radius turns each list from a borderless grid floating on
+   the page background into one contained card, at no extra markup cost.
+   Relies on the wrapper's own `overflowX: auto` inline style (set by every
+   page that uses it) to clip the table's corners to this radius — removed
+   again inside the mobile breakpoint below so it doesn't double up with each
+   stacked row's own border. */
+.table-responsive {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.table-responsive table {
+  border: none;
+}
+
 /* ---- Responsive tables ----
    Wrap a table in a `.table-responsive` div (instead of/alongside the plain
    overflow-x:auto wrapper) and add `data-label` to every <td> matching its
@@ -627,6 +536,10 @@ tbody tr:last-child td {
    admin tables (14 columns on Bookings) are unusable as a horizontal-scroll
    table on a phone/tablet; this is the standard CSS-only technique for it. */
 @media (max-width: 768px) {
+  .table-responsive {
+    border: none;
+    border-radius: 0;
+  }
   .table-responsive table,
   .table-responsive thead,
   .table-responsive tbody,
@@ -853,6 +766,7 @@ tbody tr:last-child td {
   letter-spacing: 0.02em;
   color: var(--color-text-secondary);
   border: 1px solid transparent;
+  border-left: 2px solid transparent;
   border-bottom: none;
 }
 .app-nav__link:hover {
@@ -864,6 +778,7 @@ tbody tr:last-child td {
   background: var(--color-surface-elevated);
   color: var(--color-text-primary);
   border-color: var(--color-border-light);
+  border-left-color: var(--color-accent-strong);
 }
 
 .app-nav__status {
@@ -905,8 +820,15 @@ tbody tr:last-child td {
     flex: none;
     overflow-x: auto;
   }
-  .app-nav__link {
+  .app-nav__link,
+  .app-nav__link:hover {
     white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  .app-nav__link--active,
+  .app-nav__link--active:hover {
+    border-bottom-color: var(--color-accent-strong);
   }
   .app-main {
     padding: var(--space-6) var(--space-4) var(--space-12);
@@ -1276,6 +1198,167 @@ tbody tr:last-child td {
   letter-spacing: 0.08em;
   color: var(--color-text-primary);
   margin-bottom: var(--space-2);
+}
+
+.crm-nav {
+  display: flex;
+  gap: var(--space-1);
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.crm-nav__tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.crm-nav__tab:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+.crm-nav__tab--active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-accent-strong);
+}
+.crm-nav__icon {
+  font-size: 0.95em;
+}
+
+/* ---- CRM breadcrumb: replaces the old bare "← Back to X" link on detail
+   pages with a trail that also names where you are, not just where you came
+   from. ---- */
+.crm-breadcrumb {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+.crm-breadcrumb__current {
+  color: var(--color-text-secondary);
+}
+.crm-breadcrumb__sep {
+  margin: 0 0.4em;
+  color: var(--color-text-muted);
+}
+
+/* ---- CRM inbox: split-pane thread list + conversation (Stage 2A Phase 4) ----
+   Desktop: side-by-side panes sharing the available height. Below the same
+   900px breakpoint AdminNav collapses at, the two panes stack and only one
+   shows at a time — [data-pane] on the container picks which, via a plain
+   CSS attribute selector rather than JS-computed inline styles, so the
+   breakpoint stays entirely declarative. */
+.email-inbox {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+.email-thread-list {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.email-thread-list__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.email-thread-list__item:hover {
+  background: var(--color-surface-hover);
+}
+.email-thread-list__item--active {
+  border-color: var(--color-accent);
+}
+.email-thread-list__item--unread .email-thread-list__subject {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.email-thread-list__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+.email-thread-list__subject {
+  margin: var(--space-1) 0;
+  color: var(--color-text-secondary);
+}
+.email-thread-list__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+.email-conversation {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.email-message {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: var(--color-surface);
+}
+.email-message--outbound {
+  border-color: var(--color-border-light);
+  background: var(--color-surface-elevated);
+}
+.email-message__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+.email-message__frame {
+  width: 100%;
+  min-height: 160px;
+  border: none;
+  background: var(--color-surface);
+  color-scheme: dark;
+}
+.email-message__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.email-association-group {
+  margin-bottom: var(--space-4);
+}
+@media (max-width: 900px) {
+  .email-inbox {
+    flex-direction: column;
+  }
+  .email-thread-list,
+  .email-conversation {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .email-inbox[data-pane="list"] .email-conversation {
+    display: none;
+  }
+  .email-inbox[data-pane="detail"] .email-thread-list {
+    display: none;
+  }
 }
 
 /* ---- Skeleton loaders ---- */
@@ -2605,11 +2688,6 @@ tbody tr:last-child td {
     radial-gradient(ellipse 400px 300px at 75% 15%, rgba(199, 199, 199, 0.12), transparent 60%),
     linear-gradient(200deg, var(--noir-4), var(--noir-1));
 }
-:root[data-theme="light"] .editorial-panel__image {
-  background:
-    radial-gradient(ellipse 400px 300px at 75% 15%, rgba(20, 20, 20, 0.05), transparent 60%),
-    linear-gradient(200deg, var(--noir-3), var(--noir-0));
-}
 .editorial-panel__image--active {
   opacity: 1;
   transform: scale(1);
@@ -2719,16 +2797,9 @@ tbody tr:last-child td {
   color: var(--color-text-secondary);
 }
 
-/* ---- Map: cinematic tone (grayscale + slightly darker than the raw tiles) ----
-   Tuned for the dark CARTO tiles; light theme now swaps to light tiles
-   (ServiceAreaMap.tsx) which don't need darkening — the same brightness(0.85)
-   here would just make the already-light tiles look muddy/gray instead of
-   clean, so light theme gets its own much gentler touch. */
+/* ---- Map: cinematic tone (grayscale + slightly darker than the raw tiles) ---- */
 .service-area-map__canvas .leaflet-tile-pane {
   filter: grayscale(0.3) brightness(0.85) contrast(1.05);
-}
-:root[data-theme="light"] .service-area-map__canvas .leaflet-tile-pane {
-  filter: grayscale(0.15) contrast(1.02);
 }
 .service-area-map__canvas .leaflet-overlay-pane path {
   transition: opacity 0.8s ease, stroke-width 0.8s ease;

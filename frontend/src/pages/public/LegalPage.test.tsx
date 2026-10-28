@@ -3,7 +3,6 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import LegalPage from "./LegalPage";
 import { AuthProvider } from "../../context/AuthContext";
-import { ThemeProvider } from "../../context/ThemeContext";
 import * as companyService from "../../services/companyService";
 
 vi.mock("../../services/companyService");
@@ -13,9 +12,9 @@ const mockedCompanyService = vi.mocked(companyService);
 function renderPage(titleKey: "privacyTitle" | "termsTitle" | "cookieTitle") {
   return render(
     <MemoryRouter>
-      <ThemeProvider><AuthProvider>
+      <AuthProvider>
         <LegalPage titleKey={titleKey} />
-      </AuthProvider></ThemeProvider>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

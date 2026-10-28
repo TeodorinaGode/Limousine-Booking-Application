@@ -61,9 +61,5 @@
     "loading": "Wird geladen...",
     "error": "Etwas ist schiefgelaufen.",
     "currency": "CHF"
-  },
-  "themeToggle": {
-    "switchToLight": "Zum hellen Design wechseln",
-    "switchToDark": "Zum dunklen Design wechseln"
   }
 }

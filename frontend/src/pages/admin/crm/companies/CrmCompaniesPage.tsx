@@ -11,6 +11,7 @@ import {
   updateCrmCompany,
 } from "../../../../services/crmCompanyService";
 import AdminNav from "../../../../components/AdminNav";
+import ComposeEmailModal from "../../../../components/ComposeEmailModal";
 import CrmNav from "../../../../components/CrmNav";
 import ConfirmDialog from "../../../../components/ConfirmDialog";
 import PageHeader from "../../../../components/PageHeader";
@@ -36,6 +37,7 @@ function CrmCompaniesPage() {
   const [error, setError] = useState<string | null>(null);
   const [administrators, setAdministrators] = useState<AdministratorSummaryDto[]>([]);
   const [modalState, setModalState] = useState<{ company?: CrmCompanyDto } | null>(null);
+  const [composeTarget, setComposeTarget] = useState<CrmCompanyDto | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<CrmCompanyDto | null>(null);
   const [isArchiving, setIsArchiving] = useState(false);
 
@@ -257,6 +259,9 @@ function CrmCompaniesPage() {
                         <button type="button" className="btn-ghost" onClick={() => handleToggleArchive(company)}>
                           {company.isArchived ? "Restore" : "Archive"}
                         </button>
+                        <button type="button" className="btn-ghost" onClick={() => setComposeTarget(company)}>
+                          Send Email
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -298,6 +303,20 @@ function CrmCompaniesPage() {
             isBusy={isArchiving}
             onConfirm={handleConfirmArchive}
             onCancel={() => setArchiveTarget(null)}
+          />
+        )}
+
+        {composeTarget && (
+          <ComposeEmailModal
+            prefill={{
+              toAddresses: composeTarget.email ? [{ address: composeTarget.email, name: composeTarget.name }] : [],
+              companyId: composeTarget.id,
+            }}
+            onClose={() => setComposeTarget(null)}
+            onSent={() => {
+              setComposeTarget(null);
+              showToast("Email sent.");
+            }}
           />
         )}
       </main>

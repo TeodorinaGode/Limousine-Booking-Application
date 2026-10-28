@@ -25,6 +25,25 @@ public class ApplicationDbContext : DbContext
     public DbSet<PaymentWebhookEvent> PaymentWebhookEvents => Set<PaymentWebhookEvent>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<Location> Locations => Set<Location>();
+    public DbSet<CrmCompany> CrmCompanies => Set<CrmCompany>();
+    public DbSet<CrmContact> CrmContacts => Set<CrmContact>();
+    public DbSet<CrmCompanyContact> CrmCompanyContacts => Set<CrmCompanyContact>();
+    public DbSet<CrmPipeline> CrmPipelines => Set<CrmPipeline>();
+    public DbSet<CrmPipelineStage> CrmPipelineStages => Set<CrmPipelineStage>();
+    public DbSet<CrmDeal> CrmDeals => Set<CrmDeal>();
+    public DbSet<CrmDealContact> CrmDealContacts => Set<CrmDealContact>();
+    public DbSet<CrmActivity> CrmActivities => Set<CrmActivity>();
+    public DbSet<CrmTask> CrmTasks => Set<CrmTask>();
+    public DbSet<EmailProviderConnection> EmailProviderConnections => Set<EmailProviderConnection>();
+    public DbSet<EmailSyncCheckpoint> EmailSyncCheckpoints => Set<EmailSyncCheckpoint>();
+    public DbSet<CrmEmailThread> CrmEmailThreads => Set<CrmEmailThread>();
+    public DbSet<CrmEmailThreadCompany> CrmEmailThreadCompanies => Set<CrmEmailThreadCompany>();
+    public DbSet<CrmEmailThreadContact> CrmEmailThreadContacts => Set<CrmEmailThreadContact>();
+    public DbSet<CrmEmailThreadDeal> CrmEmailThreadDeals => Set<CrmEmailThreadDeal>();
+    public DbSet<CrmEmailMessage> CrmEmailMessages => Set<CrmEmailMessage>();
+    public DbSet<CrmEmailAttachment> CrmEmailAttachments => Set<CrmEmailAttachment>();
+    public DbSet<EmailSendOperation> EmailSendOperations => Set<EmailSendOperation>();
+    public DbSet<CrmEmailTemplate> CrmEmailTemplates => Set<CrmEmailTemplate>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

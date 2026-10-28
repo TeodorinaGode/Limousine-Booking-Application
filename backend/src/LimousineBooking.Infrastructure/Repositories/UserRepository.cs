@@ -1,5 +1,6 @@
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Domain.Entities;
+using LimousineBooking.Domain.Enums;
 using LimousineBooking.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,13 @@ public class UserRepository : IUserRepository
 
         return await query.AnyAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<User>> GetAdministratorsAsync(CancellationToken cancellationToken = default) =>
+        await _dbContext.Users
+            .Where(u => u.Role == UserRole.Administrator && u.IsActive)
+            .OrderBy(u => u.FirstName)
+            .ThenBy(u => u.LastName)
+            .ToListAsync(cancellationToken);
 
     public Task AddAsync(User user, CancellationToken cancellationToken = default)
     {

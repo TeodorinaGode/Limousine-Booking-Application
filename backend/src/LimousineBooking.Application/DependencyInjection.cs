@@ -4,7 +4,9 @@ using LimousineBooking.Application.Availability;
 using LimousineBooking.Application.Bookings;
 using LimousineBooking.Application.Company;
 using LimousineBooking.Application.Contact;
+using LimousineBooking.Application.Crm;
 using LimousineBooking.Application.Drivers;
+using LimousineBooking.Application.Email;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Map;
 using LimousineBooking.Application.Notifications;
@@ -26,6 +28,8 @@ public static class DependencyInjection
         services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
         services.Configure<CompanySettings>(configuration.GetSection(CompanySettings.SectionName));
         services.Configure<MapSettings>(configuration.GetSection(MapSettings.SectionName));
+        services.Configure<GmailOAuthSettings>(configuration.GetSection(GmailOAuthSettings.SectionName));
+        services.Configure<EmailSyncSettings>(configuration.GetSection(EmailSyncSettings.SectionName));
 
         services.AddScoped<IAuthService, LoginHandler>();
         services.AddScoped<IAccountService, AccountService>();
@@ -50,6 +54,19 @@ public static class DependencyInjection
         services.AddScoped<IPublicContactService, PublicContactService>();
         services.AddScoped<IContactMessageOutboxProcessor, ContactMessageOutboxProcessor>();
         services.AddScoped<IPublicLocationService, PublicLocationService>();
+        services.AddScoped<ICrmCompanyService, CrmCompanyService>();
+        services.AddScoped<ICrmContactService, CrmContactService>();
+        services.AddScoped<ICrmDealService, CrmDealService>();
+        services.AddScoped<ICrmActivityService, CrmActivityService>();
+        services.AddScoped<ICrmTaskService, CrmTaskService>();
+        services.AddScoped<IAdministratorDirectoryService, AdministratorDirectoryService>();
+        services.AddScoped<ICrmAnalyticsService, CrmAnalyticsService>();
+        services.AddScoped<IEmailConnectionService, EmailConnectionService>();
+        services.AddScoped<IEmailAccessTokenProvider, EmailAccessTokenProvider>();
+        services.AddScoped<IEmailSyncProcessor, EmailSyncProcessor>();
+        services.AddScoped<ICrmInboxService, CrmInboxService>();
+        services.AddScoped<ICrmEmailSendService, CrmEmailSendService>();
+        services.AddScoped<ICrmEmailTemplateService, CrmEmailTemplateService>();
 
         // Further use cases, validators, and mapping profiles will be
         // registered here as they are introduced in subsequent steps.

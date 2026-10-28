@@ -10,6 +10,7 @@ public interface IUserRepository
 
     /// <summary>True if any user (case-insensitive) already has this email, excluding <paramref name="excludeUserId"/> if given.</summary>
     Task<bool> HasDuplicateEmailAsync(string email, Guid? excludeUserId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<User>> GetAdministratorsAsync(CancellationToken cancellationToken = default);
 
     Task AddAsync(User user, CancellationToken cancellationToken = default);
 

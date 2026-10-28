@@ -1,3 +1,4 @@
+using LimousineBooking.Application.Email;
 using LimousineBooking.Application.Interfaces;
 using LimousineBooking.Application.Payments;
 using LimousineBooking.Domain.Entities;
@@ -7,6 +8,7 @@ using LimousineBooking.Infrastructure.Email;
 using LimousineBooking.Infrastructure.Payments;
 using LimousineBooking.Infrastructure.Persistence;
 using LimousineBooking.Infrastructure.Repositories;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +28,19 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.Configure<PaymentSettings>(configuration.GetSection(PaymentSettings.SectionName));
+        services.Configure<GmailOAuthSettings>(configuration.GetSection(GmailOAuthSettings.SectionName));
+        services.Configure<EmailSyncSettings>(configuration.GetSection(EmailSyncSettings.SectionName));
 
         services.AddHttpContextAccessor();
+        services.AddHttpClient();
+
+        // Encrypts OAuth refresh tokens at rest (see TokenEncryptionService). Key
+        // storage uses Data Protection's default (local filesystem) — fine for a
+        // single-instance deployment; a multi-instance production deployment
+        // would need a shared key ring (e.g. PersistKeysToDbContext), noted here
+        // rather than built pre-emptively since this app has no evidence of
+        // running multi-instance today.
+        services.AddDataProtection();
 
         services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IPasswordService, PasswordService>();
@@ -51,6 +64,24 @@ public static class DependencyInjection
         services.AddScoped<IPaymentWebhookEventRepository, PaymentWebhookEventRepository>();
         services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
         services.AddScoped<ILocationRepository, LocationRepository>();
+        services.AddScoped<ICrmCompanyRepository, CrmCompanyRepository>();
+        services.AddScoped<ICrmContactRepository, CrmContactRepository>();
+        services.AddScoped<ICrmDealRepository, CrmDealRepository>();
+        services.AddScoped<ICrmActivityRepository, CrmActivityRepository>();
+        services.AddScoped<ICrmTaskRepository, CrmTaskRepository>();
+        services.AddScoped<ICrmPipelineRepository, CrmPipelineRepository>();
+        services.AddScoped<ICrmAnalyticsRepository, CrmAnalyticsRepository>();
+        services.AddScoped<IEmailProviderConnectionRepository, EmailProviderConnectionRepository>();
+        services.AddScoped<IEmailSyncCheckpointRepository, EmailSyncCheckpointRepository>();
+        services.AddScoped<GmailProviderClient>();
+        services.AddScoped<IEmailProviderClientFactory, EmailProviderClientFactory>();
+        services.AddScoped<IOAuthStateService, OAuthStateService>();
+        services.AddScoped<ITokenEncryptionService, TokenEncryptionService>();
+        services.AddScoped<IHtmlSanitizerService, HtmlSanitizerService>();
+        services.AddScoped<ICrmEmailThreadRepository, CrmEmailThreadRepository>();
+        services.AddScoped<ICrmEmailMessageRepository, CrmEmailMessageRepository>();
+        services.AddScoped<ICrmEmailTemplateRepository, CrmEmailTemplateRepository>();
+        services.AddScoped<IEmailSendOperationRepository, EmailSendOperationRepository>();
 
         // Real SMTP delivery only when explicitly enabled — otherwise the
         // dev-mode logger stands in, so the whole notification pipeline is

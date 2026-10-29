@@ -91,14 +91,6 @@ describe("HomePage", () => {
     expect(screen.getAllByText("Premium Vehicles").length).toBeGreaterThan(0);
   });
 
-  it("lists all five real Limousinen services as an editorial list, each linking to booking", () => {
-    renderPage();
-
-    expect(screen.getAllByText("Airport Transfer").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Professional Chauffeur Service").length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: /01.*Airport Transfer/s })).toHaveAttribute("href", "/booking");
-  });
-
   it("shows the real operating countries, sourced from the backend", async () => {
     renderPage();
 

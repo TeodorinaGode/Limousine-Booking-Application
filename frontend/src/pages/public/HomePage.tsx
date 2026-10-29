@@ -11,7 +11,6 @@ import HeroBookingWidget from "../../components/HeroBookingWidget";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useCompanyInfo } from "../../hooks/useCompanyInfo";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
-import { SERVICES } from "../../config/services";
 import type { PublicRouteDto } from "../../types/booking";
 import type { PublicVehicleDto } from "../../types/publicVehicle";
 import type { PublicLocationsDto } from "../../types/location";
@@ -47,7 +46,6 @@ function HomePage() {
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
   const [vehicles, setVehicles] = useState<PublicVehicleDto[]>([]);
   const [locationsData, setLocationsData] = useState<PublicLocationsDto | null>(null);
-  const [activeService, setActiveService] = useState(SERVICES[0].key);
 
   useEffect(() => {
     getActiveRoutes().then(setRoutes).catch(() => undefined);
@@ -57,7 +55,6 @@ function HomePage() {
 
   const introReveal = useScrollReveal<HTMLElement>();
   const trustReveal = useScrollReveal<HTMLElement>();
-  const servicesReveal = useScrollReveal<HTMLElement>();
   const routesReveal = useScrollReveal<HTMLElement>();
   const mapReveal = useScrollReveal<HTMLElement>();
   const fleetReveal = useScrollReveal<HTMLElement>();
@@ -119,38 +116,6 @@ function HomePage() {
               <p className="trust-item__desc">{t(`trust.${item.key}.desc`)}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section ref={servicesReveal.ref} className={`noir-section noir-section--deep ${servicesReveal.className}`}>
-        <div className="container section--center">
-          <p className="section__eyebrow">{t("nav.services")}</p>
-          <h2 className="section__title">{t("services.title")}</h2>
-          <p className="section__subtitle">{t("services.subtitle")}</p>
-        </div>
-        <div className="container row" style={{ alignItems: "flex-start", gap: "var(--space-8)" }}>
-          <div className="editorial-list" style={{ flex: 1, minWidth: 0 }}>
-            {SERVICES.map((service, index) => (
-              <Link
-                key={service.key}
-                to="/booking"
-                className={`editorial-list__row${activeService === service.key ? " editorial-list__row--active" : ""}`}
-                onMouseEnter={() => setActiveService(service.key)}
-                onFocus={() => setActiveService(service.key)}
-              >
-                <span className="editorial-list__index">0{index + 1}</span>
-                <span className="editorial-list__title">{t(`services.${service.key}.title`)}</span>
-                <span className="editorial-list__desc">{t(`services.${service.key}.desc`)}</span>
-              </Link>
-            ))}
-          </div>
-          <div className="editorial-panel" aria-hidden="true">
-            {SERVICES.map((service) => (
-              <div key={service.key} className={`editorial-panel__image${activeService === service.key ? " editorial-panel__image--active" : ""}`}>
-                {t(`services.${service.key}.title`)}
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

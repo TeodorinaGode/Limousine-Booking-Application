@@ -121,9 +121,12 @@ function HomePage() {
 
       <section ref={routesReveal.ref} className={`section ${routesReveal.className}`}>
         <div className="container">
-          <div style={{ marginBottom: "var(--space-8)" }}>
-            <p className="section__eyebrow">{t("nav.routes")}</p>
-            <h2 className="section__title" style={{ marginBottom: 0 }}>{t("routesTeaser.title")}</h2>
+          <div className="row row--between" style={{ alignItems: "flex-end", marginBottom: "var(--space-8)" }}>
+            <div>
+              <p className="section__eyebrow">{t("nav.routes")}</p>
+              <h2 className="section__title" style={{ marginBottom: 0 }}>{t("routesTeaser.title")}</h2>
+            </div>
+            <Link to="/routes">{t("routesTeaser.viewAll")}</Link>
           </div>
           <HeroBookingWidget routes={routes} />
         </div>

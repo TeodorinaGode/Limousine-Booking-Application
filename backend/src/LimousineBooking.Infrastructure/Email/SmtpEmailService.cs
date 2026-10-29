@@ -30,9 +30,7 @@ public class SmtpEmailService : IEmailService
         using var message = new MailMessage
         {
             From = new MailAddress(_settings.FromEmail, _settings.FromName),
-            Subject = subject,
-            Body = htmlBody,
-            IsBodyHtml = true
+            Subject = subject
         };
         message.To.Add(to);
 
@@ -40,6 +38,7 @@ public class SmtpEmailService : IEmailService
         {
             message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(plainTextBody, null, "text/plain"));
         }
+        message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html"));
 
         cancellationToken.ThrowIfCancellationRequested();
         await client.SendMailAsync(message, cancellationToken);

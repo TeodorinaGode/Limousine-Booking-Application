@@ -720,8 +720,7 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ProviderAttachmentId")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
+                        .HasColumnType("text");
 
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");

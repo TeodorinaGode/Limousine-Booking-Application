@@ -179,7 +179,7 @@ public class EmailSyncProcessor : IEmailSyncProcessor
         {
             var activity = new CrmActivity(
                 direction == EmailDirection.Inbound ? CrmActivityType.EmailReceived : CrmActivityType.EmailSent,
-                detail.Subject, detail.OccurredAtUtc, connection.CreatedByUserId,
+                message.Subject, detail.OccurredAtUtc, connection.CreatedByUserId,
                 companyId: null, contactId: null, dealId: null,
                 description: null, outcome: null, emailMessageId: message.Id);
             await _activityRepository.AddAsync(activity, cancellationToken);

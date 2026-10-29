@@ -197,4 +197,28 @@ public class CrmInboxServiceTests
         Assert.Equal("application/pdf", result.ContentType);
         Assert.Equal(new byte[] { 1, 2, 3 }, result.Content);
     }
+
+    [Fact]
+    public async Task RemoveThreadAsync_WhenTheThreadExists_MarksItRemovedAndPersists()
+    {
+        var thread = NewThread();
+        _threadRepository.Setup(r => r.GetByIdAsync(thread.Id, It.IsAny<CancellationToken>())).ReturnsAsync(thread);
+
+        var result = await CreateService().RemoveThreadAsync(thread.Id);
+
+        Assert.True(result);
+        Assert.True(thread.IsRemoved);
+        _threadRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RemoveThreadAsync_WhenTheThreadDoesNotExist_ReturnsFalseWithoutSaving()
+    {
+        _threadRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((CrmEmailThread?)null);
+
+        var result = await CreateService().RemoveThreadAsync(Guid.NewGuid());
+
+        Assert.False(result);
+        _threadRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
 }

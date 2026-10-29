@@ -885,6 +885,11 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                     b.Property<bool>("HasUnread")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsRemoved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("LastMessageAt")
                         .HasColumnType("timestamptz");
 
@@ -902,6 +907,8 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IsRemoved");
 
                     b.HasIndex("LastMessageAt");
 

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -191,5 +191,31 @@ describe("CrmInboxPage", () => {
     await user.click(screen.getByRole("button", { name: "Link Company" }));
 
     await waitFor(() => expect(mockedInboxService.linkCrmEmailThreadCompany).toHaveBeenCalledWith("thread-1", "company-1", "test-token"));
+  });
+
+  it("removes a conversation after confirmation, without touching Gmail, and closes the open thread", async () => {
+    const user = userEvent.setup();
+    mockedInboxService.getCrmEmailThreads.mockResolvedValue({
+      items: [makeThreadListItem({ hasUnread: false })],
+      page: 1,
+      pageSize: 25,
+      totalCount: 1,
+      totalPages: 1,
+    });
+    mockedInboxService.getCrmEmailThreadById.mockResolvedValue(makeThreadDetail({ hasUnread: false }));
+    mockedInboxService.removeCrmEmailThread.mockResolvedValue(undefined);
+
+    renderPage();
+    await user.click(await screen.findByText("Quote request for a wedding transfer"));
+    await user.click(await screen.findByRole("button", { name: "Remove" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Remove Conversation" });
+    expect(dialog).toHaveTextContent("the real email stays exactly where it is in Gmail");
+
+    mockedInboxService.getCrmEmailThreads.mockResolvedValue({ items: [], page: 1, pageSize: 25, totalCount: 0, totalPages: 0 });
+    await user.click(within(dialog).getByRole("button", { name: "Remove" }));
+
+    await waitFor(() => expect(mockedInboxService.removeCrmEmailThread).toHaveBeenCalledWith("thread-1", "test-token"));
+    expect(await screen.findByText("Select a conversation to read it.")).toBeInTheDocument();
   });
 });

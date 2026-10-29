@@ -21,6 +21,11 @@ export function getCrmEmailThreadById(id: string, accessToken: string): Promise<
   return apiRequest<CrmEmailThreadDetailDto>(`/admin/crm/email/threads/${id}`, { accessToken });
 }
 
+/** "Remove from CRM" — hides the thread from the Inbox list only. The real Gmail mailbox is untouched. */
+export function removeCrmEmailThread(id: string, accessToken: string): Promise<void> {
+  return apiRequest<void>(`/admin/crm/email/threads/${id}`, { method: "DELETE", accessToken });
+}
+
 export function markCrmEmailThreadRead(id: string, accessToken: string): Promise<CrmEmailThreadDetailDto> {
   return apiRequest<CrmEmailThreadDetailDto>(`/admin/crm/email/threads/${id}/read`, { method: "PUT", accessToken });
 }

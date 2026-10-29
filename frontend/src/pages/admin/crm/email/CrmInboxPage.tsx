@@ -14,6 +14,7 @@ import {
   linkCrmEmailThreadDeal,
   markCrmEmailThreadRead,
   markCrmEmailThreadUnread,
+  removeCrmEmailThread,
   unlinkCrmEmailThreadCompany,
   unlinkCrmEmailThreadContact,
   unlinkCrmEmailThreadDeal,
@@ -22,6 +23,7 @@ import AdminNav from "../../../../components/AdminNav";
 import CrmNav from "../../../../components/CrmNav";
 import PageHeader from "../../../../components/PageHeader";
 import ComposeEmailModal, { type ComposeEmailPrefill } from "../../../../components/ComposeEmailModal";
+import ConfirmDialog from "../../../../components/ConfirmDialog";
 import type { CrmCompanyDto } from "../../../../types/crmCompany";
 import type { CrmContactDto } from "../../../../types/crmContact";
 import type { CrmDealDto } from "../../../../types/crmDeal";
@@ -151,6 +153,8 @@ function CrmInboxPage() {
   const [isLinking, setIsLinking] = useState(false);
 
   const [composePrefill, setComposePrefill] = useState<ComposeEmailPrefill | null>(null);
+  const [removeTargetId, setRemoveTargetId] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const loadThreads = useCallback(async () => {
     if (!accessToken) return;
@@ -337,6 +341,25 @@ function CrmInboxPage() {
     if (selectedThreadId) await loadDetail(selectedThreadId, false);
   };
 
+  const handleConfirmRemove = async () => {
+    if (!accessToken || !removeTargetId) return;
+    setIsRemoving(true);
+    try {
+      await removeCrmEmailThread(removeTargetId, accessToken);
+      showToast("Conversation removed from the CRM. Your real Gmail mailbox is unaffected.");
+      if (selectedThreadId === removeTargetId) {
+        setSelectedThreadId(null);
+        setDetail(null);
+      }
+      await loadThreads();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove the conversation.");
+    } finally {
+      setIsRemoving(false);
+      setRemoveTargetId(null);
+    }
+  };
+
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const availableCompanies = companies.filter((c) => !detail?.companies.some((linked) => linked.id === c.id));
   const availableContacts = contacts.filter((c) => !detail?.contacts.some((linked) => linked.id === c.id));
@@ -463,6 +486,9 @@ function CrmInboxPage() {
                     <button type="button" className="btn-ghost" onClick={handleToggleRead}>
                       Mark as {detail.hasUnread ? "Read" : "Unread"}
                     </button>
+                    <button type="button" className="btn-ghost" onClick={() => setRemoveTargetId(detail.id)}>
+                      Remove
+                    </button>
                   </div>
                 </div>
 
@@ -561,6 +587,18 @@ function CrmInboxPage() {
 
         {composePrefill && (
           <ComposeEmailModal prefill={composePrefill} onClose={() => setComposePrefill(null)} onSent={handleComposeSent} />
+        )}
+
+        {removeTargetId && (
+          <ConfirmDialog
+            title="Remove Conversation"
+            message="Remove this conversation from the CRM? It will no longer appear in the Inbox, but the real email stays exactly where it is in Gmail — nothing is deleted there."
+            confirmLabel="Remove"
+            danger
+            isBusy={isRemoving}
+            onConfirm={handleConfirmRemove}
+            onCancel={() => setRemoveTargetId(null)}
+          />
         )}
       </main>
     </div>

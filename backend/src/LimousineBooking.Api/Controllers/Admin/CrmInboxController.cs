@@ -34,6 +34,13 @@ public class CrmInboxController : ControllerBase
         return detail is null ? NotFound(new { message = "Conversation not found." }) : Ok(detail);
     }
 
+    [HttpDelete("threads/{id:guid}")]
+    public async Task<IActionResult> RemoveThread(Guid id, CancellationToken cancellationToken)
+    {
+        var removed = await _inboxService.RemoveThreadAsync(id, cancellationToken);
+        return removed ? NoContent() : NotFound(new { message = "Conversation not found." });
+    }
+
     [HttpPut("threads/{id:guid}/read")]
     public async Task<ActionResult<CrmEmailThreadDetailResponse>> MarkRead(Guid id, CancellationToken cancellationToken)
     {

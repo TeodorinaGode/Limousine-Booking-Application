@@ -29,6 +29,9 @@ public interface ICrmInboxService
 
     Task<CrmInboxOperationResult> UnlinkDealAsync(Guid threadId, Guid dealId, CancellationToken cancellationToken = default);
 
+    /// <summary>"Remove from CRM" — hides the thread from the Inbox list only; the real Gmail mailbox is never touched (see CrmEmailThread.Remove). Returns false when the thread doesn't exist.</summary>
+    Task<bool> RemoveThreadAsync(Guid threadId, CancellationToken cancellationToken = default);
+
     /// <summary>Streams the attachment's bytes live from the provider — never from local storage. Null when the message/attachment doesn't exist or the attachment doesn't belong to that message.</summary>
     Task<CrmEmailAttachmentDownload?> GetAttachmentAsync(Guid messageId, Guid attachmentId, CancellationToken cancellationToken = default);
 }

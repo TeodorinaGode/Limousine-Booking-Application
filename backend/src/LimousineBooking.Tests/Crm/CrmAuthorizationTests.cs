@@ -85,6 +85,7 @@ public class CrmAuthorizationTests : IClassFixture<WebApplicationFactory<Program
         yield return new object[] { "POST", "/api/admin/crm/email/connection/disconnect" };
         yield return new object[] { "GET", "/api/admin/crm/email/threads" };
         yield return new object[] { "GET", $"/api/admin/crm/email/threads/{NilId}" };
+        yield return new object[] { "DELETE", $"/api/admin/crm/email/threads/{NilId}" };
         yield return new object[] { "PUT", $"/api/admin/crm/email/threads/{NilId}/read" };
         yield return new object[] { "PUT", $"/api/admin/crm/email/threads/{NilId}/unread" };
         yield return new object[] { "POST", $"/api/admin/crm/email/threads/{NilId}/companies" };

@@ -16,12 +16,14 @@ public class CrmEmailThreadConfiguration : IEntityTypeConfiguration<CrmEmailThre
         builder.Property(t => t.Subject).IsRequired().HasMaxLength(500);
         builder.Property(t => t.LastMessageAt).IsRequired().HasColumnType("timestamptz");
         builder.Property(t => t.HasUnread).IsRequired();
+        builder.Property(t => t.IsRemoved).IsRequired().HasDefaultValue(false);
 
         builder.Property(t => t.CreatedAt).IsRequired().HasColumnType("timestamptz");
         builder.Property(t => t.UpdatedAt).IsRequired().HasColumnType("timestamptz");
 
         builder.HasIndex(t => new { t.ConnectionId, t.ProviderThreadId }).IsUnique();
         builder.HasIndex(t => t.LastMessageAt);
+        builder.HasIndex(t => t.IsRemoved);
 
         builder.HasOne<EmailProviderConnection>()
             .WithMany()

@@ -208,6 +208,17 @@ public class CrmInboxService : ICrmInboxService
         };
     }
 
+    public async Task<bool> RemoveThreadAsync(Guid threadId, CancellationToken cancellationToken = default)
+    {
+        var thread = await _threadRepository.GetByIdAsync(threadId, cancellationToken);
+        if (thread is null)
+            return false;
+
+        thread.Remove();
+        await _threadRepository.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     private async Task<CrmInboxOperationResult> ReloadDetailAsync(Guid threadId, CancellationToken cancellationToken)
     {
         var detail = await _threadRepository.GetDetailByIdAsync(threadId, cancellationToken);

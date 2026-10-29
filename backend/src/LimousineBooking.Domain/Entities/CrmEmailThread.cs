@@ -10,6 +10,7 @@ public class CrmEmailThread : AuditableEntity
     public string Subject { get; private set; } = string.Empty;
     public DateTime LastMessageAt { get; private set; }
     public bool HasUnread { get; private set; }
+    public bool IsRemoved { get; private set; }
 
     public ICollection<CrmEmailMessage> Messages { get; private set; } = new List<CrmEmailMessage>();
     public ICollection<CrmEmailThreadCompany> ThreadCompanies { get; private set; } = new List<CrmEmailThreadCompany>();
@@ -50,4 +51,6 @@ public class CrmEmailThread : AuditableEntity
     public void MarkRead() => HasUnread = false;
 
     public void MarkUnread() => HasUnread = true;
+
+    public void Remove() => IsRemoved = true;
 }

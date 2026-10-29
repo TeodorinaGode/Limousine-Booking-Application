@@ -31,7 +31,7 @@ public class CrmEmailThreadRepository : ICrmEmailThreadRepository
 
     public async Task<(IReadOnlyList<CrmEmailThreadListItemResponse> Items, int TotalCount)> SearchAsync(CrmEmailThreadSearchQuery query, CancellationToken cancellationToken = default)
     {
-        var threads = _dbContext.CrmEmailThreads.AsQueryable();
+        var threads = _dbContext.CrmEmailThreads.Where(t => !t.IsRemoved);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {

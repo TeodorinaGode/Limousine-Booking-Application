@@ -188,6 +188,15 @@ public class BookingRepository : IBookingRepository
             .Take(count)
             .ToListAsync(cancellationToken);
 
+    public Task<int> CountCreatedAfterAsync(DateTime sinceUtc, CancellationToken cancellationToken = default) =>
+        _dbContext.Bookings.CountAsync(b => b.CreatedAt > sinceUtc, cancellationToken);
+
+    public async Task<IReadOnlyList<Booking>> GetRecentlyCreatedAsync(int count, CancellationToken cancellationToken = default) =>
+        await _dbContext.Bookings
+            .Include(b => b.Route)
+            .OrderByDescending(b => b.CreatedAt)
+            .Take(count)
+            .ToListAsync(cancellationToken);
     public async Task<IReadOnlyList<Booking>> GetConflictScanAsync(
         DateOnly date,
         IReadOnlyCollection<Guid> driverIds,

@@ -1977,6 +1977,9 @@ namespace LimousineBooking.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("BookingsNotificationsSeenAt")
+                        .HasColumnType("timestamptz");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamptz");
 

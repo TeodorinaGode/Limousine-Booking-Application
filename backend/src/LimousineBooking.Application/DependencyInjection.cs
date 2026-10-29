@@ -1,4 +1,5 @@
 using LimousineBooking.Application.Account;
+using LimousineBooking.Application.AdminAlerts;
 using LimousineBooking.Application.Authentication;
 using LimousineBooking.Application.Availability;
 using LimousineBooking.Application.Bookings;
@@ -67,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<ICrmInboxService, CrmInboxService>();
         services.AddScoped<ICrmEmailSendService, CrmEmailSendService>();
         services.AddScoped<ICrmEmailTemplateService, CrmEmailTemplateService>();
+        services.AddScoped<IAdminAlertsService, AdminAlertsService>();
 
         // Further use cases, validators, and mapping profiles will be
         // registered here as they are introduced in subsequent steps.

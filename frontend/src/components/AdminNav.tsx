@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import useSidebarCollapse from "../hooks/useSidebarCollapse";
 import { APP_BRAND_NAME } from "../config/brand";
 import LanguageSelector from "./LanguageSelector";
+import NotificationBell from "./NotificationBell";
 
 /** The dark sidebar shared by every admin page (section 19/54) — collapses to a horizontal bar on small screens, and can also be manually collapsed to an icon rail via the toggle button. */
 function AdminNav() {
@@ -47,6 +48,7 @@ function AdminNav() {
           {isCollapsed ? "»" : "«"}
         </button>
       </div>
+      <NotificationBell isCollapsed={isCollapsed} />
       {!isCollapsed && <LanguageSelector />}
       <div className="app-nav__links">
         {links.map((link) => (

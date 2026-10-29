@@ -38,6 +38,12 @@ public interface IBookingRepository
     /// <summary>The next <paramref name="count"/> upcoming Pending/Confirmed bookings (today or later), soonest first.</summary>
     Task<IReadOnlyList<Booking>> GetUpcomingAsync(DateOnly fromDate, int count, CancellationToken cancellationToken = default);
 
+    /// <summary>Count of bookings created strictly after <paramref name="sinceUtc"/> — drives the notification bell's "new bookings" badge.</summary>
+    Task<int> CountCreatedAfterAsync(DateTime sinceUtc, CancellationToken cancellationToken = default);
+
+    /// <summary>The <paramref name="count"/> most recently created bookings (includes Route), newest first — for the notification bell's dropdown list.</summary>
+    Task<IReadOnlyList<Booking>> GetRecentlyCreatedAsync(int count, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Non-cancelled bookings on <paramref name="date"/> whose DriverId or VehicleId
     /// is among the given candidate sets (excluding <paramref name="excludeBookingId"/>

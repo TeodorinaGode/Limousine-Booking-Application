@@ -19,6 +19,7 @@ public class User : AuditableEntity
     /// which language this user's emails are rendered in.
     /// </summary>
     public string? LanguageCode { get; private set; }
+    public DateTime? BookingsNotificationsSeenAt { get; private set; }
 
     public Driver? Driver { get; private set; }
 
@@ -64,6 +65,8 @@ public class User : AuditableEntity
     /// <summary>Null clears the preference (back to "use the browser's language"); a non-null value is normalized via <see cref="Common.SupportedLanguages.Normalize"/> — an unsupported code silently becomes "en" rather than being rejected.</summary>
     public void SetLanguage(string? languageCode) =>
         LanguageCode = languageCode is null ? null : Common.SupportedLanguages.Normalize(languageCode);
+
+    public void MarkBookingsNotificationsSeen(DateTime seenAtUtc) => BookingsNotificationsSeenAt = seenAtUtc;
 
     public void Deactivate() => IsActive = false;
 

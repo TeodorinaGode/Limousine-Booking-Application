@@ -197,6 +197,34 @@ function BookingDetailPage() {
             {booking.cancellationReason && ` — ${booking.cancellationReason}`}
           </p>
         )}
+
+        <div className="row" style={{ marginTop: "var(--space-4)" }}>
+          {canEdit && (
+            <button type="button" className="btn-secondary" onClick={() => setIsEditOpen(true)} disabled={isBusy}>
+              Edit
+            </button>
+          )}
+          {canEdit && (
+            <button type="button" className="btn-secondary" onClick={() => setIsAssignOpen(true)} disabled={isBusy}>
+              {booking.driverId ? "Reassign Driver" : "Assign Driver"}
+            </button>
+          )}
+          {canEdit && (
+            <button type="button" className="btn-secondary" onClick={handleAutoAssign} disabled={isBusy}>
+              {busyAction === "autoAssign" ? "Assigning..." : "Run Automatic Assignment"}
+            </button>
+          )}
+          {booking.status === "Confirmed" && (
+            <button type="button" className="btn-secondary" onClick={handleResendConfirmation} disabled={isBusy}>
+              {busyAction === "resend" ? "Sending..." : "Resend Confirmation Email"}
+            </button>
+          )}
+          {canCancel && (
+            <button type="button" className="btn-danger" onClick={() => setConfirmDialog("cancel")} disabled={isBusy}>
+              Cancel Booking
+            </button>
+          )}
+        </div>
       </section>
 
       <section style={{ marginBottom: "1.5rem" }}>
@@ -280,7 +308,9 @@ function BookingDetailPage() {
         )}
 
         {booking.paymentHistory.length > 0 && (
-          <div className="table-responsive" style={{ marginTop: "var(--space-4)" }}>
+          <details style={{ marginTop: "var(--space-4)" }}>
+          <summary>Show payment history ({booking.paymentHistory.length})</summary>
+          <div className="table-responsive" style={{ marginTop: "var(--space-3)" }}>
           <table>
             <thead>
               <tr>
@@ -308,13 +338,16 @@ function BookingDetailPage() {
             </tbody>
           </table>
           </div>
+          </details>
         )}
       </section>
 
       {booking.assignmentHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Assignment History</h2>
-          <div className="table-responsive">
+          <details>
+          <summary>Show assignment history ({booking.assignmentHistory.length})</summary>
+          <div className="table-responsive" style={{ marginTop: "var(--space-3)" }}>
           <table>
             <thead>
               <tr>
@@ -338,13 +371,16 @@ function BookingDetailPage() {
             </tbody>
           </table>
           </div>
+          </details>
         </section>
       )}
 
       {booking.rideStatusHistory.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }}>
           <h2>Ride Status History</h2>
-          <div className="table-responsive">
+          <details>
+          <summary>Show ride status history ({booking.rideStatusHistory.length})</summary>
+          <div className="table-responsive" style={{ marginTop: "var(--space-3)" }}>
           <table>
             <thead>
               <tr>
@@ -364,36 +400,9 @@ function BookingDetailPage() {
             </tbody>
           </table>
           </div>
+          </details>
         </section>
       )}
-
-      <div className="row">
-        {canEdit && (
-          <button type="button" className="btn-secondary" onClick={() => setIsEditOpen(true)} disabled={isBusy}>
-            Edit
-          </button>
-        )}
-        {canEdit && (
-          <button type="button" className="btn-secondary" onClick={() => setIsAssignOpen(true)} disabled={isBusy}>
-            {booking.driverId ? "Reassign Driver" : "Assign Driver"}
-          </button>
-        )}
-        {canEdit && (
-          <button type="button" className="btn-secondary" onClick={handleAutoAssign} disabled={isBusy}>
-            {busyAction === "autoAssign" ? "Assigning..." : "Run Automatic Assignment"}
-          </button>
-        )}
-        {booking.status === "Confirmed" && (
-          <button type="button" className="btn-secondary" onClick={handleResendConfirmation} disabled={isBusy}>
-            {busyAction === "resend" ? "Sending..." : "Resend Confirmation Email"}
-          </button>
-        )}
-        {canCancel && (
-          <button type="button" className="btn-danger" onClick={() => setConfirmDialog("cancel")} disabled={isBusy}>
-            Cancel Booking
-          </button>
-        )}
-      </div>
 
       {isEditOpen && <EditBookingModal booking={booking} routes={routes} onSave={handleSaveEdit} onClose={() => setIsEditOpen(false)} />}
       {isAssignOpen && (

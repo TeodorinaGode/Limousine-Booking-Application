@@ -121,39 +121,7 @@ function HomePage() {
 
       <section ref={routesReveal.ref} className={`section ${routesReveal.className}`}>
         <div className="container">
-          <div className="row row--between" style={{ alignItems: "flex-end", marginBottom: "var(--space-8)" }}>
-            <div>
-              <p className="section__eyebrow">{t("nav.routes")}</p>
-              <h2 className="section__title" style={{ marginBottom: 0 }}>{t("routesTeaser.title")}</h2>
-            </div>
-            <Link to="/routes">{t("routesTeaser.viewAll")}</Link>
-          </div>
-          <div style={{ marginBottom: "var(--space-8)" }}>
-            <HeroBookingWidget routes={routes} />
-          </div>
-          {routes.length === 0 ? (
-            <div className="stack">
-              <div className="skeleton skeleton-line" style={{ height: 90 }} />
-              <div className="skeleton skeleton-line" style={{ height: 90 }} />
-            </div>
-          ) : (
-            <div className="route-editorial">
-              {routes.slice(0, 3).map((route) => (
-                <Link key={route.id} to="/booking" state={{ routeId: route.id }} className="route-editorial__row">
-                  <div className="route-editorial__pair">
-                    <span>{route.departureLocation}</span>
-                    <span className="route-editorial__arrow">&rarr;</span>
-                    <span>{route.destination}</span>
-                  </div>
-                  <div className="route-editorial__details">
-                    {t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m
-                    {" · "}
-                    {t("routesTeaser.from")} {route.price.toFixed(0)} {route.currency}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <HeroBookingWidget routes={routes} />
         </div>
       </section>
 

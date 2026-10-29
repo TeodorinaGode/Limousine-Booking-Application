@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "./HomePage";
@@ -99,12 +100,15 @@ describe("HomePage", () => {
   });
 
   it("loads and displays popular routes from the backend, never hard-coded", async () => {
+    const user = userEvent.setup();
     renderPage();
 
     await screen.findAllByText("Basel");
     expect(screen.getAllByText("Basel").length).toBeGreaterThan(0);
-    expect(screen.getByText("Zurich")).toBeInTheDocument();
     expect(mockedBookingService.getActiveRoutes).toHaveBeenCalled();
+
+    await user.selectOptions(screen.getByLabelText("From"), "Basel");
+    expect(screen.getByRole("option", { name: "Zurich" })).toBeInTheDocument();
   });
 
   it("loads and displays the featured fleet vehicle from the backend", async () => {

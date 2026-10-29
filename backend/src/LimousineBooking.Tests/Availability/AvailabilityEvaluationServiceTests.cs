@@ -55,7 +55,7 @@ public class AvailabilityEvaluationServiceTests
     }
 
     [Fact]
-    public async Task RequestedTime_OutsideAnyScheduledPeriod_IsNotAvailable()
+    public async Task RequestedTime_OutsideAnyScheduledPeriod_IsAvailableByDefault()
     {
         var driver = ActiveDriver();
         var date = new DateOnly(2026, 9, 15);
@@ -65,10 +65,24 @@ public class AvailabilityEvaluationServiceTests
         _availabilityRepository.Setup(r => r.GetByDriverAsync(driver.Id, date, date, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { record });
 
-        // Requested 14:00-15:00 falls outside the 08:00-12:00 available window.
         var result = await CreateService().IsDriverAvailableAsync(driver.Id, date, new TimeOnly(14, 0), new TimeOnly(15, 0));
 
-        Assert.False(result);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task ActiveDriver_WithNoRecordsAtAll_IsAvailableByDefault()
+    {
+        var driver = ActiveDriver();
+        var date = new DateOnly(2026, 9, 15);
+
+        _driverRepository.Setup(r => r.GetByIdAsync(driver.Id, It.IsAny<CancellationToken>())).ReturnsAsync(driver);
+        _availabilityRepository.Setup(r => r.GetByDriverAsync(driver.Id, date, date, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<DomainAvailability>());
+
+        var result = await CreateService().IsDriverAvailableAsync(driver.Id, date, new TimeOnly(9, 0), new TimeOnly(10, 0));
+
+        Assert.True(result);
     }
 
     [Fact]
@@ -91,7 +105,7 @@ public class AvailabilityEvaluationServiceTests
     }
 
     [Fact]
-    public async Task PartialOverlapWithAvailablePeriod_IsNotSufficient()
+    public async Task PartialOverlapWithAvailablePeriod_IsStillAvailable()
     {
         var driver = ActiveDriver();
         var date = new DateOnly(2026, 9, 15);
@@ -101,10 +115,9 @@ public class AvailabilityEvaluationServiceTests
         _availabilityRepository.Setup(r => r.GetByDriverAsync(driver.Id, date, date, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { record });
 
-        // Requested 11:00-13:00 only partially overlaps the 08:00-12:00 window.
         var result = await CreateService().IsDriverAvailableAsync(driver.Id, date, new TimeOnly(11, 0), new TimeOnly(13, 0));
 
-        Assert.False(result);
+        Assert.True(result);
     }
 
     [Fact]

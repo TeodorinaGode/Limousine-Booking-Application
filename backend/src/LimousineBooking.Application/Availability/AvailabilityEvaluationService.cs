@@ -21,19 +21,9 @@ public class AvailabilityEvaluationService : IAvailabilityEvaluationService
 
         var dayRecords = await _availabilityRepository.GetByDriverAsync(driverId, date, date, cancellationToken);
 
-        // An overlapping unavailable record always wins, including over legacy
-        // data where an overlapping available record also exists (section 17).
         var blockedByUnavailablePeriod = dayRecords
             .Where(r => !r.IsAvailable)
             .Any(r => r.Overlaps(startTime, endTime));
-        if (blockedByUnavailablePeriod)
-            return false;
-
-        // The requested window must fall fully within an available period —
-        // partial overlap isn't enough to guarantee the driver is free for
-        // the whole trip.
-        return dayRecords
-            .Where(r => r.IsAvailable)
-            .Any(r => r.StartTime <= startTime && endTime <= r.EndTime);
+        return !blockedByUnavailablePeriod;
     }
 }

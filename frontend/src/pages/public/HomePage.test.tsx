@@ -123,7 +123,7 @@ describe("HomePage", () => {
     renderPage();
 
     expect(await screen.findByTestId("service-area-map")).toBeInTheDocument();
-    expect(screen.getByText("Chauffeur Services Across Switzerland and Europe")).toBeInTheDocument();
+    expect(screen.getByText("Chauffeur Services Across Switzerland")).toBeInTheDocument();
   });
 
   it("does not render the map section when the backend disables it", async () => {

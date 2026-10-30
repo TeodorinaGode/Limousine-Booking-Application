@@ -401,9 +401,14 @@ function BookingPage() {
                         role="radio"
                         aria-checked={isSelected}
                         className={`trip-card${isSelected ? " trip-card--selected" : ""}`}
-                        style={{ textAlign: "left", background: isSelected ? "var(--color-surface-elevated)" : undefined, width: "100%" }}
+                        style={{ textAlign: "left", width: "100%" }}
                         onClick={() => updateField("routeId", route.id)}
                       >
+                        {isSelected && (
+                          <span className="trip-card__check" aria-hidden="true">
+                            &#10003;
+                          </span>
+                        )}
                         <div className="trip-card__route">
                           <span>{route.departureLocation}</span>
                           <span className="trip-card__arrow">&rarr;</span>

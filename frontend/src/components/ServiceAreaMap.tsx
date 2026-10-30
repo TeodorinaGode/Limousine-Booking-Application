@@ -185,11 +185,6 @@ function ServiceAreaMap({ locations, routes, defaultLatitude, defaultLongitude, 
           <p className="map-route-card__route">
             {displayedRoute.from.name} <span className="trip-card__arrow">&rarr;</span> {displayedRoute.to.name}
           </p>
-          <p className="map-route-card__meta">
-            {t("routesTeaser.duration")}: {Math.floor(displayedRoute.route.estimatedDurationMinutes / 60)}h {displayedRoute.route.estimatedDurationMinutes % 60}m
-            {" · "}
-            {t("routesTeaser.from")} {displayedRoute.route.price.toFixed(2)} {displayedRoute.route.currency}
-          </p>
           <button type="button" onClick={() => handleBookRoute(displayedRoute.route.id)}>
             {t("serviceAreaMap.bookThisRoute")}
           </button>

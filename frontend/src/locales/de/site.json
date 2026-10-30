@@ -80,9 +80,7 @@
   "routesTeaser": {
     "title": "Beliebte Ziele",
     "viewAll": "Alle Strecken ansehen",
-    "bookThisRoute": "Diese Strecke buchen",
-    "duration": "Voraussichtliche Dauer",
-    "from": "Ab"
+    "bookThisRoute": "Diese Strecke buchen"
   },
   "routesPage": {
     "title": "Strecken & Ziele",

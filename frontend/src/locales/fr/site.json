@@ -80,9 +80,7 @@
   "routesTeaser": {
     "title": "Destinations populaires",
     "viewAll": "Voir tous les trajets",
-    "bookThisRoute": "Réserver ce trajet",
-    "duration": "Durée estimée",
-    "from": "À partir de"
+    "bookThisRoute": "Réserver ce trajet"
   },
   "routesPage": {
     "title": "Trajets & destinations",

@@ -80,9 +80,7 @@
   "routesTeaser": {
     "title": "Destinations",
     "viewAll": "View All Routes",
-    "bookThisRoute": "Book This Route",
-    "duration": "Estimated duration",
-    "from": "From"
+    "bookThisRoute": "Book This Route"
   },
   "routesPage": {
     "title": "Routes & Destinations",

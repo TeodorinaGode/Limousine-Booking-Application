@@ -20,6 +20,7 @@
   "widget": {
     "from": "Départ",
     "to": "Destination",
+    "swap": "Inverser le départ et la destination",
     "date": "Date",
     "time": "Heure",
     "passengers": "Passagers",

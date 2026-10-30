@@ -20,6 +20,7 @@
   "widget": {
     "from": "From",
     "to": "To",
+    "swap": "Swap departure and destination",
     "date": "Date",
     "time": "Time",
     "passengers": "Passengers",

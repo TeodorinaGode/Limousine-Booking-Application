@@ -20,6 +20,7 @@
   "widget": {
     "from": "Von",
     "to": "Nach",
+    "swap": "Abfahrt und Ziel tauschen",
     "date": "Datum",
     "time": "Uhrzeit",
     "passengers": "Passagiere",

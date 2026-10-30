@@ -7,6 +7,10 @@ interface HeroBookingWidgetProps {
   routes: PublicRouteDto[];
 }
 
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 /**
  * Compact FROM/TO/DATE/TIME/PASSENGERS widget shown in/below the hero
  * (Prompt 17, section 4) — deliberately not a full booking form. On submit it
@@ -32,9 +36,22 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
   );
 
   const [to, setTo] = useState("");
-  const [bookingDate, setBookingDate] = useState("");
+  const [bookingDate, setBookingDate] = useState(todayIso());
   const [pickupTime, setPickupTime] = useState("");
   const [passengerCount, setPassengerCount] = useState(1);
+
+  // Only offered when the reverse trip is itself a real bookable route —
+  // swapping into a dead-end From/To pair would be worse than no button.
+  const canSwap = useMemo(
+    () => Boolean(from && to && routes.some((r) => r.departureLocation === to && r.destination === from)),
+    [routes, from, to]
+  );
+
+  const handleSwap = () => {
+    if (!canSwap) return;
+    setFrom(to);
+    setTo(from);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,29 +70,42 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
 
   return (
     <form className="hero-widget fade-in" onSubmit={handleSubmit} aria-label={t("widget.checkAvailability")}>
-      <div className="form-group">
-        <label htmlFor="widget-from">{t("widget.from")}</label>
-        <select id="widget-from" value={from} onChange={(e) => { setFrom(e.target.value); setTo(""); }}>
-          <option value="">{t("widget.selectRoute")}</option>
-          {fromOptions.map((location) => (
-            <option key={location} value={location}>{location}</option>
-          ))}
-        </select>
-      </div>
+      <div className="hero-widget__route-pair">
+        <div className="form-group">
+          <label htmlFor="widget-from">{t("widget.from")}</label>
+          <select id="widget-from" value={from} onChange={(e) => { setFrom(e.target.value); setTo(""); }}>
+            <option value="">{t("widget.selectRoute")}</option>
+            {fromOptions.map((location) => (
+              <option key={location} value={location}>{location}</option>
+            ))}
+          </select>
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="widget-to">{t("widget.to")}</label>
-        <select id="widget-to" value={to} onChange={(e) => setTo(e.target.value)} disabled={!from}>
-          <option value="">{t("widget.selectRoute")}</option>
-          {toOptions.map((location) => (
-            <option key={location} value={location}>{location}</option>
-          ))}
-        </select>
+        <button
+          type="button"
+          className="hero-widget__swap"
+          onClick={handleSwap}
+          disabled={!canSwap}
+          aria-label={t("widget.swap")}
+          title={t("widget.swap")}
+        >
+          &#8646;
+        </button>
+
+        <div className="form-group">
+          <label htmlFor="widget-to">{t("widget.to")}</label>
+          <select id="widget-to" value={to} onChange={(e) => setTo(e.target.value)} disabled={!from}>
+            <option value="">{t("widget.selectRoute")}</option>
+            {toOptions.map((location) => (
+              <option key={location} value={location}>{location}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="form-group">
         <label htmlFor="widget-date">{t("widget.date")}</label>
-        <input id="widget-date" type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} />
+        <input id="widget-date" type="date" value={bookingDate} min={todayIso()} onChange={(e) => setBookingDate(e.target.value)} />
       </div>
 
       <div className="form-group">

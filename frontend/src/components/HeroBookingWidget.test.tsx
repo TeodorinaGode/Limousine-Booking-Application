@@ -70,4 +70,45 @@ describe("HeroBookingWidget", () => {
     expect(await screen.findByTestId("probe")).toBeInTheDocument();
     expect(capturedLocationState).toMatchObject({ routeId: undefined });
   });
+
+  it("defaults the date field to today", () => {
+    renderWidget();
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    expect(screen.getByLabelText("Date")).toHaveValue(todayIso);
+  });
+
+  it("disables swap when the reverse trip isn't a real route", async () => {
+    const user = userEvent.setup();
+    renderWidget();
+
+    await user.selectOptions(screen.getByLabelText("From"), "Basel");
+    await user.selectOptions(screen.getByLabelText("To"), "Zurich");
+
+    expect(screen.getByRole("button", { name: /swap/i })).toBeDisabled();
+  });
+
+  it("swaps From/To when the reverse trip is a real route", async () => {
+    const user = userEvent.setup();
+    const bidirectional: PublicRouteDto[] = [
+      ...routes,
+      { id: "route-3", departureLocation: "Zurich", destination: "Basel", estimatedDurationMinutes: 60, price: 180, currency: "CHF" },
+    ];
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <HeroBookingWidget routes={bidirectional} />
+      </MemoryRouter>
+    );
+
+    await user.selectOptions(screen.getByLabelText("From"), "Basel");
+    await user.selectOptions(screen.getByLabelText("To"), "Zurich");
+
+    const swapButton = screen.getByRole("button", { name: /swap/i });
+    expect(swapButton).toBeEnabled();
+
+    await user.click(swapButton);
+
+    expect(screen.getByLabelText("From")).toHaveValue("Zurich");
+    expect(screen.getByLabelText("To")).toHaveValue("Basel");
+  });
 });

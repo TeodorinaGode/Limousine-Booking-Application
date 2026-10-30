@@ -7,9 +7,11 @@ import "leaflet/dist/leaflet.css";
 import type { PublicLocationDto } from "../types/location";
 import type { PublicRouteDto } from "../types/booking";
 
-const DARK_TILE_URL = import.meta.env.VITE_MAP_TILE_URL ?? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const DARK_TILE_URL =
+  import.meta.env.VITE_MAP_TILE_URL ??
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}";
 const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  "Esri, HERE, Garmin, &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, and the GIS user community";
 
 /** Approximate geographic centre of Switzerland — used only to softly emphasize the primary market (section 11/12), never a precise business address. */
 const SWITZERLAND_CENTER: [number, number] = [46.8182, 8.2275];

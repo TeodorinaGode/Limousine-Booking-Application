@@ -179,7 +179,6 @@ function RoutesPage() {
             <tr>
               <th>Departure</th>
               <th>Destination</th>
-              <th>Duration</th>
               <th>Price</th>
               <th>Currency</th>
               <th>Status</th>
@@ -191,7 +190,6 @@ function RoutesPage() {
               <tr key={route.id}>
                 <td data-label="Departure">{route.departureLocation}</td>
                 <td data-label="Destination">{route.destination}</td>
-                <td data-label="Duration">{route.estimatedDurationMinutes} min</td>
                 <td data-label="Price">{route.price.toFixed(2)}</td>
                 <td data-label="Currency">{route.currency}</td>
                 <td data-label="Status">

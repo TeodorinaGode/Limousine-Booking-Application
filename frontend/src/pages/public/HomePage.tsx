@@ -84,32 +84,6 @@ function HomePage() {
         </div>
       </section>
 
-      <section ref={introReveal.ref} className={`noir-section noir-section--black ${introReveal.className}`}>
-        <div className={`container container--medium reveal-lines ${introReveal.className}`}>
-          <p className="noir-label">{t("noir.intro.label")}</p>
-          <h2 className="noir-heading">
-            <span className="light">{t("noir.intro.title1")}</span>
-            <span className="strong">{t("noir.intro.title2")}</span>
-          </h2>
-          <p className="section__subtitle" style={{ fontSize: "1.2rem", color: "var(--color-text-primary)", marginTop: "var(--space-8)" }}>
-            &ldquo;{t("noir.intro.quote")}&rdquo;
-          </p>
-          <p className="text-secondary">{t("noir.intro.body")}</p>
-        </div>
-      </section>
-
-      <section ref={trustReveal.ref} className={`section section--tight ${trustReveal.className}`}>
-        <div className="container grid grid--4">
-          {TRUST_ITEMS.map((item) => (
-            <div className="trust-item" key={item.key}>
-              <div className="trust-item__icon" role="img" aria-label={t(`trust.${item.key}.title`)}>{item.icon}</div>
-              <p className="trust-item__title">{t(`trust.${item.key}.title`)}</p>
-              <p className="trust-item__desc">{t(`trust.${item.key}.desc`)}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section ref={routesReveal.ref} className={`section ${routesReveal.className}`}>
         <div className="container">
           <div className="row row--between" style={{ alignItems: "flex-end", marginBottom: "var(--space-8)" }}>
@@ -144,6 +118,32 @@ function HomePage() {
           </div>
         </section>
       )}
+
+      <section ref={introReveal.ref} className={`noir-section noir-section--black ${introReveal.className}`}>
+        <div className={`container container--medium reveal-lines ${introReveal.className}`}>
+          <p className="noir-label">{t("noir.intro.label")}</p>
+          <h2 className="noir-heading">
+            <span className="light">{t("noir.intro.title1")}</span>
+            <span className="strong">{t("noir.intro.title2")}</span>
+          </h2>
+          <p className="section__subtitle" style={{ fontSize: "1.2rem", color: "var(--color-text-primary)", marginTop: "var(--space-8)" }}>
+            &ldquo;{t("noir.intro.quote")}&rdquo;
+          </p>
+          <p className="text-secondary">{t("noir.intro.body")}</p>
+        </div>
+      </section>
+
+      <section ref={trustReveal.ref} className={`section section--tight ${trustReveal.className}`}>
+        <div className="container grid grid--4">
+          {TRUST_ITEMS.map((item) => (
+            <div className="trust-item" key={item.key}>
+              <div className="trust-item__icon" role="img" aria-label={t(`trust.${item.key}.title`)}>{item.icon}</div>
+              <p className="trust-item__title">{t(`trust.${item.key}.title`)}</p>
+              <p className="trust-item__desc">{t(`trust.${item.key}.desc`)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section ref={experienceReveal.ref} className={`noir-section noir-section--black ${experienceReveal.className}`}>
         <div className="container container--medium section--center">

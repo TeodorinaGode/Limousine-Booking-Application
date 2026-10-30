@@ -32,6 +32,9 @@ interface TravelDateTimeFieldProps {
   time: string;
   minDate?: Date;
   onApply: (date: string, time: string) => void;
+  /** Overrides the generic "Date"/"Time" trigger labels — e.g. the booking page's more specific "Booking date"/"Pickup time". */
+  dateLabel?: string;
+  timeLabel?: string;
 }
 
 /**
@@ -43,13 +46,15 @@ interface TravelDateTimeFieldProps {
  * TravelDateTimeCalendar — so it never costs anything on initial page load,
  * matching the existing ServiceAreaMap lazy-load precedent.
  */
-function TravelDateTimeField({ date, time, minDate, onApply }: TravelDateTimeFieldProps) {
+function TravelDateTimeField({ date, time, minDate, onApply, dateLabel, timeLabel }: TravelDateTimeFieldProps) {
   const { t, i18n } = useTranslation("site");
   const [isOpen, setIsOpen] = useState(false);
   const [pendingDate, setPendingDate] = useState<Date | undefined>(undefined);
   const [pendingTime, setPendingTime] = useState("");
 
   const language = i18n.resolvedLanguage ?? "en";
+  const resolvedDateLabel = dateLabel ?? t("widget.date");
+  const resolvedTimeLabel = timeLabel ?? t("widget.time");
 
   const openModal = () => {
     setPendingDate(toDateOnly(date));
@@ -65,14 +70,14 @@ function TravelDateTimeField({ date, time, minDate, onApply }: TravelDateTimeFie
   return (
     <>
       <div className="form-group">
-        <label htmlFor="widget-date-trigger">{t("widget.date")}</label>
+        <label htmlFor="widget-date-trigger">{resolvedDateLabel}</label>
         <button type="button" id="widget-date-trigger" className="date-time-trigger" onClick={openModal}>
           {date ? formatDisplayDate(date, language) : t("widget.selectDate")}
         </button>
       </div>
 
       <div className="form-group">
-        <label htmlFor="widget-time-trigger">{t("widget.time")}</label>
+        <label htmlFor="widget-time-trigger">{resolvedTimeLabel}</label>
         <button type="button" id="widget-time-trigger" className="date-time-trigger" onClick={openModal}>
           {time || t("widget.selectTime")}
         </button>
@@ -93,7 +98,7 @@ function TravelDateTimeField({ date, time, minDate, onApply }: TravelDateTimeFie
           </div>
 
           <div className="form-group" style={{ marginTop: "var(--space-4)" }}>
-            <label htmlFor="widget-time-input">{t("widget.time")}</label>
+            <label htmlFor="widget-time-input">{resolvedTimeLabel}</label>
             <input id="widget-time-input" type="time" value={pendingTime} onChange={(e) => setPendingTime(e.target.value)} />
           </div>
 

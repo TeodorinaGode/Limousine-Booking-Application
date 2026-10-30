@@ -6,6 +6,7 @@ import { createBooking, getActiveRoutes } from "../../services/bookingService";
 import { createPayment } from "../../services/paymentService";
 import { ApiError } from "../../services/apiClient";
 import Header from "../../components/Header";
+import TravelDateTimeField from "../../components/TravelDateTimeField";
 import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 /** Carried in via router state from the hero widget (section 27) or a Routes-page "Book This Route" CTA (section 26) — every field is optional since either flow may only supply some of them. */
@@ -421,31 +422,24 @@ function BookingPage() {
               </div>
 
               <div className="row">
-                <div className="form-group">
-                  <label htmlFor="bookingDate">{t("booking:date")}</label>
-                  <br />
-                  <input
-                    id="bookingDate"
-                    type="date"
-                    min={new Date().toISOString().slice(0, 10)}
-                    value={values.bookingDate}
-                    onChange={(e) => updateField("bookingDate", e.target.value)}
-                  />
+                <TravelDateTimeField
+                  date={values.bookingDate}
+                  time={values.pickupTime}
+                  minDate={new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())}
+                  dateLabel={t("booking:date")}
+                  timeLabel={t("booking:time")}
+                  onApply={(date, time) => {
+                    updateField("bookingDate", date);
+                    updateField("pickupTime", time);
+                  }}
+                />
+              </div>
+              {(errors.bookingDate || errors.pickupTime) && (
+                <div className="row">
                   {errors.bookingDate && <p className="form-error">{errors.bookingDate}</p>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="pickupTime">{t("booking:time")}</label>
-                  <br />
-                  <input
-                    id="pickupTime"
-                    type="time"
-                    value={values.pickupTime}
-                    onChange={(e) => updateField("pickupTime", e.target.value)}
-                  />
                   {errors.pickupTime && <p className="form-error">{errors.pickupTime}</p>}
                 </div>
-              </div>
+              )}
             </>
           )}
 

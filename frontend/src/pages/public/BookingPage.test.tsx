@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,6 +12,11 @@ import type { BookingDto, PublicRouteDto } from "../../types/booking";
 
 vi.mock("../../services/bookingService");
 vi.mock("../../services/paymentService");
+
+// fillStep1 opens the lazy-loaded date picker (its own dynamic import) on
+// top of walking several form steps — comfortably fast alone, but the two
+// can combine to exceed the 5s default under heavy parallel test-suite load.
+vi.setConfig({ testTimeout: 15000 });
 
 const mockedBookingService = vi.mocked(bookingService);
 const mockedPaymentService = vi.mocked(paymentService);
@@ -56,16 +61,16 @@ function renderPage() {
   );
 }
 
-const FUTURE_DATE = "2099-01-01";
-
 async function fillStep1(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("radio", { name: /Basel.*Zurich/s }));
-  const dateInput = screen.getByLabelText("Booking date");
-  await user.clear(dateInput);
-  await user.type(dateInput, FUTURE_DATE);
-  const timeInput = screen.getByLabelText("Pickup time");
-  await user.clear(timeInput);
-  await user.type(timeInput, "14:30");
+
+  await user.click(screen.getByRole("button", { name: "Booking date" }));
+  const dialog = screen.getByRole("dialog", { name: "Date of travel" });
+  await user.click(await within(dialog).findByRole("button", { name: "Go to the Next Month" }, { timeout: 3000 }));
+  await user.click(await within(dialog).findByRole("button", { name: /15th/ }, { timeout: 3000 }));
+  await user.type(within(dialog).getByLabelText("Pickup time"), "14:30");
+  await user.click(within(dialog).getByRole("button", { name: "Apply" }));
+
   await user.click(screen.getByRole("button", { name: "Next" }));
 }
 

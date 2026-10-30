@@ -100,7 +100,6 @@
     "noVehicles": "Derzeit sind keine Fahrzeuge verfügbar."
   },
   "homeTeasers": {
-    "about": { "label": "Unsere Geschichte", "cta": "Mehr erfahren" },
     "faq": { "label": "Fragen", "cta": "Alle FAQs ansehen" },
     "contact": { "label": "Kontakt", "cta": "Kontaktieren Sie uns" }
   },
@@ -137,12 +136,6 @@
       "title": "Fahrt geniessen",
       "desc": "Ihr professioneller Chauffeur kümmert sich um die Fahrt."
     }
-  },
-  "about": {
-    "title": "Über unseren Service",
-    "subtitle": "Professioneller Transport, ganz auf Ihre Reise abgestimmt.",
-    "body1": "Limousinen bietet massgeschneiderten Premium-Chauffeurtransport in der Schweiz und den Nachbarländern — mit Fokus auf Komfort, Zuverlässigkeit und Diskretion.",
-    "body2": "Ob für einen besonderen Anlass, einen Firmentermin, einen Flughafentransfer oder eine private Reise — jede Fahrt wird mit derselben Sorgfalt organisiert, von der Buchung bis zur Ankunft."
   },
   "faq": {
     "title": "Häufig gestellte Fragen",

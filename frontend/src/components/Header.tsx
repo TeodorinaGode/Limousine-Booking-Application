@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { to: "/services", key: "services" },
   { to: "/routes", key: "routes" },
   { to: "/fleet", key: "fleet" },
-  { to: "/about", key: "about" },
   { to: "/faq", key: "faq" },
   { to: "/contact", key: "contact" },
 ] as const;

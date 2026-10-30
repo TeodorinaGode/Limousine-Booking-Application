@@ -100,7 +100,6 @@
     "noVehicles": "Aucun véhicule n'est disponible actuellement."
   },
   "homeTeasers": {
-    "about": { "label": "Notre histoire", "cta": "En savoir plus" },
     "faq": { "label": "Questions", "cta": "Voir toutes les FAQ" },
     "contact": { "label": "Contactez-nous", "cta": "Nous contacter" }
   },
@@ -137,12 +136,6 @@
       "title": "Profitez de votre trajet",
       "desc": "Votre chauffeur professionnel s'occupe du trajet."
     }
-  },
-  "about": {
-    "title": "À propos de notre service",
-    "subtitle": "Un transport professionnel conçu autour de votre voyage.",
-    "body1": "Limousinen propose un service de chauffeur premium sur mesure en Suisse et dans les pays voisins, fondé sur le confort, la fiabilité et la discrétion.",
-    "body2": "Qu'il s'agisse d'un événement spécial, d'un déplacement professionnel, d'un transfert aéroport ou d'un trajet privé, chaque voyage est organisé avec la même attention aux détails, de la réservation jusqu'à l'arrivée."
   },
   "faq": {
     "title": "Questions fréquentes",

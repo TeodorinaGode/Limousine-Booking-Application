@@ -23,7 +23,6 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: "Services" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Routes" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Fleet" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "About" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "FAQ" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Contact" })).toBeInTheDocument();
   });

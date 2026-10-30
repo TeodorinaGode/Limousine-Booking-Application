@@ -3,7 +3,6 @@ import HomePage from "../pages/public/HomePage";
 import ServicesPage from "../pages/public/ServicesPage";
 import PublicRoutesPage from "../pages/public/RoutesPage";
 import FleetPage from "../pages/public/FleetPage";
-import AboutPage from "../pages/public/AboutPage";
 import FAQPage from "../pages/public/FAQPage";
 import ContactPage from "../pages/public/ContactPage";
 import LegalPage from "../pages/public/LegalPage";
@@ -49,7 +48,6 @@ function AppRoutes() {
       <Route path="/services" element={<ServicesPage />} />
       <Route path="/routes" element={<PublicRoutesPage />} />
       <Route path="/fleet" element={<FleetPage />} />
-      <Route path="/about" element={<AboutPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy-policy" element={<LegalPage titleKey="privacyTitle" />} />

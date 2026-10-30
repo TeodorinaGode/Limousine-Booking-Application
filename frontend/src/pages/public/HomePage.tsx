@@ -63,7 +63,6 @@ function HomePage() {
   const whyUsReveal = useScrollReveal<HTMLElement>();
   const howItWorksReveal = useScrollReveal<HTMLElement>();
   const operatingAreaReveal = useScrollReveal<HTMLElement>();
-  const aboutTeaserReveal = useScrollReveal<HTMLElement>();
   const faqTeaserReveal = useScrollReveal<HTMLElement>();
   const contactTeaserReveal = useScrollReveal<HTMLElement>();
   const finalHeroReveal = useScrollReveal<HTMLElement>();
@@ -249,21 +248,6 @@ function HomePage() {
           </div>
         </section>
       )}
-
-      <section ref={aboutTeaserReveal.ref} className={`section ${aboutTeaserReveal.className}`}>
-        <div className="container row" style={{ alignItems: "center", gap: "var(--space-8)", flexWrap: "wrap" }}>
-          <div style={{ flex: "1 1 320px" }}>
-            <p className="section__eyebrow">{t("homeTeasers.about.label")}</p>
-            <h2 className="section__title">{t("about.title")}</h2>
-            <p className="text-secondary">{t("about.subtitle")}</p>
-          </div>
-          <div style={{ flex: "0 0 auto" }}>
-            <Link to="/about" className="cta-noir cta-noir--outline">
-              {t("homeTeasers.about.cta")}<span aria-hidden="true"> &rarr;</span>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       <section ref={faqTeaserReveal.ref} className={`section section--elevated ${faqTeaserReveal.className}`}>
         <div className="container section--center">

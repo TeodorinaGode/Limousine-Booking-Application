@@ -24,7 +24,6 @@ function Footer() {
             <li><Link to="/services">{t("nav.services")}</Link></li>
             <li><Link to="/routes">{t("nav.routes")}</Link></li>
             <li><Link to="/fleet">{t("nav.fleet")}</Link></li>
-            <li><Link to="/about">{t("nav.about")}</Link></li>
             <li><Link to="/contact">{t("nav.contact")}</Link></li>
           </ul>
         </div>

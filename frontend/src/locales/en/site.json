@@ -100,7 +100,6 @@
     "noVehicles": "No vehicles are currently available."
   },
   "homeTeasers": {
-    "about": { "label": "Our Story", "cta": "Learn More" },
     "faq": { "label": "Questions", "cta": "View All FAQs" },
     "contact": { "label": "Get In Touch", "cta": "Contact Us" }
   },
@@ -137,12 +136,6 @@
       "title": "Enjoy Your Ride",
       "desc": "Your professional chauffeur takes care of the journey."
     }
-  },
-  "about": {
-    "title": "About Our Service",
-    "subtitle": "Professional transportation designed around your journey.",
-    "body1": "Limousinen provides premium, tailored chauffeur transportation across Switzerland and neighbouring countries, built around comfort, reliability and discretion.",
-    "body2": "Whether for a special event, a corporate function, an airport transfer or a private journey, every trip is arranged with the same attention to detail — from the moment you book to the moment you arrive."
   },
   "faq": {
     "title": "Frequently Asked Questions",

@@ -409,10 +409,6 @@ function BookingPage() {
                           <span className="trip-card__arrow">&rarr;</span>
                           <span>{route.destination}</span>
                         </div>
-                        <p className="trip-card__meta">{t("booking:approxMinutes", { count: route.estimatedDurationMinutes })}</p>
-                        <p className="trip-card__price">
-                          {route.price.toFixed(2)} {route.currency}
-                        </p>
                       </button>
                     );
                   })}
@@ -588,11 +584,6 @@ function BookingPage() {
 
                 <dt>{t("booking:phone")}</dt>
                 <dd>{values.customerPhone}</dd>
-
-                <dt>{t("booking:estimatedPrice")}</dt>
-                <dd style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-primary)" }}>
-                  {selectedRoute.price.toFixed(2)} {selectedRoute.currency}
-                </dd>
               </dl>
             </>
           )}

@@ -63,7 +63,6 @@ function HomePage() {
   const whyUsReveal = useScrollReveal<HTMLElement>();
   const howItWorksReveal = useScrollReveal<HTMLElement>();
   const operatingAreaReveal = useScrollReveal<HTMLElement>();
-  const faqTeaserReveal = useScrollReveal<HTMLElement>();
   const contactTeaserReveal = useScrollReveal<HTMLElement>();
   const finalHeroReveal = useScrollReveal<HTMLElement>();
 
@@ -248,26 +247,6 @@ function HomePage() {
           </div>
         </section>
       )}
-
-      <section ref={faqTeaserReveal.ref} className={`section section--elevated ${faqTeaserReveal.className}`}>
-        <div className="container section--center">
-          <p className="section__eyebrow">{t("homeTeasers.faq.label")}</p>
-          <h2 className="section__title">{t("faq.title")}</h2>
-        </div>
-        <div className="container container--medium">
-          {(["q1", "q2", "q3"] as const).map((key) => (
-            <details className="faq-item" key={key}>
-              <summary className="faq-item__question">{t(`faq.${key}.question`)}</summary>
-              <p className="faq-item__answer">{t(`faq.${key}.answer`)}</p>
-            </details>
-          ))}
-          <div className="section--center" style={{ marginTop: "var(--space-8)" }}>
-            <Link to="/faq" className="cta-noir cta-noir--outline">
-              {t("homeTeasers.faq.cta")}<span aria-hidden="true"> &rarr;</span>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {company && (
         <section ref={contactTeaserReveal.ref} className={`noir-section noir-section--deep section--center ${contactTeaserReveal.className}`}>

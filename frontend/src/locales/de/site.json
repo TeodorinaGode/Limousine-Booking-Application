@@ -100,7 +100,6 @@
     "noVehicles": "Derzeit sind keine Fahrzeuge verfügbar."
   },
   "homeTeasers": {
-    "faq": { "label": "Fragen", "cta": "Alle FAQs ansehen" },
     "contact": { "label": "Kontakt", "cta": "Kontaktieren Sie uns" }
   },
   "whyUs": {

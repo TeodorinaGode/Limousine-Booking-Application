@@ -5,15 +5,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "./HomePage";
 import { AuthProvider } from "../../context/AuthContext";
 import * as bookingService from "../../services/bookingService";
-import * as publicVehicleService from "../../services/publicVehicleService";
 import * as companyService from "../../services/companyService";
 import * as locationService from "../../services/locationService";
 import type { PublicRouteDto } from "../../types/booking";
-import type { PublicVehicleDto } from "../../types/publicVehicle";
 import type { PublicLocationsDto } from "../../types/location";
 
 vi.mock("../../services/bookingService");
-vi.mock("../../services/publicVehicleService");
 vi.mock("../../services/companyService");
 vi.mock("../../services/locationService");
 vi.mock("../../components/ServiceAreaMap", () => ({
@@ -21,7 +18,6 @@ vi.mock("../../components/ServiceAreaMap", () => ({
 }));
 
 const mockedBookingService = vi.mocked(bookingService);
-const mockedPublicVehicleService = vi.mocked(publicVehicleService);
 const mockedCompanyService = vi.mocked(companyService);
 const mockedLocationService = vi.mocked(locationService);
 
@@ -38,9 +34,6 @@ function renderPage() {
 const routes: PublicRouteDto[] = [
   { id: "route-1", departureLocation: "Basel", destination: "Zurich", estimatedDurationMinutes: 60, price: 180, currency: "CHF" },
 ];
-const vehicles: PublicVehicleDto[] = [
-  { id: "vehicle-1", make: "Mercedes-Benz", model: "S-Class", vehicleType: "Sedan", passengerCapacity: 3 },
-];
 const enabledLocations: PublicLocationsDto = {
   enabled: true,
   provider: "leaflet",
@@ -55,7 +48,6 @@ const enabledLocations: PublicLocationsDto = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockedBookingService.getActiveRoutes.mockResolvedValue(routes);
-  mockedPublicVehicleService.getActiveVehicles.mockResolvedValue(vehicles);
   mockedLocationService.getLocations.mockResolvedValue(enabledLocations);
   mockedCompanyService.getCompanyInfo.mockResolvedValue({
     companyName: "Test Chauffeur",
@@ -102,14 +94,6 @@ describe("HomePage", () => {
 
     await user.selectOptions(screen.getByLabelText("From"), "Basel");
     expect(screen.getByRole("option", { name: "Zurich" })).toBeInTheDocument();
-  });
-
-  it("loads and displays the featured fleet vehicle from the backend", async () => {
-    renderPage();
-
-    expect(await screen.findByText("Mercedes-Benz")).toBeInTheDocument();
-    expect(screen.getByText("S-Class")).toBeInTheDocument();
-    expect(mockedPublicVehicleService.getActiveVehicles).toHaveBeenCalled();
   });
 
   it("includes the how-it-works steps", () => {

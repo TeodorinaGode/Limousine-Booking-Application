@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getActiveRoutes } from "../../services/bookingService";
-import { getActiveVehicles } from "../../services/publicVehicleService";
 import { getLocations } from "../../services/locationService";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -12,7 +11,6 @@ import { usePageMeta } from "../../hooks/usePageMeta";
 import { useCompanyInfo } from "../../hooks/useCompanyInfo";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import type { PublicRouteDto } from "../../types/booking";
-import type { PublicVehicleDto } from "../../types/publicVehicle";
 import type { PublicLocationsDto } from "../../types/location";
 
 const ServiceAreaMap = lazy(() => import("../../components/ServiceAreaMap"));
@@ -44,12 +42,10 @@ function HomePage() {
   const company = useCompanyInfo();
 
   const [routes, setRoutes] = useState<PublicRouteDto[]>([]);
-  const [vehicles, setVehicles] = useState<PublicVehicleDto[]>([]);
   const [locationsData, setLocationsData] = useState<PublicLocationsDto | null>(null);
 
   useEffect(() => {
     getActiveRoutes().then(setRoutes).catch(() => undefined);
-    getActiveVehicles().then(setVehicles).catch(() => undefined);
     getLocations().then(setLocationsData).catch(() => undefined);
   }, []);
 
@@ -57,7 +53,6 @@ function HomePage() {
   const trustReveal = useScrollReveal<HTMLElement>();
   const routesReveal = useScrollReveal<HTMLElement>();
   const mapReveal = useScrollReveal<HTMLElement>();
-  const fleetReveal = useScrollReveal<HTMLElement>();
   const experienceReveal = useScrollReveal<HTMLElement>();
   const chauffeurReveal = useScrollReveal<HTMLElement>();
   const whyUsReveal = useScrollReveal<HTMLElement>();
@@ -65,7 +60,6 @@ function HomePage() {
   const contactTeaserReveal = useScrollReveal<HTMLElement>();
   const finalHeroReveal = useScrollReveal<HTMLElement>();
 
-  const featuredVehicle = vehicles[0];
 
   return (
     <div>
@@ -147,28 +141,6 @@ function HomePage() {
                 height={380}
               />
             </Suspense>
-          </div>
-        </section>
-      )}
-
-      {featuredVehicle && (
-        <section ref={fleetReveal.ref} className={`noir-section noir-section--deep ${fleetReveal.className}`}>
-          <div className="container">
-            <div className={`fleet-cinematic ${fleetReveal.className}`}>
-              <div>
-                <p className="fleet-cinematic__label">{t("nav.fleet")}</p>
-                <h2 className="fleet-cinematic__name">
-                  <span style={{ display: "block" }}>{featuredVehicle.make}</span>
-                  <span style={{ display: "block" }}>{featuredVehicle.model}</span>
-                </h2>
-                <div className="row" style={{ marginTop: "var(--space-6)" }}>
-                  <Link to="/fleet" className="cta-noir cta-noir--outline">{t("routesTeaser.viewAll")}</Link>
-                  <Link to="/booking" className="cta-noir cta-noir--solid">
-                    {t("fleetTeaser.bookYourJourney")}<span aria-hidden="true"> &rarr;</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
       )}

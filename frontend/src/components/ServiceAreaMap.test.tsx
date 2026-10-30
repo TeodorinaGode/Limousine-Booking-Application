@@ -92,11 +92,11 @@ describe("ServiceAreaMap", () => {
     expect(screen.getAllByTestId("polyline")).toHaveLength(2);
   });
 
-  it("shows available destinations with price for a departure location, in a marker popup", () => {
+  it("shows available destinations for a departure location, in a marker popup", () => {
     renderMap();
 
-    expect(screen.getByText(/Zurich · CHF 180/)).toBeInTheDocument();
-    expect(screen.getByText(/Milan · CHF 600/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Zurich" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Milan" })).toBeInTheDocument();
   });
 
   it("shows a generic booking link, not a route list, for a location with no departing routes", () => {
@@ -110,7 +110,7 @@ describe("ServiceAreaMap", () => {
     const user = userEvent.setup();
     renderMap();
 
-    await user.click(screen.getByText(/Zurich · CHF 180/));
+    await user.click(screen.getByRole("button", { name: "Zurich" }));
 
     expect(await screen.findByTestId("probe")).toBeInTheDocument();
     expect(capturedLocationState).toEqual({ routeId: "route-1" });

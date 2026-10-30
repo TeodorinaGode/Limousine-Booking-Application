@@ -163,7 +163,7 @@ function ServiceAreaMap({ locations, routes, defaultLatitude, defaultLongitude, 
                             className="map-popup__route-button"
                             onClick={() => handleBookRoute(matched.route.id)}
                           >
-                            {matched.to.name} &middot; {matched.route.currency} {matched.route.price.toFixed(0)}
+                            {matched.to.name}
                           </button>
                         ))}
                       </div>

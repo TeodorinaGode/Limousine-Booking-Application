@@ -100,12 +100,6 @@ function RoutesPage() {
                       <span className="trip-card__arrow">&rarr;</span>
                       <span>{route.destination}</span>
                     </div>
-                    <p className="content-card__meta">
-                      <span>{t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m</span>
-                    </p>
-                    <p className="trip-card__price" style={{ marginTop: 0 }}>
-                      {t("routesTeaser.from")} {route.price.toFixed(2)} {route.currency}
-                    </p>
                     <Link
                       to="/booking"
                       state={{ routeId: route.id }}
@@ -126,11 +120,6 @@ function RoutesPage() {
                     <span>{route.departureLocation}</span>
                     <span className="route-editorial__arrow">&rarr;</span>
                     <span>{route.destination}</span>
-                  </div>
-                  <div className="route-editorial__details">
-                    {t("routesTeaser.duration")}: {Math.floor(route.estimatedDurationMinutes / 60)}h {route.estimatedDurationMinutes % 60}m
-                    {" · "}
-                    {t("routesTeaser.from")} {route.price.toFixed(2)} {route.currency}
                   </div>
                 </Link>
               ))}

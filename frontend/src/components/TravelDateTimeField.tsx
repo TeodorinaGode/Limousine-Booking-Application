@@ -97,12 +97,12 @@ function TravelDateTimeField({ date, time, minDate, onApply, dateLabel, timeLabe
             </Suspense>
           </div>
 
-          <div className="form-group" style={{ marginTop: "var(--space-4)" }}>
+          <div className="form-group" style={{ marginTop: "var(--space-2)" }}>
             <label htmlFor="widget-time-input">{resolvedTimeLabel}</label>
             <input id="widget-time-input" type="time" value={pendingTime} onChange={(e) => setPendingTime(e.target.value)} />
           </div>
 
-          <div className="row" style={{ justifyContent: "flex-end", marginTop: "var(--space-4)" }}>
+          <div className="row" style={{ justifyContent: "flex-end", marginTop: "var(--space-3)" }}>
             <button type="button" className="btn-secondary" onClick={() => setIsOpen(false)}>
               {t("widget.cancel")}
             </button>

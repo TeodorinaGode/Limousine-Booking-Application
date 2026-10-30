@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 
 interface ModalProps {
@@ -75,7 +76,7 @@ function Modal({ title, onClose, children }: ModalProps) {
     };
   }, []);
 
-  return (
+  return createPortal(
     <div
       style={overlayStyle}
       role="presentation"
@@ -93,7 +94,8 @@ function Modal({ title, onClose, children }: ModalProps) {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -2069,15 +2069,15 @@ tbody tr:last-child td {
   --rdp-outside-opacity: 0.5;
   /* Shrink the default 44px cells — sized for a full-page calendar, too
      large inside a compact booking-widget modal. */
-  --rdp-day-height: 34px;
-  --rdp-day-width: 34px;
-  --rdp-day_button-height: 32px;
-  --rdp-day_button-width: 32px;
-  --rdp-nav_button-height: 1.75rem;
-  --rdp-nav_button-width: 1.75rem;
-  --rdp-nav-height: 2rem;
-  --rdp-weekday-padding: 0.25rem 0rem;
-  font-size: 0.85rem;
+  --rdp-day-height: 28px;
+  --rdp-day-width: 28px;
+  --rdp-day_button-height: 26px;
+  --rdp-day_button-width: 26px;
+  --rdp-nav_button-height: 1.5rem;
+  --rdp-nav_button-width: 1.5rem;
+  --rdp-nav-height: 1.75rem;
+  --rdp-weekday-padding: 0.1rem 0rem;
+  font-size: 0.78rem;
   color: var(--color-text-primary);
 }
 .app-datepicker .rdp-weekday {

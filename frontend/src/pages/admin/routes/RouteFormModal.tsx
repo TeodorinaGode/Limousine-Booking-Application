@@ -17,11 +17,17 @@ interface RouteFormModalProps {
   onClose: () => void;
 }
 
+// Routes no longer collect this through the form (admin decision — see
+// RoutesPage history), but it's still real, required backend data used for
+// driver-assignment conflict scheduling. New routes get this fixed fallback;
+// editing an existing route never touches/overwrites its real value.
+const DEFAULT_ESTIMATED_DURATION_MINUTES = 60;
+
 function toFormValues(route?: RouteDto): RouteFormValues {
   return {
     departureLocation: route?.departureLocation ?? "",
     destination: route?.destination ?? "",
-    estimatedDurationMinutes: route?.estimatedDurationMinutes ?? 0,
+    estimatedDurationMinutes: route?.estimatedDurationMinutes ?? DEFAULT_ESTIMATED_DURATION_MINUTES,
     price: route?.price ?? 0,
     currency: route?.currency ?? "CHF",
     isActive: route?.isActive ?? true,
@@ -33,9 +39,6 @@ function validate(values: RouteFormValues): Record<string, string> {
 
   if (!values.departureLocation.trim()) errors.departureLocation = "Departure location is required.";
   if (!values.destination.trim()) errors.destination = "Destination is required.";
-  if (!Number.isFinite(values.estimatedDurationMinutes) || values.estimatedDurationMinutes <= 0) {
-    errors.estimatedDurationMinutes = "Estimated duration must be greater than zero.";
-  }
   if (!Number.isFinite(values.price) || values.price < 0) errors.price = "Price must not be negative.";
   if (!values.currency.trim()) errors.currency = "Currency is required.";
 
@@ -93,18 +96,6 @@ function RouteFormModal({ route, onSave, onClose }: RouteFormModalProps) {
             onChange={(e) => setValues({ ...values, destination: e.target.value })}
           />
           {errors.destination && <p className="form-error">{errors.destination}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="estimatedDurationMinutes">Estimated duration (minutes)</label>
-          <br />
-          <input
-            id="estimatedDurationMinutes"
-            type="number"
-            value={values.estimatedDurationMinutes}
-            onChange={(e) => setValues({ ...values, estimatedDurationMinutes: Number(e.target.value) })}
-          />
-          {errors.estimatedDurationMinutes && <p className="form-error">{errors.estimatedDurationMinutes}</p>}
         </div>
 
         <div>

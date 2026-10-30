@@ -3,6 +3,11 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import TravelDateTimeField from "./TravelDateTimeField";
 
+// The calendar chunk's dynamic import() can occasionally exceed the default
+// findBy* timeout under a heavily parallel full-suite run (not in isolation)
+// — same mitigation already applied to BookingPage.test.tsx.
+vi.setConfig({ testTimeout: 15000 });
+
 describe("TravelDateTimeField", () => {
   it("shows placeholders when no date/time is set", () => {
     render(<TravelDateTimeField date="" time="" onApply={vi.fn()} />);
@@ -35,8 +40,11 @@ describe("TravelDateTimeField", () => {
     await user.click(screen.getByRole("button", { name: "Date" }));
     const dialog = screen.getByRole("dialog", { name: "Date of travel" });
 
-    await user.click(await within(dialog).findByRole("button", { name: /June 18th, 2026/ }, { timeout: 3000 }));
-    await user.type(within(dialog).getByLabelText("Time"), "09:15");
+    await user.click(await within(dialog).findByRole("button", { name: /June 18th, 2026/ }, { timeout: 5000 }));
+    const hourCol = within(dialog).getByRole("group", { name: "Hour" });
+    const minuteCol = within(dialog).getByRole("group", { name: "Minute" });
+    await user.click(within(hourCol).getByRole("button", { name: "09" }));
+    await user.click(within(minuteCol).getByRole("button", { name: "15" }));
     await user.click(within(dialog).getByRole("button", { name: "Apply" }));
 
     expect(onApply).toHaveBeenCalledWith("2026-06-18", "09:15");
@@ -50,7 +58,7 @@ describe("TravelDateTimeField", () => {
 
     await user.click(screen.getByRole("button", { name: "Date" }));
     const dialog = screen.getByRole("dialog", { name: "Date of travel" });
-    await user.click(await within(dialog).findByRole("button", { name: /June 25th, 2026/ }, { timeout: 3000 }));
+    await user.click(await within(dialog).findByRole("button", { name: /June 25th, 2026/ }, { timeout: 5000 }));
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
     expect(onApply).not.toHaveBeenCalled();
@@ -65,7 +73,7 @@ describe("TravelDateTimeField", () => {
     await user.click(screen.getByRole("button", { name: "Date" }));
     const dialog = screen.getByRole("dialog", { name: "Date of travel" });
 
-    expect(await within(dialog).findByRole("button", { name: /June 10th, 2026/ }, { timeout: 3000 })).toBeDisabled();
+    expect(await within(dialog).findByRole("button", { name: /June 10th, 2026/ }, { timeout: 5000 })).toBeDisabled();
     expect(within(dialog).getByRole("button", { name: /June 20th, 2026/ })).toBeEnabled();
   });
 });

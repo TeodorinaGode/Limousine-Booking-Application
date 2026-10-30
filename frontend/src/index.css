@@ -2109,6 +2109,64 @@ tbody tr:last-child td {
   border-radius: var(--radius-sm);
 }
 
+.form-group__label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+/* Custom hour/minute picker replacing <input type="time"> inside the
+   date-of-travel modal — avoids the browser's native time dropdown, whose
+   OS-rendered light styling clashes with this modal's dark theme. */
+.time-select {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+.time-select__col {
+  flex: 1;
+  max-height: 170px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scroll-behavior: smooth;
+}
+.time-select__sep {
+  align-self: center;
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+.time-select__option {
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.4em 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.time-select__option:hover {
+  background: var(--color-surface-hover);
+}
+.time-select__option--selected {
+  background: var(--color-accent-strong);
+  color: #0d0d0d;
+  font-weight: 700;
+}
+
 @media (max-width: 480px) {
   .hero-widget__details-row {
     flex-direction: column;

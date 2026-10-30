@@ -66,9 +66,11 @@ async function fillStep1(user: ReturnType<typeof userEvent.setup>) {
 
   await user.click(screen.getByRole("button", { name: "Booking date" }));
   const dialog = screen.getByRole("dialog", { name: "Date of travel" });
-  await user.click(await within(dialog).findByRole("button", { name: "Go to the Next Month" }, { timeout: 3000 }));
-  await user.click(await within(dialog).findByRole("button", { name: /15th/ }, { timeout: 3000 }));
-  await user.type(within(dialog).getByLabelText("Pickup time"), "14:30");
+  await user.click(await within(dialog).findByRole("button", { name: "Go to the Next Month" }, { timeout: 5000 }));
+  await user.click(await within(dialog).findByRole("button", { name: /15th/ }, { timeout: 5000 }));
+  const timeGroup = within(dialog).getByRole("group", { name: "Pickup time" });
+  await user.click(within(within(timeGroup).getByRole("group", { name: "Hour" })).getByRole("button", { name: "14" }));
+  await user.click(within(within(timeGroup).getByRole("group", { name: "Minute" })).getByRole("button", { name: "30" }));
   await user.click(within(dialog).getByRole("button", { name: "Apply" }));
 
   await user.click(screen.getByRole("button", { name: "Next" }));

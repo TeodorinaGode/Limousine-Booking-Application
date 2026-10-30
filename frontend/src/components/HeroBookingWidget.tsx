@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import TravelDateTimeField from "./TravelDateTimeField";
 import type { PublicRouteDto } from "../types/booking";
 
 interface HeroBookingWidgetProps {
@@ -9,6 +10,11 @@ interface HeroBookingWidgetProps {
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function todayDateOnly(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 /**
@@ -103,15 +109,15 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
         </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="widget-date">{t("widget.date")}</label>
-        <input id="widget-date" type="date" value={bookingDate} min={todayIso()} onChange={(e) => setBookingDate(e.target.value)} />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="widget-time">{t("widget.time")}</label>
-        <input id="widget-time" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
-      </div>
+      <TravelDateTimeField
+        date={bookingDate}
+        time={pickupTime}
+        minDate={todayDateOnly()}
+        onApply={(date, time) => {
+          setBookingDate(date);
+          setPickupTime(time);
+        }}
+      />
 
       <div className="form-group">
         <label htmlFor="widget-passengers">{t("widget.passengers")}</label>

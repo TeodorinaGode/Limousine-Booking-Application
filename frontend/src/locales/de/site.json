@@ -25,7 +25,12 @@
     "time": "Uhrzeit",
     "passengers": "Passagiere",
     "checkAvailability": "Verfügbarkeit prüfen",
-    "selectRoute": "Strecke wählen"
+    "selectRoute": "Strecke wählen",
+    "selectDate": "Datum wählen",
+    "selectTime": "Uhrzeit wählen",
+    "dateOfTravel": "Reisedatum",
+    "apply": "Übernehmen",
+    "cancel": "Abbrechen"
   },
   "trust": {
     "chauffeur": {

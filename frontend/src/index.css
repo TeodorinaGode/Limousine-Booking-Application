@@ -1980,6 +1980,67 @@ tbody tr:last-child td {
   opacity: 0.35;
   cursor: not-allowed;
 }
+.date-time-trigger {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  text-align: left;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6em 0.75em;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.date-time-trigger:hover {
+  border-color: var(--color-border-light);
+  background: var(--color-surface-elevated);
+}
+
+/* Theme react-day-picker to match this app's dark palette — the library
+   ships a light-mode default (blue accent, near-white backgrounds), themed
+   entirely through its documented --rdp-* custom properties plus a handful
+   of direct color overrides for parts the variables don't cover. */
+.app-datepicker .rdp-root {
+  --rdp-accent-color: var(--color-accent-strong);
+  --rdp-accent-background-color: var(--color-surface-elevated);
+  --rdp-today-color: var(--color-accent-strong);
+  --rdp-disabled-opacity: 0.35;
+  --rdp-outside-opacity: 0.5;
+  color: var(--color-text-primary);
+}
+.app-datepicker .rdp-weekday {
+  color: var(--color-text-muted);
+}
+.app-datepicker .rdp-caption_label,
+.app-datepicker .rdp-month_caption {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+.app-datepicker .rdp-day_button {
+  color: var(--color-text-primary);
+}
+.app-datepicker .rdp-day_button:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+.app-datepicker .rdp-selected .rdp-day_button {
+  background: var(--color-accent-strong);
+  color: #0d0d0d;
+  font-weight: 700;
+}
+.app-datepicker .rdp-button_previous,
+.app-datepicker .rdp-button_next {
+  color: var(--color-text-secondary);
+}
+.app-datepicker .rdp-button_previous:hover:not([aria-disabled="true"]),
+.app-datepicker .rdp-button_next:hover:not([aria-disabled="true"]) {
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+}
+
 @media (max-width: 900px) {
   .hero-widget {
     grid-template-columns: repeat(2, 1fr);

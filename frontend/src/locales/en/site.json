@@ -25,7 +25,12 @@
     "time": "Time",
     "passengers": "Passengers",
     "checkAvailability": "Check Availability",
-    "selectRoute": "Select a route"
+    "selectRoute": "Select a route",
+    "selectDate": "Select a date",
+    "selectTime": "Select a time",
+    "dateOfTravel": "Date of travel",
+    "apply": "Apply",
+    "cancel": "Cancel"
   },
   "trust": {
     "chauffeur": {

@@ -74,8 +74,8 @@ describe("HeroBookingWidget", () => {
   it("defaults the date field to today", () => {
     renderWidget();
 
-    const todayIso = new Date().toISOString().slice(0, 10);
-    expect(screen.getByLabelText("Date")).toHaveValue(todayIso);
+    const todayDayOfMonth = String(new Date().getDate());
+    expect(screen.getByRole("button", { name: "Date" })).toHaveTextContent(todayDayOfMonth);
   });
 
   it("disables swap when the reverse trip isn't a real route", async () => {

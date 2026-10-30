@@ -54,7 +54,6 @@ function HomePage() {
   const routesReveal = useScrollReveal<HTMLElement>();
   const mapReveal = useScrollReveal<HTMLElement>();
   const experienceReveal = useScrollReveal<HTMLElement>();
-  const chauffeurReveal = useScrollReveal<HTMLElement>();
   const whyUsReveal = useScrollReveal<HTMLElement>();
   const howItWorksReveal = useScrollReveal<HTMLElement>();
   const contactTeaserReveal = useScrollReveal<HTMLElement>();
@@ -152,20 +151,6 @@ function HomePage() {
             {(t("noir.experience.words", { returnObjects: true }) as string[]).map((word) => (
               <span className="strong" key={word} style={{ display: "block" }}>{word}</span>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section ref={chauffeurReveal.ref} className={`section section--elevated ${chauffeurReveal.className}`}>
-        <div className="container row" style={{ alignItems: "center", gap: "var(--space-8)", flexWrap: "wrap" }}>
-          <div className="noir-portrait" style={{ flex: "1 1 320px" }} role="img" aria-label={t("noir.chauffeur.title1")} />
-          <div style={{ flex: "1 1 320px" }}>
-            <h2 className="noir-heading">
-              <span className="light">{t("noir.chauffeur.title1")}</span>
-              <span className="strong">{t("noir.chauffeur.title2")}</span>
-              <span className="strong">{t("noir.chauffeur.title3")}</span>
-            </h2>
-            <p className="text-secondary" style={{ marginTop: "var(--space-4)" }}>{t("noir.chauffeur.body")}</p>
           </div>
         </div>
       </section>

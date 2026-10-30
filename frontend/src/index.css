@@ -3124,16 +3124,6 @@ tbody tr:last-child td {
   line-height: 0.95;
 }
 
-/* ---- Chauffeur / experience dark sections ---- */
-.noir-portrait {
-  border-radius: var(--radius-lg);
-  min-height: 360px;
-  background:
-    radial-gradient(ellipse 500px 400px at 30% 20%, rgba(199, 199, 199, 0.07), transparent 60%),
-    linear-gradient(160deg, var(--noir-3), var(--noir-0));
-  border: 1px solid var(--color-border);
-}
-
 /* ---- Operating-area staggered country reveal ---- */
 .operating-list {
   list-style: none;

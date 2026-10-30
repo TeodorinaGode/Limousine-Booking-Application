@@ -13,7 +13,7 @@
     "eyebrow": "Premium-Chauffeurservice",
     "title1": "Luxuriöses Reisen.",
     "title2": "Mit Sorgfalt begleitet.",
-    "subtitle": "Premium-Chauffeurtransfers in der Schweiz und in ganz Europa.",
+    "subtitle": "Premium-Chauffeurtransfers in der ganzen Schweiz.",
     "ctaPrimary": "Fahrt buchen",
     "ctaSecondary": "Unsere Leistungen entdecken"
   },
@@ -144,11 +144,11 @@
     "title": "Häufig gestellte Fragen",
     "q1": {
       "question": "Wie arbeiten Sie?",
-      "answer": "Wir bieten privaten Chauffeurtransport mit professionellen, lizenzierten Fahrern in der Schweiz und den Nachbarländern. Sie können online buchen, Strecke, Datum und Uhrzeit wählen und sicher bezahlen — ganz ohne Anruf."
+      "answer": "Wir bieten privaten Chauffeurtransport mit professionellen, lizenzierten Fahrern in der ganzen Schweiz. Sie können online buchen, Strecke, Datum und Uhrzeit wählen und sicher bezahlen — ganz ohne Anruf."
     },
     "q2": {
       "question": "In welchen Ländern sind Sie tätig?",
-      "answer": "Wir sind in der Schweiz, Österreich, Italien, Deutschland, Frankreich, Belgien und Luxemburg tätig."
+      "answer": "Wir sind in der Schweiz tätig."
     },
     "q3": {
       "question": "Welche Fahrzeuge bieten Sie an?",
@@ -225,7 +225,7 @@
   "backToTop": "Nach oben",
   "operatingArea": {
     "title": "Unser Einsatzgebiet",
-    "subtitle": "Wir betreuen Kunden in ganz Europa.",
+    "subtitle": "Wir betreuen Kunden in der ganzen Schweiz.",
     "countries": {
       "CH": "Schweiz",
       "AT": "Österreich",
@@ -243,7 +243,7 @@
   "serviceAreaMap": {
     "eyebrow": "Unser Einsatzgebiet",
     "title": "Chauffeurservice in der Schweiz",
-    "subtitle": "Von der Schweiz zu wichtigen Zielen in ganz Europa — Limousinen bietet Premium-Chauffeurtransport für Geschäfts- und Privatreisen.",
+    "subtitle": "Limousinen bietet Premium-Chauffeurtransport in der ganzen Schweiz für Geschäfts- und Privatreisen.",
     "regionLabel": "Interaktive Karte des Einsatzgebiets von Limousinen",
     "availableDestinations": "Verfügbare Ziele",
     "bookThisRoute": "Diese Strecke buchen",

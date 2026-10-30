@@ -13,7 +13,7 @@
     "eyebrow": "Service de chauffeur premium",
     "title1": "Voyagez dans le luxe.",
     "title2": "Pris en charge avec soin.",
-    "subtitle": "Transferts privés premium en Suisse et à travers l'Europe.",
+    "subtitle": "Transferts privés premium dans toute la Suisse.",
     "ctaPrimary": "Réserver un trajet",
     "ctaSecondary": "Découvrir nos services"
   },
@@ -144,11 +144,11 @@
     "title": "Questions fréquentes",
     "q1": {
       "question": "Comment fonctionnez-vous ?",
-      "answer": "Nous proposons un transport privé avec chauffeur, assuré par des conducteurs professionnels et licenciés, en Suisse et dans les pays voisins. Vous pouvez réserver en ligne, choisir votre trajet, la date et l'heure, puis payer en toute sécurité — sans appel téléphonique."
+      "answer": "Nous proposons un transport privé avec chauffeur, assuré par des conducteurs professionnels et licenciés, dans toute la Suisse. Vous pouvez réserver en ligne, choisir votre trajet, la date et l'heure, puis payer en toute sécurité — sans appel téléphonique."
     },
     "q2": {
       "question": "Dans quels pays intervenez-vous ?",
-      "answer": "Nous intervenons en Suisse, en Autriche, en Italie, en Allemagne, en France, en Belgique et au Luxembourg."
+      "answer": "Nous intervenons en Suisse."
     },
     "q3": {
       "question": "Quels véhicules proposez-vous ?",
@@ -225,7 +225,7 @@
   "backToTop": "Retour en haut",
   "operatingArea": {
     "title": "Notre zone d'intervention",
-    "subtitle": "Au service de nos clients à travers l'Europe.",
+    "subtitle": "Au service de nos clients dans toute la Suisse.",
     "countries": {
       "CH": "Suisse",
       "AT": "Autriche",
@@ -243,7 +243,7 @@
   "serviceAreaMap": {
     "eyebrow": "Notre zone de service",
     "title": "Service de chauffeur en Suisse",
-    "subtitle": "De la Suisse vers les principales destinations européennes, Limousinen propose un transport premium avec chauffeur pour vos voyages professionnels et privés.",
+    "subtitle": "Limousinen propose un transport premium avec chauffeur dans toute la Suisse pour vos voyages professionnels et privés.",
     "regionLabel": "Carte interactive de la zone de service de Limousinen",
     "availableDestinations": "Destinations disponibles",
     "bookThisRoute": "Réserver ce trajet",

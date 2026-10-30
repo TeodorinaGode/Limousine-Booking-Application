@@ -92,13 +92,6 @@ describe("HomePage", () => {
     expect(screen.getAllByText("Premium Vehicles").length).toBeGreaterThan(0);
   });
 
-  it("shows the real operating countries, sourced from the backend", async () => {
-    renderPage();
-
-    expect(await screen.findByText("Switzerland")).toBeInTheDocument();
-    expect(screen.getByText("Austria")).toBeInTheDocument();
-  });
-
   it("loads and displays popular routes from the backend, never hard-coded", async () => {
     const user = userEvent.setup();
     renderPage();

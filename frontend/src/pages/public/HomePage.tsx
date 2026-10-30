@@ -62,7 +62,6 @@ function HomePage() {
   const chauffeurReveal = useScrollReveal<HTMLElement>();
   const whyUsReveal = useScrollReveal<HTMLElement>();
   const howItWorksReveal = useScrollReveal<HTMLElement>();
-  const operatingAreaReveal = useScrollReveal<HTMLElement>();
   const contactTeaserReveal = useScrollReveal<HTMLElement>();
   const finalHeroReveal = useScrollReveal<HTMLElement>();
 
@@ -229,24 +228,6 @@ function HomePage() {
           ))}
         </div>
       </section>
-
-      {company && company.operatingCountryCodes.length > 0 && (
-        <section ref={operatingAreaReveal.ref} className={`noir-section noir-section--black ${operatingAreaReveal.className}`}>
-          <div className="container section--center">
-            <h2 className="noir-heading">
-              <span className="strong">{t("noir.operatingArea.title1")}</span>
-              <span className="light">{t("noir.operatingArea.title2")}</span>
-            </h2>
-          </div>
-          <div className="container" style={{ marginTop: "var(--space-8)" }}>
-            <ul className={`operating-list reveal-lines ${operatingAreaReveal.className}`}>
-              {company.operatingCountryCodes.map((code) => (
-                <li key={code}>{t(`operatingArea.countries.${code}`, { defaultValue: code })}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
 
       {company && (
         <section ref={contactTeaserReveal.ref} className={`noir-section noir-section--deep section--center ${contactTeaserReveal.className}`}>

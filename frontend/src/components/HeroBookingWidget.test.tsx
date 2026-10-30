@@ -55,7 +55,7 @@ describe("HeroBookingWidget", () => {
     await user.selectOptions(screen.getByLabelText("To"), "Zurich");
     await user.clear(screen.getByLabelText("Passengers"));
     await user.type(screen.getByLabelText("Passengers"), "3");
-    await user.click(screen.getByRole("button", { name: "Check Availability" }));
+    await user.click(screen.getByRole("button", { name: "Book Now" }));
 
     expect(await screen.findByTestId("probe")).toBeInTheDocument();
     expect(capturedLocationState).toMatchObject({ routeId: "route-1", passengerCount: 3 });
@@ -65,7 +65,7 @@ describe("HeroBookingWidget", () => {
     const user = userEvent.setup();
     renderWidget();
 
-    await user.click(screen.getByRole("button", { name: "Check Availability" }));
+    await user.click(screen.getByRole("button", { name: "Book Now" }));
 
     expect(await screen.findByTestId("probe")).toBeInTheDocument();
     expect(capturedLocationState).toMatchObject({ routeId: undefined });

@@ -76,9 +76,6 @@ function HomePage() {
             <Link to="/booking" className="cta-noir cta-noir--solid">
               {t("noir.ctaBeginJourney")}<span aria-hidden="true"> &rarr;</span>
             </Link>
-            <Link to="/services" className="cta-noir cta-noir--outline">
-              {t("hero.ctaSecondary")}
-            </Link>
           </div>
         </div>
       </section>

@@ -67,13 +67,12 @@ beforeEach(() => {
 });
 
 describe("HomePage", () => {
-  it("renders the hero with the primary and secondary calls to action", () => {
+  it("renders the hero with the primary call to action", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("In Silence.");
     expect(screen.getAllByRole("link", { name: "Book a Ride" }).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: "Begin Your Journey" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Explore Our Services" })).toBeInTheDocument();
   });
 
   it("shows the trust indicators", () => {

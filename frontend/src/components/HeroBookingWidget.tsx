@@ -76,15 +76,35 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
 
   return (
     <form className="hero-widget fade-in" onSubmit={handleSubmit} aria-label={t("widget.checkAvailability")}>
-      <div className="hero-widget__route-pair">
-        <div className="form-group">
-          <label htmlFor="widget-from">{t("widget.from")}</label>
-          <select id="widget-from" value={from} onChange={(e) => { setFrom(e.target.value); setTo(""); }}>
-            <option value="">{t("widget.selectRoute")}</option>
-            {fromOptions.map((location) => (
-              <option key={location} value={location}>{location}</option>
-            ))}
-          </select>
+      <div className="hero-widget__route-card">
+        <div className="hero-widget__route-stack">
+          <div className="hero-widget__route-row">
+            <span className="hero-widget__route-dot" aria-hidden="true" />
+            <div className="form-group">
+              <label htmlFor="widget-from">{t("widget.from")}</label>
+              <select id="widget-from" value={from} onChange={(e) => { setFrom(e.target.value); setTo(""); }}>
+                <option value="">{t("widget.selectRoute")}</option>
+                {fromOptions.map((location) => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="hero-widget__route-connector" aria-hidden="true" />
+
+          <div className="hero-widget__route-row">
+            <span className="hero-widget__route-dot hero-widget__route-dot--filled" aria-hidden="true" />
+            <div className="form-group">
+              <label htmlFor="widget-to">{t("widget.to")}</label>
+              <select id="widget-to" value={to} onChange={(e) => setTo(e.target.value)} disabled={!from}>
+                <option value="">{t("widget.selectRoute")}</option>
+                {toOptions.map((location) => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         <button
@@ -97,40 +117,32 @@ function HeroBookingWidget({ routes }: HeroBookingWidgetProps) {
         >
           &#8646;
         </button>
+      </div>
+
+      <div className="hero-widget__details-row">
+        <TravelDateTimeField
+          date={bookingDate}
+          time={pickupTime}
+          minDate={todayDateOnly()}
+          onApply={(date, time) => {
+            setBookingDate(date);
+            setPickupTime(time);
+          }}
+        />
 
         <div className="form-group">
-          <label htmlFor="widget-to">{t("widget.to")}</label>
-          <select id="widget-to" value={to} onChange={(e) => setTo(e.target.value)} disabled={!from}>
-            <option value="">{t("widget.selectRoute")}</option>
-            {toOptions.map((location) => (
-              <option key={location} value={location}>{location}</option>
-            ))}
-          </select>
+          <label htmlFor="widget-passengers">{t("widget.passengers")}</label>
+          <input
+            id="widget-passengers"
+            type="number"
+            min={1}
+            value={passengerCount}
+            onChange={(e) => setPassengerCount(Number(e.target.value))}
+          />
         </div>
+
+        <button type="submit" className="hero-widget__submit">{t("widget.checkAvailability")}</button>
       </div>
-
-      <TravelDateTimeField
-        date={bookingDate}
-        time={pickupTime}
-        minDate={todayDateOnly()}
-        onApply={(date, time) => {
-          setBookingDate(date);
-          setPickupTime(time);
-        }}
-      />
-
-      <div className="form-group">
-        <label htmlFor="widget-passengers">{t("widget.passengers")}</label>
-        <input
-          id="widget-passengers"
-          type="number"
-          min={1}
-          value={passengerCount}
-          onChange={(e) => setPassengerCount(Number(e.target.value))}
-        />
-      </div>
-
-      <button type="submit" className="hero-widget__submit">{t("widget.checkAvailability")}</button>
     </form>
   );
 }

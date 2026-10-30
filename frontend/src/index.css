@@ -1924,14 +1924,9 @@ tbody tr:last-child td {
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
-  display: grid;
-  /* 5 equal fields, then a 6th column sized to the submit button's own
-     content — it used to share a single 1fr column with the passengers
-     input (via an inline flex hack) and had nowhere to go but to overflow
-     the widget's right edge. */
-  grid-template-columns: repeat(5, 1fr) auto;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
-  align-items: end;
   max-width: 980px;
   margin: 0 auto;
   text-align: left;
@@ -1939,27 +1934,74 @@ tbody tr:last-child td {
 .hero-widget .form-group {
   margin-bottom: 0;
 }
-.hero-widget__submit {
-  white-space: nowrap;
-}
-.hero-widget__route-pair {
-  grid-column: span 2;
+
+/* ---- Route card: From/To stacked with a connecting line and a swap
+   button pinned to the card's right edge (inspired by sbb.ch's journey
+   search) — a self-contained card rather than two fields floating in the
+   widget's own grid, so the From→To relationship reads as one unit. ---- */
+.hero-widget__route-card {
   position: relative;
-  display: flex;
-  gap: var(--space-4);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  padding-right: calc(var(--space-4) + 2.75em);
 }
-.hero-widget__route-pair .form-group {
+.hero-widget__route-stack {
+  display: flex;
+  flex-direction: column;
+}
+.hero-widget__route-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.hero-widget__route-row .form-group {
   flex: 1;
   min-width: 0;
 }
-.hero-widget__swap {
+.hero-widget__route-row select {
+  border: none;
+  background: transparent;
+  padding: 0.3em 0;
+  font-weight: 600;
+  max-width: none;
+}
+.hero-widget__route-row select:focus-visible {
+  outline: none;
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+}
+.hero-widget__route-dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 2px solid var(--color-text-muted);
+  background: transparent;
+}
+.hero-widget__route-dot--filled {
+  border-color: var(--color-accent-strong);
+  background: var(--color-accent-strong);
+}
+.hero-widget__route-connector {
+  width: 1px;
+  height: 14px;
+  margin-left: 4px;
+  background: var(--color-border-light);
+}
+.hero-widget__route-card .hero-widget__swap {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  right: var(--space-3);
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-widget__swap {
   z-index: 1;
-  width: 2em;
-  height: 2em;
+  width: 2.25em;
+  height: 2.25em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1979,6 +2021,21 @@ tbody tr:last-child td {
 .hero-widget__swap:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+/* ---- Details row: date/time picker, passengers, submit ---- */
+.hero-widget__details-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-4);
+}
+.hero-widget__details-row .form-group {
+  flex: 1;
+  min-width: 140px;
+}
+.hero-widget__submit {
+  white-space: nowrap;
 }
 .date-time-trigger {
   display: block;
@@ -2041,25 +2098,13 @@ tbody tr:last-child td {
   border-radius: var(--radius-sm);
 }
 
-@media (max-width: 900px) {
-  .hero-widget {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 480px) {
+  .hero-widget__details-row {
+    flex-direction: column;
+    align-items: stretch;
   }
   .hero-widget__submit {
-    grid-column: 1 / -1;
-  }
-}
-@media (max-width: 480px) {
-  .hero-widget {
-    grid-template-columns: 1fr;
-  }
-  .hero-widget__route-pair {
-    flex-direction: column;
-  }
-  .hero-widget__swap {
-    top: auto;
-    bottom: calc(50% - 1em);
-    transform: translate(-50%, 50%) rotate(90deg);
+    width: 100%;
   }
 }
 

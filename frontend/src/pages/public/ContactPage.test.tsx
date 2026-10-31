@@ -105,12 +105,20 @@ describe("ContactPage", () => {
     });
   });
 
-  it("displays the fetched company phone and email as quick actions", async () => {
+  it("displays the fetched company phone as a quick action", async () => {
     renderPage();
 
     const callLink = await screen.findByRole("link", { name: "Call Us" });
     expect(callLink).toHaveAttribute("href", "tel:+41 79 000 00 00");
-    expect(screen.getByRole("link", { name: "Email Us" })).toHaveAttribute("href", "mailto:info@example.com");
+  });
+
+  it("focuses the contact form's name field when Email Us is clicked, instead of relying on a mailto: handoff", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(await screen.findByRole("button", { name: "Email Us" }));
+
+    expect(screen.getByLabelText("Name")).toHaveFocus();
   });
 
   it("submits the optional preferred contact method and date when provided", async () => {

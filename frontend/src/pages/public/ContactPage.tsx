@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { submitContactForm } from "../../services/contactService";
@@ -38,6 +38,11 @@ function ContactPage() {
   usePageMeta(`${t("contact.title")} | ${t("footer.description")}`, t("contact.subtitle"));
   const company = useCompanyInfo();
   const formReveal = useScrollReveal<HTMLElement>();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const focusContactForm = () => {
+    nameInputRef.current?.focus();
+  };
 
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -103,9 +108,14 @@ function ContactPage() {
               <a href={`tel:${company.phone}`} className="btn-secondary" style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}>
                 {t("contact.callUs")}
               </a>
-              <a href={`mailto:${company.email}`} className="btn-secondary" style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}>
+              <button
+                type="button"
+                onClick={focusContactForm}
+                className="btn-secondary"
+                style={{ display: "inline-block", padding: "0.6em 1.2em", borderRadius: "var(--radius-sm)" }}
+              >
                 {t("contact.emailUs")}
-              </a>
+              </button>
               <Link to="/booking" className="cta-noir cta-noir--solid">
                 {t("nav.bookARide")}<span aria-hidden="true"> &rarr;</span>
               </Link>
@@ -127,7 +137,13 @@ function ContactPage() {
                   <div className="form-group" style={{ flex: 1 }}>
                     <label htmlFor="contact-name">{t("contact.form.name")}</label>
                     <br />
-                    <input id="contact-name" type="text" value={values.name} onChange={(e) => setValues({ ...values, name: e.target.value })} />
+                    <input
+                      id="contact-name"
+                      ref={nameInputRef}
+                      type="text"
+                      value={values.name}
+                      onChange={(e) => setValues({ ...values, name: e.target.value })}
+                    />
                     {errors.name && <p className="form-error">{errors.name}</p>}
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
